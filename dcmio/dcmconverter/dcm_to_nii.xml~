@@ -1,0 +1,77 @@
+<pipeline>
+    <docstring>
+        Dicom to Nifti converter.
+
+        Wraps around the `dcm2nii` command.
+    </docstring>
+    <processes>
+        <standard name="config">
+            <module>dcmio.dcmconverter.dicom_utils.generate_config</module>
+            <force name="output_directory" value="Undefined"/>
+        </standard>
+        <standard name="converter">
+            <module>nipype.interfaces.dcm2nii.Dcm2nii</module>
+            <force name="anonymize" value="True"/>
+            <force name="source_names" value="Undefined"/>
+            <force name="collapse_folders" value="True"/>
+            <force name="gzip_output" value="True"/>
+            <force name="nii_output" value="True"/>
+            <force name="reorient" value="False"/>
+            <force name="reorient_and_crop" value="False"/>
+            <force name="events_in_filename" value="False"/>
+            <force name="date_in_filename" value="False"/>
+            <force name="id_in_filename" value="False"/>
+            <force name="protocol_in_filename" value="True"/>
+            <force name="source_in_filename" value="False"/>
+            <force name="terminal_output" value="stream"/>
+        </standard>
+        <standard name="fill">
+            <module>dcmio.dcmconverter.dicom_utils.add_meta_to_nii</module>
+            <force name="prefix" value="filled"/>
+            <force name="dcm_tags" value="[('TR', ('0x0018', '0x0080')),
+                                           ('TE', ('0x0018', '0x0081'))]"/>
+            <force name="output_directory" value="Undefined"/>
+        </standard>
+        <standard name="snap" processing="False">
+            <module>dcmio.dcmconverterv.dicom_utils.multi_snaps</module>
+            <force name="nb_snaps" value="7"/>
+            <force name="nb_volumes" value="5"/>
+            <force name="nb_snaps_per_page" value="5"/>
+            <force name="output_directory" value="Undefined"/>
+        </standard>
+    </processes>
+    <links>
+        <link src="output_directory" dest="converter.output_dir"/>
+        <link src="config.config_file" dest="converter.config_file"/>
+        <link src="converter._converted_files" dest="fill.nii_files"/>
+        <link src="source_dir" dest="fill.dicom_dir"/>
+        <link src="converter._converted_files" dest="snap.image_files"/>
+    </links>
+    <inputs>
+        <input name="source_dir" dest="converter.source_dir"/>
+        <input name="output_directory" dest="converter.output_directory"/>
+        <input name="reorient" dest="converter.reorient"/>
+        <input name="reorient_and_crop" dest="converter.reorient_and_crop"/>
+        <input name="dcm_tags" dest="fill.dcm_tags"/>
+        <input name="nb_snaps" dest="snap.nb_snaps"/>
+        <input name="nb_volumes" dest="snap.nb_volumes"/>
+    </inputs>
+    <outputs>
+        <output name="bvals" src="converter._bvals"/>
+        <output name="bvecs" src="converter._bvecs"/>
+        <output name="converted_files" src="converter._converted_files"/>
+        <output name="reoriented_and_cropped_files" src="converter._reoriented_and_cropped_files"/>
+        <output name="reoriented_files" src="converter._reoriented_files"/>
+        <output name="filled_converted_files" src="fill.filled_nii_files"/>
+        <output name="snap_files" src="snap.snap_files"/>
+    </outputs>
+    <positions>
+        <position process="inputs" x="0" y="0"/>
+        <position process="config" x="200" y="200"/>
+        <position process="converter" x="350" y="-200"/>
+        <position process="fill" x="600" y="200"/>
+        <position process="snap" x="800" y="-200"/>
+        <position process="outputs" x="1000" y="0"/>
+    </positions>
+    <scale factor="0.5"/> 
+</pipeline>
