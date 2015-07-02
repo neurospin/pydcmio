@@ -1,0 +1,33 @@
+<pipeline>
+    <docstring>
+        Dicom anonymizer pipeline
+    </docstring>
+    <processes>
+        <standard name="dcm_anon" processing="False">
+            <module>dcmio.dcmanonymizer.anonymizer.anonymize_dicom</module>
+            <force name="new_uid" value="'anonymous'" />
+            <force name="remove_curves" value="True" />
+            <force name="remove_private_tags" value="False" />
+            <force name="remove_overlays" value="True" />
+        </standard>
+    </processes>
+    <inputs>
+        <input name="dicom_file" dest="dcm_anon.input_file"/>
+        <input name="output_file" dest="dcm_anon.output_file"/>
+        <input name="generate_log" dest="dcm_anon.generate_log"/>
+        <input name="new_uid" dest="dcm_anon.new_uid"/>
+        <input name="remove_curves" dest="dcm_anon.remove_curves"/>
+        <input name="remove_private_tags" dest="dcm_anon.remove_private_tags"/>
+        <input name="remove_overlays" dest="dcm_anon.remove_overlays"/>
+    </inputs>
+    <outputs>
+        <output name="output_dicom" src="dcm_anon.output_dicom"/>
+        <output name="json_log" src="dcm_anon.json_log"/>
+    </outputs>
+    <positions>
+        <position process="inputs" x="0" y="0"/>
+        <position process="dcm_anon" x="342" y="-10"/>
+        <position process="outputs" x="613" y="175"/>
+    </positions>
+    <scale factor="1.0"/> 
+</pipeline>
