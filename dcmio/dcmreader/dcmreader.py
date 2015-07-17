@@ -1,59 +1,80 @@
 # Diverse dicom reading functions to extract precise information
 
 import dicom
+import os
+import logging
 
 
-def get_date_scan(path_to_dicom):
-    """
-    return session date as string
-    """
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        value = dataset[0x0008, 0x0022].value
-    except:
-        logging.warning("WARNING: no AcquisitionDate field")
-        value = '0'
-    return value
+# dataset Walker (to browse enhanced dicom efficiently)
+def walk(dataset, callback, _tag):
+    taglist = sorted(dataset.keys())
+    for tag in taglist:
+        data_element = dataset[tag]
+        out = callback(dataset, data_element, _tag)
+        if tag in dataset and data_element.VR == "SQ":
+            sequence = data_element.value
+            for sub_dataset in sequence:
+                out = walk(sub_dataset, callback, _tag)
+        if out:
+            return out
+
+    return None
+
+
+def walker_callback(dataset, data_element, _tag):
+    """Called from the dataset "walk" recursive function for
+    all data elements."""
+    if data_element.tag == _tag:
+        return data_element.value
+    return None
 
 
 def get_repetition_time(path_to_dicom):
     """
     return the repetition time as string
     """
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        value = dataset[0x0018, 0x0080].value
-    except:
-        logging.warning("WARNING: no RepetitionTime field")
-        value = '0'
-    return value
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    tr = walk(dataset, walker_callback, (0x0018, 0x0080))
+    if tr:
+        # convert in ms
+        if tr < 1000:
+            tr *= 1000.
+        return "{0}".format(tr)
+    return '0'
+
+
+def get_date_scan(path_to_dicom):
+    """
+    return session date as string
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0008, 0x0022))
+    if value:
+        return value
+    return '0'
 
 
 def get_echo_time(path_to_dicom):
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        value = dataset[0x0018, 0x0081].value
-    except:
-        logging.warning("WARNING: no EchoTime field in {0}".format(
-            path_to_dicom))
-        value = -1
-    return value
+    """
+    return echo time
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0018, 0x0081))
+    if value:
+        return value
+    return -1
 
 
 def get_SOP_storage_type(path_to_dicom):
     """
     return True for Enhanced storage, False otherwise
     """
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        value = dataset[0x0008, 0x0016].value
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0008, 0x0016))
+    if value:
         if "Enhanced" in str(value):
             return True
-        else:
-            return False
-    except:
-        logging.warning("WARNING: no 'SOPClassUID' field")
-        return False
+    return False
 
 
 def get_Raw_Data_Run_Number(path_to_dicom):
@@ -61,12 +82,83 @@ def get_Raw_Data_Run_Number(path_to_dicom):
     return value field
     WARNING: private field: designed for GE scan (LONDON IOP centre)
     """
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        return int(dataset[0x0019, 0x10a2].value)
-    except:
-        print "WARNING: no 'RawDataRunNumber' field"
-        return -1
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0019, 0x10a2))
+    if value:
+        return value
+    return -1
+
+
+def get_sequence_number(path_to_dicom):
+    """
+    return sequence Number
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0020, 0x0011))
+    if value:
+        return value
+    return '0'
+
+
+def get_nb_slices(path_to_dicom):
+    """
+    Return number of slices (ImagesInAcquisition)
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0020, 0x1002))
+    if value:
+        return int(value)
+    else:
+        value = walk(dataset, walker_callback, (0x2001, 0x1018))
+        if value:
+            return int(value)
+    return 0
+
+
+def get_nb_temporal_position(path_to_dicom):
+    """
+    Get number of volumes
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0020, 0x0105))
+    if value:
+        return int(value)
+    return 0
+
+
+def get_sequence_name(path_to_dicom):
+    """
+    get sequence name and format it
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0008, 0x103e))
+    if value:
+        return value.replace(" ", "_")
+    return "unknown"
+
+
+def get_protocol_name(path_to_dicom):
+    """
+    get protocol name
+    """
+
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0018, 0x1030))
+    if value:
+        return value.replace(" ", "_")
+    return "unknown"
+
+
+def get_serie_serieInstanceUID(path_to_dicom):
+    """
+    serie UID number
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0020, 0x000e))
+    if value:
+        return value.replace(" ", "_")
+    return "unknown"
+
 
 def get_number_of_slices_philips(path_to_dicom):
     """ return value of "NumberOfSlicesMR" field
@@ -95,68 +187,3 @@ def get_number_of_slices_philips(path_to_dicom):
     except:
         logging.warning("WARNING: no 'NumberOfSlicesMR' field")
         return 0
-
-def get_sequence_number(path_to_dicom):
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        serie_number = dataset[0x0020, 0x0011].value
-    except:
-        logging.warning("WARNING: no 'SeriesNumber' field")
-        serie_number = '0'
-    return serie_number
-
-
-def get_nb_slices(path_to_dicom):
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        volume_number = dataset[0x0020, 0x1002].value
-    except:
-        try:
-            volume_number = dataset[0x2001, 0x1018].value
-        except:
-            logging.debug("WARNING: no 'ImagesInAcquisition' field")
-            volume_number = -1
-    return int(volume_number)
-
-
-def get_nb_temporal_position(path_to_dicom):
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        volume_number = dataset[0x0020, 0x0105].value
-    except:
-        logging.warning("WARNING: no 'NumberOfTemporalPositions' field")
-        volume_number = 0
-    return int(volume_number)
-
-
-def get_sequence_name(path_to_dicom):
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        serie_descr = dataset[0x0008, 0x103e].value
-        serie_descr = serie_descr.replace(" ", "_")
-    except:
-        logging.warning("WARNING: no 'SerieDescription' field")
-        serie_descr = "Unknown"
-    return serie_descr
-
-
-def get_protocol_name(path_to_dicom):
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        protocol_name = dataset[0x0018, 0x1030].value
-        protocol_name = protocol_name.replace(" ", "_")
-    except:
-        logging.warning("WARNING: no 'ProtocolName' field")
-        protocol_name = "Unknown"
-    return protocol_name
-
-
-def get_serie_serieInstanceUID(path_to_dicom):
-    try:
-        dataset = dicom.read_file(path_to_dicom, force=True)
-        serie_UID = dataset[0x0020, 0x000e].value
-        serie_UID = serie_UID.replace(" ", "_")
-    except:
-        print "WARNING: no 'SeriesInstanceUID' field"
-        serie_UID = "Unknown"
-    return serie_UID
