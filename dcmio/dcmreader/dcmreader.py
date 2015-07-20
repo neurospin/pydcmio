@@ -126,7 +126,7 @@ def get_echo_time(path_to_dicom):
     return -1
 
 
-def get_SOP_storage_type(path_to_dicom):
+def get_sop_storage_type(path_to_dicom):
     """
         Get the storage type as boolean (True if enhanced, False otherwise)
         dafault=False
