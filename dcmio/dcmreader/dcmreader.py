@@ -7,10 +7,32 @@ import logging
 
 # dataset Walker (to browse enhanced dicom efficiently)
 def walk(dataset, callback, _tag):
+    """ Function to read DICOM files and extract fields content
+
+    .. note::
+
+        Recusrive function is required as new enhanced storage presents only
+        one dicom containing several sub-sequence of fields.
+        The walked is called on each sub-sequence
+
+    Parameters
+    ----------
+    inputs :
+        dataset: a dataset structure (ourput from pydicom reader) (mandatory)
+            the dataset to read
+        callback: function that will be called on each field (value extraction)
+        _tag : the tag of the field containing the value to extract. Only the
+        first field with this tag is read.
+
+    Returns :
+    The value in the chosen field. None if the field has not been found
+    dictionary of modified fields path (if asked)
+    """
+
     taglist = sorted(dataset.keys())
     for tag in taglist:
         data_element = dataset[tag]
-        out = callback(dataset, data_element, _tag)
+        out = callback(data_element, _tag)
         if tag in dataset and data_element.VR == "SQ":
             sequence = data_element.value
             for sub_dataset in sequence:
@@ -21,9 +43,21 @@ def walk(dataset, callback, _tag):
     return None
 
 
-def walker_callback(dataset, data_element, _tag):
+def walker_callback(data_element, _tag):
     """Called from the dataset "walk" recursive function for
-    all data elements."""
+        all data elements. Extract field's content.
+
+    Parameters
+    ----------
+    inputs :
+        data_element: the field to examine
+        _tag : the tag of the field containing the value to extract. Only the
+        first field with this tag is read.
+
+    Returns :
+    The value in the chosen field. None if the field is not the one asked
+
+    """
     if data_element.tag == _tag:
         return data_element.value
     return None
@@ -31,7 +65,16 @@ def walker_callback(dataset, data_element, _tag):
 
 def get_repetition_time(path_to_dicom):
     """
-    return the repetition time as string
+        Get the repetition time as string
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the repetition time value ('0' if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     tr = walk(dataset, walker_callback, (0x0018, 0x0080))
@@ -45,7 +88,16 @@ def get_repetition_time(path_to_dicom):
 
 def get_date_scan(path_to_dicom):
     """
-    return session date as string
+        Get the date scan as string
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the date scan value ('0' if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     value = walk(dataset, walker_callback, (0x0008, 0x0022))
@@ -56,7 +108,16 @@ def get_date_scan(path_to_dicom):
 
 def get_echo_time(path_to_dicom):
     """
-    return echo time
+        Get the echo time as string
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the echo time value (-1 if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     value = walk(dataset, walker_callback, (0x0018, 0x0081))
@@ -67,7 +128,17 @@ def get_echo_time(path_to_dicom):
 
 def get_SOP_storage_type(path_to_dicom):
     """
-    return True for Enhanced storage, False otherwise
+        Get the storage type as boolean (True if enhanced, False otherwise)
+        dafault=False
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the storage type ('False' if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     value = walk(dataset, walker_callback, (0x0008, 0x0016))
@@ -77,10 +148,20 @@ def get_SOP_storage_type(path_to_dicom):
     return False
 
 
-def get_Raw_Data_Run_Number(path_to_dicom):
+def get_raw_data_run_number(path_to_dicom):
     """
-    return value field
-    WARNING: private field: designed for GE scan (LONDON IOP centre)
+    Get the raw data run number as string
+
+    ..note: private field: designed for GE scan (LONDON IOP centre)
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the raw data run number (-1 if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     value = walk(dataset, walker_callback, (0x0019, 0x10a2))
@@ -91,7 +172,16 @@ def get_Raw_Data_Run_Number(path_to_dicom):
 
 def get_sequence_number(path_to_dicom):
     """
-    return sequence Number
+    Get the sequence number as string
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the sequence number ('0' if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     value = walk(dataset, walker_callback, (0x0020, 0x0011))
@@ -102,7 +192,16 @@ def get_sequence_number(path_to_dicom):
 
 def get_nb_slices(path_to_dicom):
     """
-    Return number of slices (ImagesInAcquisition)
+    Get the number of slices as Integer
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the number of slices (0 if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     value = walk(dataset, walker_callback, (0x0020, 0x1002))
@@ -117,7 +216,17 @@ def get_nb_slices(path_to_dicom):
 
 def get_nb_temporal_position(path_to_dicom):
     """
-    Get number of volumes
+    Get the number of volumes (temporal positions) as Integer
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the number of volumes (temporal positions)
+        (0 if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     value = walk(dataset, walker_callback, (0x0020, 0x0105))
@@ -128,7 +237,18 @@ def get_nb_temporal_position(path_to_dicom):
 
 def get_sequence_name(path_to_dicom):
     """
-    get sequence name and format it
+    Get sequence name as string
+
+    ..note: spaces are replaced by "_" in the extracted value
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the sequence name ('unknown' if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     value = walk(dataset, walker_callback, (0x0008, 0x103e))
@@ -139,7 +259,18 @@ def get_sequence_name(path_to_dicom):
 
 def get_protocol_name(path_to_dicom):
     """
-    get protocol name
+    Get protocol name as string
+
+    ..note: spaces are replaced by "_" in the extracted value
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the protocol name ('unknown' if the value is not found)
     """
 
     dataset = dicom.read_file(path_to_dicom, force=True)
@@ -151,7 +282,18 @@ def get_protocol_name(path_to_dicom):
 
 def get_serie_serieInstanceUID(path_to_dicom):
     """
-    serie UID number
+    Get serie UID as string
+
+    ..note: spaces are replaced by "_" in the extracted value
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the serie UID ('unknown' if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     value = walk(dataset, walker_callback, (0x0020, 0x000e))
@@ -161,7 +303,17 @@ def get_serie_serieInstanceUID(path_to_dicom):
 
 
 def get_number_of_slices_philips(path_to_dicom):
-    """ return value of "NumberOfSlicesMR" field
+    """
+    Get number of slices for Philips scans as integer
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        value of "NumberOfSlicesMR" field, 0 if value not found
     """
     try:
         # run dcmdump and read number of slices inside. pydicom is unable
