@@ -32,30 +32,33 @@ print "Start Configuration", start_time
 study_config = StudyConfig(
     modules=["SmartCachingConfig"],
     use_smart_caching=True,
-    output_directory="/volatile/nsap/catalogue/dicom_convert/")
+    output_directory="/volatile/capsul")
 print "Done in {0} seconds".format(datetime.datetime.now() - start_time)
 
 
 # Create pipeline
 start_time = datetime.datetime.now()
 print "Start Pipeline Creation", start_time
-pipeline = get_process_instance("dcmio.dcmconverter.dcm_to_nii.xml")
+pipeline = get_process_instance("dcmio.dcmanonymizer.dicom_anonymizer.xml")
 print "Done in {0} seconds.".format(datetime.datetime.now() - start_time)
 
 
 # Set pipeline input parameters
 start_time = datetime.datetime.now()
 print "Start Parametrization", start_time
-localizer_dataset = get_sample_data("localizer")
-pipeline.source_dir = localizer_dataset.fmridcm
+t1_dataset = get_sample_data("qt1")
+pipeline.dicom_file = t1_dataset.gre5dcm
+pipeline.output_file = "/volatile/capsul/pilot_dcm.dcm"
+pipeline.generate_log = True
+#pipeline.new_uid = "toto"
 print "Done in {0} seconds.".format(datetime.datetime.now() - start_time)
+
 
 # View pipeline
 app = QtGui.QApplication(sys.argv)
 view1 = PipelineDevelopperView(pipeline)
 view1.show()
 app.exec_()
-del view1
 
 
 # Execute the pipeline in the configured study
