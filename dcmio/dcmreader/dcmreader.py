@@ -24,6 +24,47 @@ def walk(dataset, callback, _tag):
         Recusrive function is required as new enhanced storage presents only
         one dicom containing several sub-sequence of fields.
         The walked is called on each sub-sequence
+        The first corresponding tag's value is returned: the walker stops as
+        soon as a value is found.
+
+    Parameters
+    ----------
+    inputs :
+        dataset: a dataset structure (ourput from pydicom reader) (mandatory)
+            the dataset to read
+        callback: function that will be called on each field (value extraction)
+        _tag : the tag of the field containing the value to extract. Only the
+        first field with this tag is read.
+
+    Returns :
+    The value in the chosen field. None if the field has not been found
+    dictionary of modified fields path (if asked)
+    """
+    taglist = sorted(dataset.keys())
+    for tag in taglist:
+        data_element = dataset[tag]
+        out = callback(data_element, _tag)
+        if out:
+            return out
+        elif tag in dataset and data_element.VR == "SQ":
+            sequence = data_element.value
+            for sub_dataset in sequence:
+                out = walk(sub_dataset, callback, _tag)
+                if out:
+                    return out
+    return None
+
+
+def walk_all(dataset, callback, _tag):
+    """ Function to read DICOM files and extract fields content
+
+    .. note::
+
+        Recusrive function is required as new enhanced storage presents only
+        one dicom containing several sub-sequence of fields.
+        The walked is called on each sub-sequence
+        The walker stops at the end of the dataset, returns a list of all
+        encountered values (if several tags had the same identifier)
 
     Parameters
     ----------
@@ -40,17 +81,20 @@ def walk(dataset, callback, _tag):
     """
 
     taglist = sorted(dataset.keys())
+    out_list = []
     for tag in taglist:
         data_element = dataset[tag]
         out = callback(data_element, _tag)
-        if tag in dataset and data_element.VR == "SQ":
+        if out:
+            out_list.append(out)
+            return out_list
+        elif tag in dataset and data_element.VR == "SQ":
             sequence = data_element.value
             for sub_dataset in sequence:
-                out = walk(sub_dataset, callback, _tag)
-        if out:
-            return out
-
-    return None
+                out = walk_all(sub_dataset, callback, _tag)
+                if out:
+                    out_list.extend(out)
+    return out_list
 
 
 def walker_callback(data_element, _tag):
@@ -71,6 +115,40 @@ def walker_callback(data_element, _tag):
     if data_element.tag == _tag:
         return data_element.value
     return None
+
+
+def get_b_vectors(path_to_dicom):
+    """
+        Get the b-vectors as list of lists
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the b-vectors (empty list of not found)
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    return walk_all(dataset, walker_callback, (0x0018, 0x9089))
+
+
+def get_b_values(path_to_dicom):
+    """
+        Get the b-values as list
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the b-vectors (empty list of not found)
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    return walk_all(dataset, walker_callback, (0x0018, 0x9087))
 
 
 def get_repetition_time(path_to_dicom):
