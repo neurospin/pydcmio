@@ -24,24 +24,24 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
 
 
-def multi_snaps(image_files, nb_snaps, nb_volumes, nb_snaps_per_page, output_directory):
-    """ Slice a Volume
-
+def multi_snaps(image_files, output_directory, nb_snaps=7, nb_volumes=5,
+                nb_snaps_per_page=5):
+    """ Slice a Volume.
     Generate an image with merge sagittal, axial, and coronal slices.
 
-    <process>
-        <return name="snap_files" type="List_File" desc="Path to the resulting snp
-            images."/>
+    <unit>
         <input name="image_files" type="List_File" desc="Volumes to slice."/>
-        <input name="nb_snaps" type="Int" desc="The desired number of
+        <input name="output_directory" type="Directory" description="The
+            destination folder."/>
+        <input name="nb_snaps" type="Int" description="The desired number of
             snapshots."/>
-        <input name="nb_volumes" type="Int" desc="The desired number of
+        <input name="nb_volumes" type="Int" description="The desired number of
             volumes sanped in the time domain."/>
-        <input name="nb_snaps_per_page" type="Int" desc="The desired number of
-            sanps per page."/>
-        <input name="output_directory" type="Directory" desc="The destination
-            folder."/>
-    </process>
+        <input name="nb_snaps_per_page" type="Int" description="The desired
+            number of snaps per page."/>
+        <output name="snap_files" type="List_File" description="Path to the
+            resulting snp images."/>
+    </unit>
     """
     # Go through all nifti files
     snap_files = []
@@ -158,12 +158,12 @@ def generate_config(output_directory):
     """ Generate a dcm2nii configuration file that disable the interactive
     mode.
 
-    <process>
-        <return name="config_file" type="File" desc="A dcm2nii configuration
-            file."/>
-        <input name="output_directory" type="Directory" desc="The destination
-            folder."/>
-    </process>
+    <unit>
+        <input name="output_directory" type="Directory" description="The
+            destination folder."/>
+        <output name="config_file" type="File" description="A dcm2nii
+            configuration file."/>
+    </unit>
     """
     if not os.path.isdir(output_directory):
         os.makedirs(output_directory)
@@ -176,34 +176,35 @@ def generate_config(output_directory):
 
 def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
     """ Add slice duration and acquisition times to nifit1 image header.
-
     All selected dicom tags values are set in the description nifti header
     field.
 
-    <process>
-        <return name="filled_nii_files" type="List_File" desc="The nifti image
-            containing the filled header."/>
-        <input name="nii_files" type="List_File" desc="The nifti image to fill."/>
-        <input name="dicom_dir" type="Directory" desc="The directory containing
-            the dicoms used to generate the nifti image."/>
-        <input name="prefix" type="String" desc="The output image name prefix."/>
-        <input name="dcm_tags" type="List_Tuple_Str_Tuple_Str_Str" desc="A list of
-            2-uplet of the form (name, tag) that will be inserted in the
-            'descrip' nifti header field."/>
-        <input name="output_directory" type="Directory" desc="The destination
-            folder."/>
-    </process>
+    <unit>
+        <input name="nii_files" type="List" content="File" description="The
+            nifti images to fill."/>
+        <input name="dicom_dir" type="Directory" description="The directory
+            containing the dicoms used to generate the nifti image."/>
+        <input name="prefix" type="String" description="The output image name
+            prefix."/>
+        <input name="dcm_tags" type="List" content="Tuple_Str_Tuple_Str_Str"
+            description="A list of 2-uplet of the form (name, tag) that will
+            be inserted in the 'descrip' nifti header field."/>
+        <input name="output_directory" type="Directory" description="The
+            destination folder."/>
+        <output name="filled_nii_files" type="List" content="File"
+            description="The nifti images containing the filled header."/>
+    </unit>
     """
+    # Load a dicom image
+    dicom_files = glob.glob(os.path.join(dicom_dir, "*.dcm"))
+    dcmimage = dicom.read_file(dicom_files[0])
+
     # Go through all nifti files
     filled_nii_files = []
     for nii_file in nii_files:
 
         # Load the nifti1 image
         image = nibabel.load(nii_file)
-
-        # Load a dicom image
-        dicom_files = glob.glob(os.path.join(dicom_dir, "*.dcm"))
-        dcmimage = dicom.read_file(dicom_files[0])
 
         # Check the we have a nifti1 format image
         if isinstance(image, nibabel.nifti1.Nifti1Image):
@@ -218,7 +219,7 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
             header = image.get_header()
 
             # > slice_duration: Time for 1 slice
-            repetition_time = float(dcmimage[('0x0018', '0x0080')].value)
+            repetition_time = float(dcmimage[("0x0018", "0x0080")].value)
             header.set_dim_info(slice=2)
             nb_slices = header.get_n_slices()
             # Force round to 0 digit after coma. If more, nibabel completes to
@@ -241,10 +242,10 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
 
             filled_nii_files.append(filled_nii_file)
 
-            return filled_nii_files
-
         # Unknwon image format
         else:
             raise Exception(
                 "Only Nifti1 image are supported not '{0}'.".format(type(image)))
+
+    return filled_nii_files
 
