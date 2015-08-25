@@ -31,7 +31,7 @@ install:
     - pip install pep8
     - git clone https://github.com/neurospin/caps-mmutils.git /tmp/caps-mmutils
     - python /tmp/caps-mmutils/setup.py install
-    - git clone https://github.com/neurospin/capsul.git /tmp/capsul
+    - git clone -b glossary https://github.com/AGrigis/capsul.git /tmp/capsul
     - python /tmp/capsul/setup.py install
     - python setup.py install
 
