@@ -2,11 +2,11 @@
 CAPS-DCMIO: CAPSul DiCoM IO 
 ===========================
 
-.. image:: https://travis-ci.org/neurospin/dcmio.svg?branch=master
-    :target: https://api.travis-ci.org/neurospin/dcmio
+.. image:: https://travis-ci.org/neurospin/caps-dcmio.svg?branch=master
+    :target: https://api.travis-ci.org/neurospin/caps-dcmio
 
-.. image:: https://coveralls.io/repos/neurospin/dcmio/badge.svg?branch=master&service=github
-    :target: https://coveralls.io/github/neurospin/dcmio
+.. image:: https://coveralls.io/repos/neurospin/caps-dcmio/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/neurospin/caps-dcmio
   
 Documentation
 =============
