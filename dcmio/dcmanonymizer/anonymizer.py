@@ -52,7 +52,8 @@ def anonymize_dicom(input_file, output_file, new_uid="anonymous",
         <return name="output_dicom" type="File" desc="anonymized dicom path" />
         <return name="json_log" type="File" desc="dictionary of modified
         fields path (if asked)" />
-        <input name="input_file" type="File" desc="the dicom file to process" />
+        <input name="input_file" type="File" desc="the dicom file to
+            process" />
         <input name="output_file" type="File" desc="the file to generate" />
         <input name="new_uid" type="String" desc="a value to set as
             participant name and identifier (optional, default='anonymous')"

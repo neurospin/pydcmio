@@ -10,7 +10,6 @@
 # System import
 import sys
 import unittest
-import os
 import tempfile
 
 # Capsul import
@@ -26,7 +25,8 @@ class TestDcmToNii(unittest.TestCase):
     """ Class to test dicom to nifti pipeline.
     """
     def setUp(self):
-        self.outdir = tempfile.mkdtemp() #"/volatile/nsap/catalogue/dicom_convert/" 
+        self.outdir = tempfile.mkdtemp()
+        # "/volatile/nsap/catalogue/dicom_convert/"
         self.pipeline_name = "dcmio.dcmconverter.dcm_to_nii.xml"
 
     def test_simple_run(self):
@@ -49,7 +49,7 @@ class TestDcmToNii(unittest.TestCase):
         pipeline.source_dir = localizer_dataset.fmridcm
 
         # View pipeline
-        if 1:
+        if 0:
             from PySide import QtGui
             app = QtGui.QApplication(sys.argv)
             view1 = PipelineDevelopperView(pipeline)

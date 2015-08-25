@@ -55,12 +55,12 @@ def multi_snaps(image_files, output_directory, nb_snaps=7, nb_volumes=5,
 
         # Case 3d + t images
         if ndims == 4:
-            for time_index in numpy.round(numpy.linspace(
-                                            0, image.shape[3] - 1, nb_volumes)):
+            for time_index in numpy.round(
+                    numpy.linspace(0, image.shape[3] - 1, nb_volumes)):
                 tslices[time_index] = get_3d_volume_slices(
                     data[..., time_index], nb_snaps)
         # Case 3d image
-        elif ndim == 3:
+        elif ndims == 3:
             tslices[0] = get_3d_volume_slices(data, nb_snaps)
         # Not implemented error
         else:
@@ -77,7 +77,7 @@ def multi_snaps(image_files, output_directory, nb_snaps=7, nb_volumes=5,
 
                 x_slices, y_slices, z_slices = slices
                 for cut in range(nb_snaps):
-        
+
                     # Create the figure
                     row_index = cut % nb_snaps_per_page
                     if row_index == 0:
@@ -106,7 +106,7 @@ def multi_snaps(image_files, output_directory, nb_snaps=7, nb_volumes=5,
 
                 # Close current page before treating a new volume
                 plt.suptitle("{0}, {1}".format(os.path.basename(fname),
-                                            int(t_index)))
+                                               int(t_index)))
                 pdf.savefig(fig)
                 plt.close()
 
@@ -116,7 +116,6 @@ def multi_snaps(image_files, output_directory, nb_snaps=7, nb_volumes=5,
         except:
             pdf.close()
             raise
-            
 
     return snap_files
 
@@ -228,7 +227,7 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
             header.set_slice_duration(slice_duration)
 
             # > add free dicom fields
-            content = ["{0}={1}".format(name, dcmimage[tag].value) 
+            content = ["{0}={1}".format(name, dcmimage[tag].value)
                        for name, tag in dcm_tags]
             free_field = numpy.array(";".join(content),
                                      dtype=header["descrip"].dtype)
@@ -245,7 +244,7 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
         # Unknwon image format
         else:
             raise Exception(
-                "Only Nifti1 image are supported not '{0}'.".format(type(image)))
+                "Only Nifti1 image are supported not '{0}'.".format(
+                    type(image)))
 
     return filled_nii_files
-

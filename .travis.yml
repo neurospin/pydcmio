@@ -22,12 +22,17 @@ install:
     - pip install argparse
     - pip install importlib
     - pip install nibabel
+    - pip install pydicom
     - pip install nipype
     - pip install nose
     - pip install nose-exclude
     - pip install coverage
     - pip install coveralls
     - pip install pep8
+    - git clone https://github.com/neurospin/caps-mmutils.git /tmp/caps-mmutils
+    - python /tmp/caps-mmutils/setup.py install
+    - git clone https://github.com/neurospin/capsul.git /tmp/capsul
+    - python /tmp/capsul/setup.py install
     - python setup.py install
 
 script:
