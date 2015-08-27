@@ -17,15 +17,12 @@ install:
     - conda create -n testenv --yes pip python=$TRAVIS_PYTHON_VERSION
     - source activate testenv
     - if [ ${TRAVIS_PYTHON_VERSION:0:1} == "2" ]; then pip install ordereddict; fi
-    - conda install --yes numpy scipy traits networkx dateutil
+    - conda install --yes numpy scipy
     - git clone https://github.com/neurospin/caps-mmutils.git /tmp/caps-mmutils
     - python /tmp/caps-mmutils/setup.py install
     - pip install capsul
-    - pip install argparse
-    - pip install importlib
     - pip install nibabel
     - pip install pydicom
-    - pip install nipype
     - pip install nose
     - pip install nose-exclude
     - pip install coverage
