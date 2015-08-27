@@ -13,7 +13,6 @@ import unittest
 import tempfile
 
 # Capsul import
-from capsul.qt_gui.widgets import PipelineDevelopperView
 from capsul.study_config.study_config import StudyConfig
 from capsul.process.loader import get_process_instance
 
@@ -50,6 +49,7 @@ class TestDcmToNii(unittest.TestCase):
 
         # View pipeline
         if 0:
+            from capsul.qt_gui.widgets import PipelineDevelopperView
             from PySide import QtGui
             app = QtGui.QApplication(sys.argv)
             view1 = PipelineDevelopperView(pipeline)
