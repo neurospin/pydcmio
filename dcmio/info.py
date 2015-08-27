@@ -40,7 +40,7 @@ a pipeline engine.
 # Dependencies
 SPHINX_MIN_VERSION = 1.0
 DICOM_MIN_VERSION = 0.9
-CAPSUL_VERSION = 2.0
+CAPSUL_VERSION = 1.0
 MMUTILS_VERSION = 1.0
 
 # Main setup parameters
