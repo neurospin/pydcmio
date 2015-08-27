@@ -20,6 +20,7 @@ install:
     - conda install --yes numpy scipy
     - git clone https://github.com/neurospin/caps-mmutils.git /tmp/caps-mmutils
     - python /tmp/caps-mmutils/setup.py install
+    - pip install ez_setup
     - pip install capsul
     - pip install nibabel
     - pip install pydicom
