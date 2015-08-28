@@ -23,6 +23,7 @@ install:
     - pip install ez_setup
     - pip install soma-workflow
     - pip install capsul
+    - pip install matplotlib
     - pip install nibabel
     - pip install pydicom
     - pip install nose
