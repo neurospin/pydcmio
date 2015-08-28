@@ -26,7 +26,7 @@ class TestDcmToNii(unittest.TestCase):
     """
     def setUp(self):
         self.outdir = tempfile.mkdtemp()
-        self.outdir = "/volatile/nsap/catalogue/dicom_convert/"
+        # self.outdir = "/volatile/nsap/catalogue/dicom_convert/"
         self.pipeline_name = "dcmio.dcmconverter.dcm_to_nii.xml"
 
     def test_simple_run(self):
