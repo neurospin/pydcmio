@@ -62,7 +62,7 @@ VERSION = __version__
 PROVIDES = ["dcmio"]
 REQUIRES = [
     "capsul=={0}".format(CAPSUL_VERSION),
-    "mmutils=={0}".format(MMUTILS_VERSION),
+    # "mmutils=={0}".format(MMUTILS_VERSION),
     "pydicom>={0}".format(DICOM_MIN_VERSION)
 ]
 EXTRA_REQUIRES = {
