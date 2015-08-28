@@ -196,6 +196,8 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
     """
     # Load a dicom image
     dicom_files = glob.glob(os.path.join(dicom_dir, "*.dcm"))
+    print os.path.isfile(dicom_files[0])
+    print dicom_files[0]
     dcmimage = dicom.read_file(dicom_files[0])
 
     # Go through all nifti files

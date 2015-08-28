@@ -8,6 +8,7 @@
 ##########################################################################
 
 # System import
+import os
 import sys
 import unittest
 import tempfile
@@ -25,7 +26,7 @@ class TestDcmToNii(unittest.TestCase):
     """
     def setUp(self):
         self.outdir = tempfile.mkdtemp()
-        # "/volatile/nsap/catalogue/dicom_convert/"
+        self.outdir = "/volatile/nsap/catalogue/dicom_convert/"
         self.pipeline_name = "dcmio.dcmconverter.dcm_to_nii.xml"
 
     def test_simple_run(self):
@@ -44,8 +45,10 @@ class TestDcmToNii(unittest.TestCase):
         pipeline = get_process_instance(self.pipeline_name)
 
         # Set pipeline input parameters
-        localizer_dataset = get_sample_data("localizer")
-        pipeline.source_dir = localizer_dataset.fmridcm
+        dicom_dataset = get_sample_data("dicom")
+        dicom_path = os.path.join(
+            dicom_dataset.osirix, "BRAIN", "Sag T1 FSE - 3")
+        pipeline.source_dir = dicom_path
 
         # View pipeline
         if 0:
