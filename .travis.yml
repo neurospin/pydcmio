@@ -30,6 +30,8 @@ install:
     - pip install coverage
     - pip install coveralls
     - pip install pep8
+    - git clone -b glossary https://github.com/AGrigis/capsul.git /tmp/capsul
+    - export PYTHONPATH=$PYTHONPATH:/tmp/capsul
     - python setup.py install
 
 script:
