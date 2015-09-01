@@ -8,9 +8,11 @@
 ##########################################################################
 
 # System import
+import os
 import sys
 import unittest
 import tempfile
+import shutil
 
 # Capsul import
 from capsul.study_config.study_config import StudyConfig
@@ -25,7 +27,7 @@ class TestDcmToNii(unittest.TestCase):
     """
     def setUp(self):
         self.outdir = tempfile.mkdtemp()
-        # "/volatile/nsap/catalogue/dicom_convert/"
+        # self.outdir = "/volatile/nsap/catalogue/dicom_convert/"
         self.pipeline_name = "dcmio.dcmconverter.dcm_to_nii.xml"
 
     def test_simple_run(self):
@@ -42,10 +44,15 @@ class TestDcmToNii(unittest.TestCase):
 
         # Create pipeline
         pipeline = get_process_instance(self.pipeline_name)
+        pipeline.date_in_filename = True
 
         # Set pipeline input parameters
-        localizer_dataset = get_sample_data("localizer")
-        pipeline.source_dir = localizer_dataset.fmridcm
+        dicom_dataset = get_sample_data("dicom")
+        dcmfolder = os.path.join(self.outdir, "dicom")
+        if not os.path.isdir(dcmfolder):
+            os.makedirs(dcmfolder)
+        shutil.copy(dicom_dataset.barre, os.path.join(dcmfolder, "heart.dcm"))
+        pipeline.source_dir = dcmfolder
 
         # View pipeline
         if 0:
@@ -57,7 +64,7 @@ class TestDcmToNii(unittest.TestCase):
             app.exec_()
 
         # Execute the pipeline in the configured study
-        study_config.run(pipeline, executer_qc_nodes=True, verbose=1)
+        study_config.run(pipeline)
 
 
 def test():
