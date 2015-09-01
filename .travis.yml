@@ -20,9 +20,8 @@ install:
     - sudo apt-get install mricron
     - git clone https://github.com/neurospin/caps-mmutils.git /tmp/caps-mmutils
     - export PYTHONPATH=$PYTHONPATH:/tmp/caps-mmutils
-    - pip install ordereddict
-    - pip install importlib
     - pip install ez_setup
+    - pip install nilearn
     - pip install soma-workflow
     - pip install capsul
     - pip install matplotlib
