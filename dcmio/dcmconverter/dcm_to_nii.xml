@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pipeline version="1.0">
     <docstring>
-        Dicom to Nifti converter.
+        Dicom to Nifti converter
+        ~~~~~~~~~~~~~~~~~~~~~~~~
+
         Wraps around the 'dcm2nii' command.
     </docstring>
     <units>

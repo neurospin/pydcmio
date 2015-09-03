@@ -1,3 +1,18 @@
-[
-    "dcmio.dcmconverter.dcm_to_nii.xml",
-]
+{
+    "DICOM to Nifti": {
+        "module": "dcmio.dcmconverter.dcm_to_nii.xml",
+        "category": "DICOM",
+        "time_cost": 1,
+        "qc_cost": 1,
+        "pilot": "dcmio.test.test_dcm_to_nii",
+        "references": [
+            [
+                "This code was used in 2015 by David Goyard",
+                "<david.goyard@cea.fr> to treat the EU-AIMS_ data in",
+                "NeuroSpin.",
+                "",
+                ".. _EU-AIMS: http://www.eu-aims.eu/"
+            ]
+        ]
+    }
+}
