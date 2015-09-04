@@ -10,10 +10,14 @@
 # System import
 from __future__ import with_statement
 import os
+import json
 import dicom
 import nibabel
 import glob
 import numpy
+
+# Dcmio import
+from dcmio.dcmreader.dcmreader import get_repetition_time
 
 
 def generate_config(output_directory):
@@ -36,9 +40,11 @@ def generate_config(output_directory):
     return config_file
 
 
-def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
-    """ Add slice duration and acquisition times to nifit1 image header.
-    All selected dicom tags values are set in the description nifti header
+def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory,
+                    additional_information=None):
+    """ Add dicom tags to Nifti1 image type header.
+
+    All selected dicom tags values are set in the 'descrip' nifti header
     field.
 
     <unit>
@@ -53,13 +59,16 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
             be inserted in the 'descrip' nifti header field."/>
         <input name="output_directory" type="Directory" description="The
             destination folder."/>
+        <input name="additional_information" type="List"
+            content="Tuple_Str_Str" description="A free dictionary items to be
+            inserted in the 'descrip' image header field."/>
         <output name="filled_nii_files" type="List" content="File"
             description="The nifti images containing the filled header."/>
     </unit>
     """
     # Load a dicom image
     dicom_files = glob.glob(os.path.join(dicom_dir, "*.dcm"))
-    dcmimage = dicom.read_file(dicom_files[0])
+    dcmimage = dicom.read_file(dicom_files[0], force=True)
 
     # Go through all nifti files
     filled_nii_files = []
@@ -68,7 +77,7 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
         # Load the nifti1 image
         image = nibabel.load(nii_file)
 
-        # Check the we have a nifti1 format image
+        # Check that we have a nifti1 format image
         if isinstance(image, nibabel.nifti1.Nifti1Image):
 
             # Create the destination image path
@@ -81,18 +90,23 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
             header = image.get_header()
 
             # > slice_duration: Time for 1 slice
-            repetition_time = float(dcmimage[("0x0018", "0x0080")].value)
-            header.set_dim_info(slice=2)
-            nb_slices = header.get_n_slices()
-            # Force round to 0 digit after coma. If more, nibabel completes to
-            # 6 digits with random numbers...
-            slice_duration = round(repetition_time / nb_slices, 0)
-            header.set_slice_duration(slice_duration)
+            repetition_time = get_repetition_time(dicom_files[0])
+            if repetition_time is not None:
+                repetition_time = float(repetition_time)
+                header.set_dim_info(slice=2)
+                nb_slices = header.get_n_slices()
+                slice_duration = round(repetition_time / nb_slices, 0)
+                header.set_slice_duration(slice_duration)
 
             # > add free dicom fields
-            content = ["{0}={1}".format(name, dcmimage[tag].value)
-                       for name, tag in dcm_tags]
-            free_field = numpy.array(";".join(content),
+            content = dict(
+                (str(name), str(dcmimage[tag].value))
+                for name, tag in dcm_tags)
+
+            # > add/update content
+            for key, value in additional_information:
+                content[key] = value
+            free_field = numpy.array(json.dumps(content),
                                      dtype=header["descrip"].dtype)
             image.get_header()["descrip"] = free_field
 
@@ -101,7 +115,6 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory):
 
             # Save the filled image
             nibabel.save(image, filled_nii_file)
-
             filled_nii_files.append(filled_nii_file)
 
         # Unknwon image format

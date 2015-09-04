@@ -8,14 +8,18 @@
 ##########################################################################
 
 # System import
+from __future__ import print_function
 import unittest
 
 
 def pilot_dcm2nii():
-    """ 
-    Dicom to nifti.
-
+    """
     Imports
+    -------
+
+    This code needs 'capsul' and 'mmutils' package in order to instanciate and
+    execute the pipeline and to get a toy dataset.
+    These packages are available in the 'neurospin' source list or in pypi.
     """
     import os
     import sys
@@ -27,39 +31,73 @@ def pilot_dcm2nii():
 
     """
     Parameters
+    ----------
+
+    The 'pipeline_name' parameter contains the location of the pipeline XML
+    description that will perform the DICOMs conversion, and the 'outdir' the
+    location of the pipeline's results: in this case a temporary directory.
     """
     pipeline_name = "dcmio.dcmconverter.dcm_to_nii.xml"
     outdir = tempfile.mkdtemp()
 
     """
-    Configure the environment
+    Capsul configuration
+    --------------------
+
+    A 'StudyConfig' has to be instantiated in order to execute the pipeline
+    properly. It enables us to define the results directory through the
+    'output_directory' attribute, the number of CPUs to be used through the
+    'number_of_cpus' attributes, and to specify that we want a log of the
+    processing step through the 'generate_logging'. The 'use_scheduler'
+    must be set to True if more than 1 CPU is used.
     """
     study_config = StudyConfig(
         modules=[],
-        use_smart_caching=True,
-        output_directory=self.outdir,
+        output_directory=outdir,
         number_of_cpus=1,
         generate_logging=True,
         use_scheduler=True)
 
     """
-    Create pipeline
-    """
-    pipeline = get_process_instance(self.pipeline_name)
-    pipeline.date_in_filename = True
+    Get the toy dataset
+    -------------------
 
-    """
-    Set pipeline input parameters
+    The toy dataset is composed of a 3D heart dicom image that is downloaded
+    if it is necessary throught the 'get_sample_data' function and exported
+    locally in a 'heart.dcm' file.
     """
     dicom_dataset = get_sample_data("dicom")
-    dcmfolder = os.path.join(self.outdir, "dicom")
+    dcmfolder = os.path.join(outdir, "dicom")
     if not os.path.isdir(dcmfolder):
         os.makedirs(dcmfolder)
     shutil.copy(dicom_dataset.barre, os.path.join(dcmfolder, "heart.dcm"))
-    pipeline.source_dir = dcmfolder
 
     """
-    View pipeline
+    Pipeline definition
+    -------------------
+
+    The pipeline XML description is first imported throught the
+    'get_process_instance' method, and the resulting pipeline instance is
+    parametrized: in this example we decided to set the date in the converted
+    file name and we set two DICOM directories to be converted in Nifti
+    format.
+    """
+    pipeline = get_process_instance(pipeline_name)
+    pipeline.date_in_filename = True
+    pipeline.dicom_directories = [dcmfolder, dcmfolder]
+    pipeline.additional_informations = [[("Provided by", "Neurospin@2015")],
+                                        [("Provided by", "Neurospin@2015"),
+                                         ("TR", "1500")]]
+    pipeline.dcm_tags = [("TR", ("0x0018", "0x0080")),
+                         ("TE", ("0x0018", "0x0081"))]
+
+    """
+    Pipeline representation
+    -----------------------
+
+    By executing this block of code, a pipeline representation can be
+    displayed. This representation is composed of boxes connected to each
+    other.
     """
     if 0:
         from capsul.qt_gui.widgets import PipelineDevelopperView
@@ -70,15 +108,44 @@ def pilot_dcm2nii():
         app.exec_()
 
     """
-    Execute the pipeline in the configured study
+    Pipeline execution
+    ------------------
+
+    Finally the pipeline is eecuted in the defined 'study_config'.
     """
     study_config.run(pipeline)
+
+    """
+    Access the result
+    -----------------
+
+    The 'nibabel' package is used to load the generated images. We display the
+    numpy array shape and the stored repetiton and echo times: in order
+    to load the 'descrip' image field we use the 'json' package.
+    """
+    import json
+    import copy
+    import nibabel
+
+    generated_images = pipeline.filled_converted_files
+
+    for fnames in generated_images:
+        print(">>>", fnames, "...")
+        im = nibabel.load(fnames[0])
+        print("shape=", im.get_data().shape)
+        header = im.get_header()
+        a = str(header["descrip"])
+        a = a.strip()
+        description = json.loads(copy.deepcopy(a))
+        print("TE=", description["TE"])
+        print("TR=", description["TR"])
+        print("Provided by=", description["Provided by"])
 
 
 class TestDcmToNii(unittest.TestCase):
     """ Class to test dicom to nifti pipeline.
     """
-    def test_simple_run(self):
+    def test_dcm_to_nii(self):
         """ Method to test a simple 1 cpu call with the scheduler.
         """
         pilot_dcm2nii()

@@ -136,7 +136,7 @@ def get_repetition_time(path_to_dicom):
             data extraction will be made
 
     Returns :
-        the repetition time value ('0' if the value is not found)
+        the repetition time value (None if the value is not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     tr = walk(dataset, walker_callback, (0x0018, 0x0080))
@@ -145,7 +145,7 @@ def get_repetition_time(path_to_dicom):
         if tr < 1000:
             tr *= 1000.
         return "{0}".format(tr)
-    return '0'
+    return None
 
 
 def get_date_scan(path_to_dicom):
