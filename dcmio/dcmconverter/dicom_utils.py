@@ -41,7 +41,7 @@ def generate_config(output_directory):
 
 
 def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory,
-                    additional_information=None):
+                    additional_information=[]):
     """ Add dicom tags to Nifti1 image type header.
 
     All selected dicom tags values are set in the 'descrip' nifti header
@@ -54,7 +54,8 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory,
             containing the dicoms used to generate the nifti image."/>
         <input name="prefix" type="String" description="The output image name
             prefix."/>
-        <input name="dcm_tags" type="List" content="Tuple_Str_Tuple_Str_Str"
+        <input name="dcm_tags" type="List"
+            content="Tuple_Str_List_Tuple_Str_Str"
             description="A list of 2-uplet of the form (name, tag) that will
             be inserted in the 'descrip' nifti header field."/>
         <input name="output_directory" type="Directory" description="The
@@ -99,10 +100,22 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory,
                 header.set_slice_duration(slice_duration)
 
             # > add free dicom fields
-            content = dict(
-                (str(name), str(dcmimage[tag].value))
-                for name, tag in dcm_tags)
+            # extract value from the dicom file
+            content = {}
+            for name, tag in dcm_tags:
 
+                try:
+                    # enhances storage, the value is burried under one or
+                    # several layer(s) of sequence
+                    dcmimage_temp = dcmimage
+                    if len(tag) > 1:
+                        for sub_tag in tag[:-1]:
+                            seq_field = dcmimage_temp[sub_tag]
+                            dcmimage_temp = seq_field.value[0]
+                    last_tag = tag[-1]
+                    content[str(name)] = str(dcmimage_temp[last_tag].value)
+                except:
+                    pass
             # > add/update content
             for key, value in additional_information:
                 content[key] = value
