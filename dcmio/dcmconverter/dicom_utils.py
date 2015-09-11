@@ -107,15 +107,16 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory,
                 try:
                     # enhances storage, the value is burried under one or
                     # several layer(s) of sequence
-                    dcmimage_temp = dcmimage
+                    current_dataset = dcmimage
                     if len(tag) > 1:
-                        for sub_tag in tag[:-1]:
-                            seq_field = dcmimage_temp[sub_tag]
-                            dcmimage_temp = seq_field.value[0]
+                        for inner_tag in tag[:-1]:
+                            seq_field = current_dataset[inner_tag]
+                            current_dataset = seq_field.value[0]
                     last_tag = tag[-1]
-                    content[str(name)] = str(dcmimage_temp[last_tag].value)
+                    content[str(name)] = str(current_dataset[last_tag].value)
                 except:
                     pass
+
             # > add/update content
             for key, value in additional_information:
                 content[key] = value

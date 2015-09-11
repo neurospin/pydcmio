@@ -88,8 +88,9 @@ def pilot_dcm2nii():
     pipeline.additional_informations = [[("Provided by", "Neurospin@2015")],
                                         [("Provided by", "Neurospin@2015"),
                                          ("TR", "1500")]]
-    pipeline.dcm_tags = [("TR", ("0x0018", "0x0080")),
-                         ("TE", ("0x0018", "0x0081"))]
+
+    pipeline.dcm_tags = [("TR", [("0x0018", "0x0080")]),
+                         ("TE", [("0x0018", "0x0081")])]
 
     """
     Pipeline representation
