@@ -1,18 +1,18 @@
-#! /usr/bin/env python
 ##########################################################################
-# NSAp - Copyright (C) CEA, 2015
+# NSAP - Copyright (C) CEA, 2015
 # Distributed under the terms of the CeCILL-B license, as published by
 # the CEA-CNRS-INRIA. Refer to the LICENSE file or to
 # http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
 # for details.
 ##########################################################################
 
+
 # System import
 from __future__ import print_function
 import unittest
 
 
-def pilot_dcm2nii():
+def pilot_dcmanon():
     """
     Imports
     -------
@@ -20,6 +20,8 @@ def pilot_dcm2nii():
     This code needs 'capsul' and 'mmutils' packages in order to instanciate and
     execute the pipeline and to get a toy dataset.
     These packages are available in the 'neurospin' source list or in pypi.
+    It also requires the 'pydicom' package in order to be able to read the
+    DICOM fields.
     """
     import os
     import sys
@@ -34,10 +36,10 @@ def pilot_dcm2nii():
     ----------
 
     The 'pipeline_name' parameter contains the location of the pipeline XML
-    description that will perform the DICOMs conversion, and the 'outdir' the
-    location of the pipeline's results: in this case a temporary directory.
+    description that will perform the DICOMs anonimization, and the 'outdir'
+    the location of the pipeline's results: in this case a temporary directory.
     """
-    pipeline_name = "dcmio.dcmconverter.dcm_to_nii.xml"
+    pipeline_name = "dcmio.dcmanonymizer.dcm_anonymizer.xml"
     outdir = tempfile.mkdtemp()
 
     """
@@ -78,18 +80,11 @@ def pilot_dcm2nii():
 
     The pipeline XML description is first imported throught the
     'get_process_instance' method, and the resulting pipeline instance is
-    parametrized: in this example we decided to set the date in the converted
-    file name and we set two DICOM directories to be converted in Nifti
-    format.
+    parametrized: we only need to set the path to the DICOM folder to be
+    anonymized. Note that this folder is expected to contain only DICOM files.
     """
     pipeline = get_process_instance(pipeline_name)
-    pipeline.date_in_filename = True
-    pipeline.dicom_directories = [dcmfolder, dcmfolder]
-    pipeline.additional_informations = [[("Provided by", "Neurospin@2015")],
-                                        [("Provided by", "Neurospin@2015"),
-                                         ("TR", "1500")]]
-    pipeline.dcm_tags = [("TR", ("0x0018", "0x0080")),
-                         ("TE", ("0x0018", "0x0081"))]
+    pipeline.dcmdirs = [dcmfolder, dcmfolder]
 
     """
     Pipeline representation
@@ -119,42 +114,32 @@ def pilot_dcm2nii():
     Access the result
     -----------------
 
-    The 'nibabel' package is used to load the generated images. We display the
-    numpy array shape and the stored repetiton and echo times: in order
-    to load the 'descrip' image field we use the 'json' package.
+    The 'pydicom' package is used to load the generated DICOMs. We display the
+    patient name to check the anonimization process.
     """
-    import json
-    import copy
-    import nibabel
+    import dicom
 
-    generated_images = pipeline.filled_converted_files
-
-    for fnames in generated_images:
-        print(">>>", fnames, "...")
-        im = nibabel.load(fnames[0])
-        print("shape=", im.get_data().shape)
-        header = im.get_header()
-        a = str(header["descrip"])
-        a = a.strip()
-        description = json.loads(copy.deepcopy(a))
-        print("TE=", description["TE"])
-        print("TR=", description["TR"])
-        print("Provided by=", description["Provided by"])
+    for rundcmfile in pipeline.dcmfiles:
+        dcmfile = rundcmfile[0]
+        dataset = dicom.read_file(dcmfile, force=True)
+        print(dataset[(0x0010, 0x0010)])
+        if dataset[(0x0010, 0x0010)].value != "John Doe":
+            raise Exception("Dataset has not been de-idetnify properly.")
 
 
-class TestDcmToNii(unittest.TestCase):
-    """ Class to test dicom to nifti pipeline.
+class TestDcmAnon(unittest.TestCase):
+    """ Class to test dicom anonymization pipeline.
     """
-    def test_dcm_to_nii(self):
+    def test_dcm_anon(self):
         """ Method to test a simple 1 cpu call with the scheduler.
         """
-        pilot_dcm2nii()
+        pilot_dcmanon()
 
 
 def test():
     """ Function to execute unitest
     """
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestDcmToNii)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestDcmAnon)
     runtime = unittest.TextTestRunner(verbosity=2).run(suite)
     return runtime.wasSuccessful()
 

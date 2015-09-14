@@ -14,5 +14,21 @@
                 ".. _EU-AIMS: http://www.eu-aims.eu/"
             ]
         ]
+    },
+    "DICOM Anonymizer": {
+        "module": "dcmio.dcmanonymizer.dcm_anonymizer.xml",
+        "category": "DICOM",
+        "time_cost": 2,
+        "qc_cost": 4,
+        "pilot": "dcmio.test.test_dcm_anonymizer",
+        "references": [
+            [
+                "This will soon be used by David Goyard",
+                "<david.goyard@cea.fr> to treat the EU-AIMS_ data in",
+                "NeuroSpin.",
+                "",
+                ".. _EU-AIMS: http://www.eu-aims.eu/"
+            ]
+        ]
     }
 }
