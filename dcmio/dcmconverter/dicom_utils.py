@@ -111,6 +111,9 @@ def add_meta_to_nii(nii_files, dicom_dir, prefix, dcm_tags, output_directory,
                     if len(tag) > 1:
                         for inner_tag in tag[:-1]:
                             seq_field = current_dataset[inner_tag]
+                            if not seq_field.VR == "SQ":
+                                raise Exception("the field {0} is not "
+                                                "a sequence".format(inner_tag))
                             current_dataset = seq_field.value[0]
                     last_tag = tag[-1]
                     content[str(name)] = str(current_dataset[last_tag].value)
