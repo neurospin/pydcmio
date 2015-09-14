@@ -230,7 +230,7 @@ def anonymize_dataset(dataset, level=1):
         add_dataelement(dataset, (0x0012, 0x0064), sqdataset, "SQ")
 
     # Check that all tags with 'VR' 'PN' has been anonymized
-    #dataset.walk(callback_patient_name)
+    # dataset.walk(callback_patient_name)
 
 
 def callback_main(dataset, data_element):
