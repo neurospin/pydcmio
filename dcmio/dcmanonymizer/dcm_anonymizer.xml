@@ -41,7 +41,6 @@
     <units>
         <unit name="dcmanon">
             <module>dcmio.dcmanonymizer.dcm_anonymizer_bbox.xml</module>
-            <set name="output_directory" value="None"/>
             <iterinput name="inputdir"/>
             <iteroutput name="dcmfiles"/>
             <iteroutput name="logfiles"/>
