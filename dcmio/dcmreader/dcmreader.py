@@ -91,6 +91,28 @@ def walker_callback(data_element, _tag):
     return None
 
 
+def get_phase_encoding(path_to_dicom):
+    """
+        Get the phase encoding direction as string ("ROW" or "COL")
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the phase encoding (none if not found)
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0018, 0x1312), stack_values=True)
+    if value:
+        return str(value[0])
+    elif value == []:
+        return None
+    return value
+
+
 def get_b_vectors(path_to_dicom):
     """
         Get the b-vectors as list of lists
@@ -102,7 +124,7 @@ def get_b_vectors(path_to_dicom):
             data extraction will be made
 
     Returns :
-        the b-vectors (empty list of not found)
+        the b-vectors (empty list if not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     return walk(dataset, walker_callback, (0x0018, 0x9089), stack_values=True)
@@ -119,7 +141,7 @@ def get_b_values(path_to_dicom):
             data extraction will be made
 
     Returns :
-        the b-vectors (empty list of not found)
+        the b-vectors (empty list if not found)
     """
     dataset = dicom.read_file(path_to_dicom, force=True)
     return walk(dataset, walker_callback, (0x0018, 0x9087), stack_values=True)
@@ -313,6 +335,28 @@ def get_nb_temporal_position(path_to_dicom):
     if value:
         return int(value)
     return 0
+
+
+def get_manufacturer_name(path_to_dicom):
+    """
+    Get sequence name as string
+
+    ..note: spaces are replaced by "_" in the extracted value
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the manufacturer name ('unknown' if the value is not found)
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0008, 0x0070))
+    if value:
+        return value.replace(" ", "_")
+    return "unknown"
 
 
 def get_sequence_name(path_to_dicom):
