@@ -17,7 +17,7 @@ def pilot_dcm2nii():
     Imports
     -------
 
-    This code needs 'capsul' and 'mmutils' package in order to instanciate and
+    This code needs 'capsul' and 'mmutils' packages in order to instanciate and
     execute the pipeline and to get a toy dataset.
     These packages are available in the 'neurospin' source list or in pypi.
     """
@@ -49,7 +49,7 @@ def pilot_dcm2nii():
     'output_directory' attribute, the number of CPUs to be used through the
     'number_of_cpus' attributes, and to specify that we want a log of the
     processing step through the 'generate_logging'. The 'use_scheduler'
-    must be set to True if more than 1 CPU is used.
+    must be set to True if more than 1 CPU are used.
     """
     study_config = StudyConfig(
         modules=[],

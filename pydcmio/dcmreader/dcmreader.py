@@ -24,8 +24,6 @@ def walk(dataset, callback, _tag, stack_values=False):
         Recusrive function is required as new enhanced storage presents only
         one dicom containing several sub-sequence of fields.
         The walked is called on each sub-sequence
-        The first corresponding tag's value is returned: the walker stops as
-        soon as a value is found.
 
     Parameters
     ----------
@@ -33,8 +31,7 @@ def walk(dataset, callback, _tag, stack_values=False):
         dataset: a dataset structure (ourput from pydicom reader) (mandatory)
             the dataset to read
         callback: function that will be called on each field (value extraction)
-        _tag : the tag of the field containing the value to extract. Only the
-        first field with this tag is read.
+        _tag : the tag of the field containing the value to extract.
         all_value: if set to True, a list of all values is returned. The first
             value is returned otherwise.
 
@@ -77,10 +74,7 @@ def walker_callback(data_element, _tag):
     ----------
     inputs :
         data_element: the field to examine
-        _tag : the tag of the field containing the value to extract. Only the
-        first field with this tag is read.stack_values: boolean (optional).
-        Only the first field with this tag is read if False, return a list of
-        values if True. Default = False
+        _tag : the tag of the field containing the value to extract.
 
     Returns :
     The value in the chosen field. None if the field is not the one asked

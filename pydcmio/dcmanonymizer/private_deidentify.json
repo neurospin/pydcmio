@@ -1,0 +1,48 @@
+{
+    "SIEMENS": [
+        {
+            "Tag": "0019,xx0C",
+            "Attribute Name": "B Value"
+        },
+        {
+            "Tag": "0019,xx0D",
+            "Attribute Name": "Diffusion Directionality"
+        },
+        {
+            "Tag": "0019,xx0E",
+            "Attribute Name": "Diffusion Gradient Direction"
+        },
+        {
+            "Tag": "0019,xx27",
+            "Attribute Name": "B Matrix"
+        }
+    ],
+    "GE MEDICAL SYSTEMS": [
+        {
+            "Tag": "0043,xx39",
+            "Attribute Name": "1st value is B Value"
+        },
+        {
+            "Tag": "0019,10xx",
+            "Attribute Name": "Diffusion Direction"
+        }
+    ],
+    "Philips Healthcare": [
+        {
+            "Tag": "2001,xx03",
+            "Attribute Name": "Diffusion B-Factor"
+        },
+        {
+            "Tag": "2001,xx04",
+            "Attribute Name": "Diffusion Direction"
+        },
+        {
+            "Tag": "2001,105f",
+            "Attribute Name": "Swizzling"
+        },
+        {
+            "Tag": "2001,101x",
+            "Attribute Name": "Swizzling"
+        }
+    ]
+}
