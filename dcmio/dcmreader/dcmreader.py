@@ -359,6 +359,28 @@ def get_manufacturer_name(path_to_dicom):
     return "unknown"
 
 
+def get_manufacturer_model_name(path_to_dicom):
+    """
+    Get sequence name as string
+
+    ..note: spaces are replaced by "_" in the extracted value
+
+    Parameters
+    ----------
+    inputs :
+        path_to_dicom: a filepath (mandatory) to the dicom from which the
+            data extraction will be made
+
+    Returns :
+        the manufacturer model name ('unknown' if the value is not found)
+    """
+    dataset = dicom.read_file(path_to_dicom, force=True)
+    value = walk(dataset, walker_callback, (0x0008, 0x1090))
+    if value:
+        return value.replace(" ", "_")
+    return "unknown"
+
+
 def get_sequence_name(path_to_dicom):
     """
     Get sequence name as string
