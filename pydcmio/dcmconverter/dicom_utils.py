@@ -204,25 +204,30 @@ def add_meta_to_nii(nii_files, dicom_dir, dcm_tags, output_directory,
     All selected dicom tags values are set in the 'descrip' nifti header
     field.
 
-    <unit>
-        <input name="nii_files" type="List" content="File" description="The
-            nifti images to fill."/>
-        <input name="dicom_dir" type="Directory" description="The directory
-            containing the dicoms used to generate the nifti image."/>
-        <input name="prefix" type="String" description="The output image name
-            prefix."/>
-        <input name="dcm_tags" type="List"
-            content="Tuple_Str_List_Tuple_Str_Str"
-            description="A list of 2-uplet of the form (name, tag) that will
-            be inserted in the 'descrip' nifti header field."/>
-        <input name="output_directory" type="Directory" description="The
-            destination folder."/>
-        <input name="additional_information" type="List"
-            content="Tuple_Str_Str" description="A free dictionary items to be
-            inserted in the 'descrip' image header field."/>
-        <output name="filled_nii_files" type="List" content="File"
-            description="The nifti images containing the filled header."/>
-    </unit>
+    Parameters
+    ----------
+
+    nii_files: List
+        The nifti images to fill.
+    dicom_dir: Directory
+        The directory containing the dicoms used to generate the nifti image.
+    prefix: str
+        The output image name prefix
+    dcm_tags: List
+        A list of 2-uplet of the form (name, tag) that will
+        be inserted in the 'descrip' nifti header field.
+    output_directory: Directory
+        The destination folder.
+    additional_information: List
+        A free dictionary items to be inserted in the 'descrip' image
+        header field.
+
+    Returns
+    -------
+
+    filled_nii_files: List
+        The nifti images containing the filled header.
+
     """
     # Set default
     if additional_information is None:
