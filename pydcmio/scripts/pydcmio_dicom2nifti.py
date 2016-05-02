@@ -18,17 +18,17 @@ import numpy
 try:
     import bredala
     bredala.USE_PROFILER = False
-    bredala.register("dcmio.dcmconverter.dicom_utils",
+    bredala.register("pydcmio.dcmconverter.dicom_utils",
                      names=["generate_config", "dcm2nii", "add_meta_to_nii",
                             "mosaic"])
 except:
     pass
 
 # Dcmio import
-from dcmio.dcmconverter.dicom_utils import generate_config
-from dcmio.dcmconverter.dicom_utils import dcm2nii
-from dcmio.dcmconverter.dicom_utils import add_meta_to_nii
-from dcmio.dcmconverter.dicom_utils import mosaic
+from pydcmio.dcmconverter.dicom_utils import generate_config
+from pydcmio.dcmconverter.dicom_utils import dcm2nii
+from pydcmio.dcmconverter.dicom_utils import add_meta_to_nii
+from pydcmio.dcmconverter.dicom_utils import mosaic
 
 
 # Parameters to keep trace
@@ -63,7 +63,7 @@ Steps:
 
 Command:
 
-python $HOME/git/caps-dcmio/dcmio/scripts/dicom2nifti.py \
+python $HOME/git/pydcmio/pydcmio/scripts/dicom2nifti.py \
     -v 2 \
     -d /volatile/nsap/dcm2nii/dicom/T2GRE \
     -o /volatile/nsap/dcm2nii/convert/T2GRE \
