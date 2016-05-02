@@ -99,7 +99,7 @@ def dcm2nii(input, o, b):
         dcm2nii <options> <sourcenames>
     Options:
         -a Anonymize [remove identifying information]: Y,N = Y
-        -b load settings from specified inifile, e.g. '-b C:\set\t1.ini' 
+        -b load settings from specified inifile, e.g. '-b C:\set\t1.ini'
         -d Date in filename [filename.dcm -> 20061230122032.nii]: Y,N = N
         -e events (series/acq) in filename [filename.dcm -> s002a003.nii]: Y,N = N
         -f Source filename [e.g. filename.par -> filename.nii]: Y,N = N
@@ -108,7 +108,7 @@ def dcm2nii(input, o, b):
         -n output .nii file [if no, create .hdr/.img pair]: Y,N = Y
         -o Output Directory, e.g. 'C:\TEMP' (if unspecified, source directory is used)
         -p Protocol in filename [filename.dcm -> TFE_T1.nii]: Y,N = Y
-        -r Reorient image to nearest orthogonal: Y,N 
+        -r Reorient image to nearest orthogonal: Y,N
         -s SPM2/Analyze not SPM5/NIfTI [ignored if '-n y']: Y,N = N
         -t Text report (patient and scan details): Y,N = N
         -v Convert every image in the directory: Y,N = Y
@@ -229,8 +229,9 @@ def add_meta_to_nii(nii_files, dicom_dir, dcm_tags, output_directory,
         additional_information = []
 
     # Load a dicom image
-    dicom_files = glob.glob(os.path.join(dicom_dir, "*.dcm"))
-    dcmimage = dicom.read_file(dicom_files[0], force=True)
+    dicom_files = os.listdir(dicom_dir)
+    dcmimage = dicom.read_file(os.path.join(dicom_dir, dicom_files[0]),
+                               force=True)
 
     # Go through all nifti files
     filled_nii_files = []
@@ -252,7 +253,8 @@ def add_meta_to_nii(nii_files, dicom_dir, dcm_tags, output_directory,
             header = image.get_header()
 
             # > slice_duration: Time for 1 slice
-            repetition_time = get_repetition_time(dicom_files[0])
+            repetition_time = get_repetition_time(os.path.join(dicom_dir,
+                                                               dicom_files[0]))
             if repetition_time is not None:
                 repetition_time = float(repetition_time)
                 header.set_dim_info(slice=2)
@@ -335,7 +337,7 @@ def mosaic(impath, outdir, strategy="average", indices=None, title=None):
     if len(array.dtype) > 0:
         array = numpy.asarray(array.tolist())
     shape = array.shape
-        
+
     if array.ndim < 3 or array.ndim > 4:
         raise Exception("Only 3d or 4d images are accepted.")
     if array.ndim == 4 and strategy == "average":
@@ -359,5 +361,5 @@ def mosaic(impath, outdir, strategy="average", indices=None, title=None):
     fig.savefig(snap, dpi=300)
 
     return snap
-        
-    
+
+
