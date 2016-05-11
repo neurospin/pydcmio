@@ -18,10 +18,10 @@ from setuptools import find_packages, setup
 modules = find_packages()
 scripts = []
 pkgdata = {
-    "dcmio.dcmconverter": ["*.xml"]
+    "pydcmio.dcmconverter": ["*.xml"]
 }
 release_info = {}
-execfile(os.path.join("dcmio", "info.py"), release_info)
+execfile(os.path.join("pydcmio", "info.py"), release_info)
 
 
 # Build the setup

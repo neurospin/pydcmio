@@ -1,22 +1,22 @@
-===========================
-CAPS-DCMIO: CAPSul DiCoM IO 
-===========================
+========================
+PYDCMIO: Python DiCoM IO 
+========================
 
-.. image:: https://travis-ci.org/neurospin/caps-dcmio.svg?branch=master
-    :target: https://api.travis-ci.org/neurospin/caps-dcmio
+.. image:: https://travis-ci.org/neurospin/pydcmio.svg?branch=master
+    :target: https://api.travis-ci.org/neurospin/pydcmio
 
-.. image:: https://coveralls.io/repos/neurospin/caps-dcmio/badge.svg?branch=master&service=github
-    :target: https://coveralls.io/github/neurospin/caps-dcmio
+.. image:: https://coveralls.io/repos/neurospin/pydcmio/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/neurospin/pydcmio
   
 Documentation
 =============
 
-  Visit CAPS-DCMIO (http://neurospin.github.io/caps-dcmio) main page!
+  Visit PYDCMIO (http://neurospin.github.io/pydcmio) main page!
 
 Download
 ========
 
-  CAPS-DCMIO is available on pypi!
+  PYDCMIO is available on pypi!
 
 
 

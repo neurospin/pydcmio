@@ -29,16 +29,20 @@ from .utils import repr_dataelement
 def anonymize_dicomdir(inputdir, output_directory):
     """ Anonymize all DICOM files of the input directory.
 
-    <unit>
-        <input name="inputdir" type="Directory" description="A folder that
-            contains only DICOM files to be anonymized."/>
-        <input name="output_directory" type="Directory" description="The
-            destination folder."/>
-        <output name="dcmfiles" type="List" content="File" description="The
-            anonimized DICOM files."/>
-        <output name="logfiles" type="List" content="File" description="The
-            anonimization log files."/>
-    </unit>
+    Parameters
+    ----------
+    inputdir: str (mandatory)
+        A folder that contains only DICOM files to be anonymized.
+    output_directory: str (mandatory)
+        The anonimized DICOM files folder.
+
+    Returns
+    -------
+    dcmfiles: str
+        The anonimized DICOM files.
+    logfiles: list
+        The anonimization log files.
+
     """
     # Load the first dataset
     input_dicoms = [os.path.join(inputdir, fname)

@@ -25,22 +25,20 @@ CLASSIFIERS = ["Development Status :: 5 - Production/Stable",
                "Topic :: Utilities"]
 
 # Project descriptions
-description = "CAPS-DCMIO"
+description = "PYDCMIO"
 long_description = """
 ==========
-CAPS-DCMIO
+PYDCMIO
 ==========
 
 [dcmio] DiCoM IO.
-A pure python tool that defines processing pipelines to convert and
-anonymize dicoms. The pipeline are described in XML and interpreted by
-a pipeline engine.
+A pure python tool that defines processing scripts to convert and
+anonymize dicoms.
 """
 
 # Dependencies
 SPHINX_MIN_VERSION = 1.0
 DICOM_MIN_VERSION = 0.9
-CAPSUL_MIN_VERSION = 2.0
 MMUTILS_VERSION = 1.0
 
 # Main setup parameters
@@ -50,18 +48,17 @@ MAINTAINER = "Antoine Grigis"
 MAINTAINER_EMAIL = "antoine.grigis@cea.fr"
 DESCRIPTION = description
 LONG_DESCRIPTION = long_description
-URL = "https://github.com/neurospin/caps-dcmio.git"
-DOWNLOAD_URL = "https://pypi.python.org/pypi/caps-dcmio/" + __version__
+URL = "https://github.com/neurospin/pydcmio.git"
+DOWNLOAD_URL = "https://pypi.python.org/pypi/pydcmio/" + __version__
 LICENSE = "CeCILL-B"
 CLASSIFIERS = CLASSIFIERS
-AUTHOR = "CAPS-DCMIO developers"
+AUTHOR = "PYDCMIO developers"
 AUTHOR_EMAIL = "antoine.grigis@cea.fr"
 PLATFORMS = "OS Independent"
 ISRELEASE = True
 VERSION = __version__
 PROVIDES = ["dcmio"]
 REQUIRES = [
-    # "capsul>={0}".format(CAPSUL_VERSION),
     # "mmutils=={0}".format(MMUTILS_VERSION),
     "pydicom>={0}".format(DICOM_MIN_VERSION)
 ]

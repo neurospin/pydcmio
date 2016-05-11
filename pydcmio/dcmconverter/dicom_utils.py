@@ -99,7 +99,7 @@ def dcm2nii(input, o, b):
         dcm2nii <options> <sourcenames>
     Options:
         -a Anonymize [remove identifying information]: Y,N = Y
-        -b load settings from specified inifile, e.g. '-b C:\set\t1.ini' 
+        -b load settings from specified inifile, e.g. '-b C:\set\t1.ini'
         -d Date in filename [filename.dcm -> 20061230122032.nii]: Y,N = N
         -e events (series/acq) in filename [filename.dcm -> s002a003.nii]: Y,N = N
         -f Source filename [e.g. filename.par -> filename.nii]: Y,N = N
@@ -108,7 +108,7 @@ def dcm2nii(input, o, b):
         -n output .nii file [if no, create .hdr/.img pair]: Y,N = Y
         -o Output Directory, e.g. 'C:\TEMP' (if unspecified, source directory is used)
         -p Protocol in filename [filename.dcm -> TFE_T1.nii]: Y,N = Y
-        -r Reorient image to nearest orthogonal: Y,N 
+        -r Reorient image to nearest orthogonal: Y,N
         -s SPM2/Analyze not SPM5/NIfTI [ignored if '-n y']: Y,N = N
         -t Text report (patient and scan details): Y,N = N
         -v Convert every image in the directory: Y,N = Y
@@ -204,32 +204,39 @@ def add_meta_to_nii(nii_files, dicom_dir, dcm_tags, output_directory,
     All selected dicom tags values are set in the 'descrip' nifti header
     field.
 
-    <unit>
-        <input name="nii_files" type="List" content="File" description="The
-            nifti images to fill."/>
-        <input name="dicom_dir" type="Directory" description="The directory
-            containing the dicoms used to generate the nifti image."/>
-        <input name="prefix" type="String" description="The output image name
-            prefix."/>
-        <input name="dcm_tags" type="List" content="Tuple_Str_Tuple_Str_Str"
-            description="A list of 2-uplet of the form (name, tag) that will
-            be inserted in the 'descrip' nifti header field."/>
-        <input name="output_directory" type="Directory" description="The
-            destination folder."/>
-        <input name="additional_information" type="List"
-            content="Tuple_Str_Str" description="A free dictionary items to be
-            inserted in the 'descrip' image header field."/>
-        <output name="filled_nii_files" type="List" content="File"
-            description="The nifti images containing the filled header."/>
-    </unit>
+    Parameters
+    ----------
+
+    nii_files: List
+        The nifti images to fill.
+    dicom_dir: Directory
+        The directory containing the dicoms used to generate the nifti image.
+    prefix: str
+        The output image name prefix
+    dcm_tags: List
+        A list of 2-uplet of the form (name, tag) that will
+        be inserted in the 'descrip' nifti header field.
+    output_directory: Directory
+        The destination folder.
+    additional_information: List
+        A free dictionary items to be inserted in the 'descrip' image
+        header field.
+
+    Returns
+    -------
+
+    filled_nii_files: List
+        The nifti images containing the filled header.
+
     """
     # Set default
     if additional_information is None:
         additional_information = []
 
     # Load a dicom image
-    dicom_files = glob.glob(os.path.join(dicom_dir, "*.dcm"))
-    dcmimage = dicom.read_file(dicom_files[0], force=True)
+    dicom_files = os.listdir(dicom_dir)
+    dcmimage = dicom.read_file(os.path.join(dicom_dir, dicom_files[0]),
+                               force=True)
 
     # Go through all nifti files
     filled_nii_files = []
@@ -251,7 +258,8 @@ def add_meta_to_nii(nii_files, dicom_dir, dcm_tags, output_directory,
             header = image.get_header()
 
             # > slice_duration: Time for 1 slice
-            repetition_time = get_repetition_time(dicom_files[0])
+            repetition_time = get_repetition_time(os.path.join(dicom_dir,
+                                                               dicom_files[0]))
             if repetition_time is not None:
                 repetition_time = float(repetition_time)
                 header.set_dim_info(slice=2)
@@ -260,10 +268,25 @@ def add_meta_to_nii(nii_files, dicom_dir, dcm_tags, output_directory,
                 header.set_slice_duration(slice_duration)
 
             # > add free dicom fields
+            # extract value from the dicom file
             content = {}
             for name, tag in dcm_tags:
-                if tag in  dcmimage:
-                    content[str(name)] = str(dcmimage[tag].value)
+
+                try:
+                    # enhances storage, the value is burried under one or
+                    # several layer(s) of sequence
+                    current_dataset = dcmimage
+                    if len(tag) > 1:
+                        for inner_tag in tag[:-1]:
+                            seq_field = current_dataset[inner_tag]
+                            if not seq_field.VR == "SQ":
+                                raise Exception("the field {0} is not "
+                                                "a sequence".format(inner_tag))
+                            current_dataset = seq_field.value[0]
+                    last_tag = tag[-1]
+                    content[str(name)] = str(current_dataset[last_tag].value)
+                except:
+                    pass
 
             # > add/update content
             for key, value in additional_information:
@@ -319,7 +342,7 @@ def mosaic(impath, outdir, strategy="average", indices=None, title=None):
     if len(array.dtype) > 0:
         array = numpy.asarray(array.tolist())
     shape = array.shape
-        
+
     if array.ndim < 3 or array.ndim > 4:
         raise Exception("Only 3d or 4d images are accepted.")
     if array.ndim == 4 and strategy == "average":
@@ -343,5 +366,5 @@ def mosaic(impath, outdir, strategy="average", indices=None, title=None):
     fig.savefig(snap, dpi=300)
 
     return snap
-        
-    
+
+
