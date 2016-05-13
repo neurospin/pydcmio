@@ -26,14 +26,14 @@ from .utils import replace_by
 from .utils import repr_dataelement
 
 
-def anonymize_dicomdir(inputdir, output_directory):
+def anonymize_dicomdir(inputdir, outdir):
     """ Anonymize all DICOM files of the input directory.
 
     Parameters
     ----------
     inputdir: str (mandatory)
         A folder that contains only DICOM files to be anonymized.
-    output_directory: str (mandatory)
+    outdir: str (mandatory)
         The anonimized DICOM files folder.
 
     Returns
@@ -102,7 +102,7 @@ def anonymize_dicomdir(inputdir, output_directory):
             statinfo.st_size / 10e5)
         progress_indicator.next(1)
         output_dicom, output_log = anonymize_dicomfile(
-            input_dicom, output_directory, outname=str(cnt))
+            input_dicom, outdir, outname=str(cnt))
         dcmfiles.append(output_dicom)
         logfiles.append(output_log)
     progress_indicator.finish()
@@ -111,7 +111,6 @@ def anonymize_dicomdir(inputdir, output_directory):
 
 
 def anonymize_dicomfile(input_dicom, outdir, outname=None):
-
     """ Anonymize DICOMs
 
     According to PS 3.15-2008, basic application level de-indentification of

@@ -12,23 +12,23 @@ from __future__ import print_function
 import argparse
 import os
 import shutil
-import numpy
 
 # Bredala import
 try:
     import bredala
     bredala.USE_PROFILER = False
     bredala.register("pydcmio.dcmanonymizer.anonymize",
-                     names=["anonymize_dicomdir", "anonymize_dicomfile",
-                            "anonymize_dataset"])
+                     names=["anonymize_dicomdir"])
 except:
     pass
 
 # Dcmio import
+from pydcmio import __version__ as version
 from pydcmio.dcmanonymizer.anonymize import anonymize_dicomdir
 
 # Parameters to track
-__hopla__ = [""]
+__hopla__ = ["tool", "version", "inputs", "outputs",
+             "dcmdir", "anon_dcmdir", "anon_dcm_files", "logfiles"]
 
 
 # Script documentation
@@ -43,8 +43,8 @@ One logfile is generated for each dicom anonymized.
 
 Command:
 
-python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_dicomanonymizer.py \
-    -v 2 \
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_dicomanonymizer \
+    -v 1 \
     -d /volatile/nsap/dcm2nii/dicom/T2GRE \
     -o /volatile/nsap/dcm2nii/dicom_anon/T2GRE \
     -e
@@ -88,21 +88,21 @@ if args.verbose > 0:
     print("[info] Output: {0}.".format(args.outdir))
 dcmdir = args.dcmdir
 anon_dcmdir = args.outdir
+inputs = [dcmdir]
+outputs = []
 if os.path.isdir(anon_dcmdir):
     if args.erase:
         shutil.rmtree(anon_dcmdir)
-    else:
-        raise ValueError("The output folder '{}' already exist".format(
-            anon_dcmdir))
-os.mkdir(anon_dcmdir)
+        os.makedirs(anon_dcmdir)
+else:
+    os.makedirs(anon_dcmdir)
 
 
 """
-anonymization
+Anonymize the Dicom files
 """
-
 anon_dcm_files, logfiles = anonymize_dicomdir(dcmdir, anon_dcmdir)
-
 if args.verbose > 1:
     print("[result] anonymized files: {0}.".format(anon_dcm_files))
     print("[result] logfiles: {0}.".format(logfiles))
+outputs = anon_dcm_files + logfiles

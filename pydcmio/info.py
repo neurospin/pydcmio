@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 ##########################################################################
-# NSAp - Copyright (C) CEA, 2015
+# NSAp - Copyright (C) CEA, 2013 - 2016
 # Distributed under the terms of the CeCILL-B license, as published by
 # the CEA-CNRS-INRIA. Refer to the LICENSE file or to
 # http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
@@ -8,7 +8,7 @@
 ##########################################################################
 
 # Current version
-version_major = 1
+version_major = 2
 version_minor = 0
 version_micro = 0
 
@@ -25,45 +25,45 @@ CLASSIFIERS = ["Development Status :: 5 - Production/Stable",
                "Topic :: Utilities"]
 
 # Project descriptions
-description = "PYDCMIO"
-long_description = """
-==========
-PYDCMIO
-==========
+description = """
+[pyDcmio]
+This package provides common scripts:
 
-[dcmio] DiCoM IO.
-A pure python tool that defines processing scripts to convert and
-anonymize dicoms.
+*
+*
+*
+"""
+long_description = """
+========================
+PYDCMIO: Python DiCoM IO
+========================
+
+
+[dcmio] A Python project that provides a wrapping over the 'dcm2nii' command,
+common tools to read and anonymize DICOM files, and transcoding features.
+Visit also the `API documentation <http://neurospin.github.io/pydcmio>`_.
 """
 
-# Dependencies
-SPHINX_MIN_VERSION = 1.0
-DICOM_MIN_VERSION = 0.9
-MMUTILS_VERSION = 1.0
-
 # Main setup parameters
-NAME = "dcmio"
+NAME = "pyDcmio"
 ORGANISATION = "CEA"
 MAINTAINER = "Antoine Grigis"
 MAINTAINER_EMAIL = "antoine.grigis@cea.fr"
 DESCRIPTION = description
 LONG_DESCRIPTION = long_description
-URL = "https://github.com/neurospin/pydcmio.git"
-DOWNLOAD_URL = "https://pypi.python.org/pypi/pydcmio/" + __version__
+URL = "https://github.com/neurospin/pydcmio"
+DOWNLOAD_URL = "https://github.com/neurospin/pydcmio"
 LICENSE = "CeCILL-B"
 CLASSIFIERS = CLASSIFIERS
-AUTHOR = "PYDCMIO developers"
+AUTHOR = "pyDcmio developers"
 AUTHOR_EMAIL = "antoine.grigis@cea.fr"
 PLATFORMS = "OS Independent"
 ISRELEASE = True
 VERSION = __version__
-PROVIDES = ["dcmio"]
+PROVIDES = ["pydcmio"]
 REQUIRES = [
-    # "mmutils=={0}".format(MMUTILS_VERSION),
-    "pydicom>={0}".format(DICOM_MIN_VERSION)
+    "numpy>=1.6.1",
+    "pydicom>=0.9",
+    "nibabel>=2.0.2"
 ]
-EXTRA_REQUIRES = {
-    "doc": [
-        "sphinx>=1.0",
-    ]
-}
+EXTRA_REQUIRES = {}
