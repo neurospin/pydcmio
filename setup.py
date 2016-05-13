@@ -22,10 +22,10 @@ pkgdata = {
     "pydcmio": ["dcmanonymizer/*.json"]
 }
 scripts = [
-    "pydcmio/scripts/pydicom_dicom2nifti",
-    "pydcmio/scripts/pydicom_dicomanonymizer",
-    "pydcmio/scripts/pydicom_dicomreader",
-    "pydcmio/scripts/pydicom_transcode"
+    "pydcmio/scripts/pydcmio_dicom2nifti",
+    "pydcmio/scripts/pydcmio_dicomanonymizer",
+    "pydcmio/scripts/pydcmio_dicomreader",
+    "pydcmio/scripts/pydcmio_transcode"
 ]
 
 
