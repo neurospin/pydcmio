@@ -7,7 +7,7 @@
 ##########################################################################
 
 """
-Package to wrap read/convert/anonymize/transcode DICOM files.
+Package to read/split/convert/anonymize/transcode DICOM files.
 """
 
 from .info import __version__

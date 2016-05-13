@@ -40,7 +40,7 @@ def callback_private(dataset, data_element):
             value_repr = repr_dataelement(data_element)
             ANON_LOG.setdefault(tag_repr, []).append((value_repr, anon_value))
         else:
-            print tag_repr, repr_dataelement(data_element)
+            print(tag_repr, repr_dataelement(data_element))
 
         return True
 

@@ -29,9 +29,12 @@ description = """
 [pyDcmio]
 This package provides common scripts:
 
-*
-*
-*
+* pydcmio_dicomreader: can be use to read specific or registered dicom tags
+  recursively.
+* pydcmio_splitseries: can be used to split DICOM files by serie names.
+* pydcmio_dicomanonymizer: can be used to anonymize DICOM files (experimental).
+* pydcmio_transcode: can be used to transcode the subject identifiers.
+* pydcmio_dicom2nifti: can be used to convert DICOM files in Nifti format.
 """
 long_description = """
 ========================
@@ -41,7 +44,6 @@ PYDCMIO: Python DiCoM IO
 
 [dcmio] A Python project that provides a wrapping over the 'dcm2nii' command,
 common tools to read and anonymize DICOM files, and transcoding features.
-Visit also the `API documentation <http://neurospin.github.io/pydcmio>`_.
 """
 
 # Main setup parameters

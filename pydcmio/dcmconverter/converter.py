@@ -35,8 +35,19 @@ def generate_config(niidir, anonymized=True, gzip=True, add_date=True,
         If 'True' then patient name will not be copied to NIfTI header.
     gzip: bool (optional, default True)
         If 'True' then dcm2nii will create compressed .nii.gz files.
-    add_date, add_acquisition_number, add_protocol_name,
-    add_patient_name, add_source_filename: str (optional, default True)
+    add_date: str (optional, default True)
+        If 'True' then dcm2nii will add the requested element in the output
+        filename.
+    add_acquisition_number: str (optional, default True)
+        If 'True' then dcm2nii will add the requested element in the output
+        filename.
+    add_protocol_name: str (optional, default True)
+        If 'True' then dcm2nii will add the requested element in the output
+        filename.
+    add_patient_name: str (optional, default True)
+        If 'True' then dcm2nii will add the requested element in the output
+        filename.
+    add_source_filename: str (optional, default True)
         If 'True' then dcm2nii will add the requested element in the output
         filename.
     begin_clip: int (optional, default 0)
@@ -92,25 +103,25 @@ def dcm2nii(input, o, b):
     parameters.
 
     The basic usage is:
-        dcm2nii <options> <sourcenames>
+    dcm2nii <options> <sourcenames>
+
     Options:
-        -a Anonymize [remove identifying information]: Y,N = Y
-        -b load settings from specified inifile, e.g. '-b C:\set\t1.ini'
-        -d Date in filename [filename.dcm -> 20061230122032.nii]: Y,N = N
-        -e events (series/acq) in filename [filename.dcm -> s002a003.nii]:
-           Y,N = N
-        -f Source filename [e.g. filename.par -> filename.nii]: Y,N = N
-        -g gzip output, filename.nii.gz [ignored if '-n n']: Y,N = Y
-        -i ID  in filename [filename.dcm -> johndoe.nii]: Y,N = N
-        -n output .nii file [if no, create .hdr/.img pair]: Y,N = Y
-        -o Output Directory, e.g. 'C:\TEMP' (if unspecified, source directory
-           is used)
-        -p Protocol in filename [filename.dcm -> TFE_T1.nii]: Y,N = Y
-        -r Reorient image to nearest orthogonal: Y,N
-        -s SPM2/Analyze not SPM5/NIfTI [ignored if '-n y']: Y,N = N
-        -t Text report (patient and scan details): Y,N = N
-        -v Convert every image in the directory: Y,N = Y
-        -x Reorient and crop 3D NIfTI images: Y,N = N
+    a Anonymize [remove identifying information]: Y,N = Y
+    b load settings from specified inifile, e.g. '-b C:\set\t1.ini'
+    d Date in filename [filename.dcm -> 20061230122032.nii]: Y,N = N
+    e events (series/acq) in filename [filename.dcm -> s002a003.nii]: Y,N = N
+    f Source filename [e.g. filename.par -> filename.nii]: Y,N = N
+    g gzip output, filename.nii.gz [ignored if '-n n']: Y,N = Y
+    i ID  in filename [filename.dcm -> johndoe.nii]: Y,N = N
+    n output .nii file [if no, create .hdr/.img pair]: Y,N = Y
+    o Output Directory, e.g. 'C:\TEMP' (if unspecified, source directory
+    is used)
+    p Protocol in filename [filename.dcm -> TFE_T1.nii]: Y,N = Y
+    r Reorient image to nearest orthogonal: Y,N
+    s SPM2/Analyze not SPM5/NIfTI [ignored if '-n y']: Y,N = N
+    t Text report (patient and scan details): Y,N = N
+    v Convert every image in the directory: Y,N = Y
+    x Reorient and crop 3D NIfTI images: Y,N = N
 
     Returns
     -------
