@@ -10,9 +10,13 @@
 import numpy
 import nibabel
 import os
-
-# QAP import
-from qap.viz.plotting import plot_mosaic
+import math
+import time
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import FigureCanvasPdf as FigureCanvas
 
 
 def mosaic(impath, outdir, strategy="average", indices=None, title=None):
@@ -72,3 +76,92 @@ def mosaic(impath, outdir, strategy="average", indices=None, title=None):
     fig.savefig(snap, dpi=300)
 
     return snap
+
+
+def plot_mosaic(nifti_file, title=None, overlay_mask=None,
+                figsize=(11.7, 8.3)):
+    """ From the qap module.
+    """
+    from pylab import cm
+
+    if isinstance(nifti_file, str):
+        nii = nibabel.load(nifti_file)
+        mean_data = nii.get_data()
+    else:
+        mean_data = nifti_file
+
+    z_vals = np.array(range(0, mean_data.shape[2]))
+    # Reduce the number of slices shown
+    if mean_data.shape[2] > 70:
+        rem = 15
+        # Crop inferior and posterior
+        mean_data = mean_data[..., rem:-rem]
+        z_vals = z_vals[rem:-rem]
+        # Discard one every two slices
+        mean_data = mean_data[..., ::2]
+        z_vals = z_vals[::2]
+
+    n_images = mean_data.shape[2]
+    row, col = _calc_rows_columns(figsize[0] / figsize[1], n_images)
+
+    if overlay_mask:
+        overlay_data = nibabel.load(overlay_mask).get_data()
+
+    # create figures
+    fig = plt.Figure(figsize=figsize)
+    FigureCanvas(fig)
+
+    fig.subplots_adjust(top=0.85)
+    for image, z_val in enumerate(z_vals):
+        ax = fig.add_subplot(row, col, image + 1)
+        data_mask = np.logical_not(np.isnan(mean_data))
+        if overlay_mask:
+            ax.set_rasterized(True)
+
+        ax.imshow(np.fliplr(mean_data[:, :, image].T), vmin=np.percentile(
+            mean_data[data_mask], 0.5),
+            vmax=np.percentile(mean_data[data_mask], 99.5),
+            cmap=cm.Greys_r, interpolation='nearest', origin='lower')
+
+        if overlay_mask:
+            cmap = cm.Reds  # @UndefinedVariable
+            cmap._init()
+            alphas = np.linspace(0, 0.75, cmap.N + 3)
+            cmap._lut[:, -1] = alphas
+            ax.imshow(np.fliplr(overlay_data[:, :, image].T), vmin=0, vmax=1,
+                      cmap=cmap, interpolation='nearest', origin='lower')
+
+        ax.annotate(
+            str(z_val), xy=(.95, .015), xycoords='axes fraction',
+            fontsize=10, color='white', horizontalalignment='right',
+            verticalalignment='bottom')
+
+        ax.axis('off')
+
+    fig.subplots_adjust(
+        left=0.05, right=0.95, bottom=0.05, top=0.95, wspace=0.01, hspace=0.1)
+
+    if not title:
+        _, title = os.path.split(nifti_file)
+        title += " (last modified: %s)" % time.ctime(
+            os.path.getmtime(nifti_file))
+    fig.suptitle(title, fontsize='10')
+    return fig
+
+
+def _calc_rows_columns(ratio, n_images):
+    """ From the qap module.
+    """
+    rows = 1
+    for _ in range(100):
+        columns = math.floor(ratio * rows)
+        total = rows * columns
+        if total > n_images:
+            break
+
+        columns = math.ceil(ratio * rows)
+        total = rows * columns
+        if total > n_images:
+            break
+        rows += 1
+    return rows, columns
