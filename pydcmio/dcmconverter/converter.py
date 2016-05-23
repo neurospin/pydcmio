@@ -138,19 +138,19 @@ def dcm2nii(input, o, b):
     """
     # Get the destination folder
     if not os.path.isfile(b):
-        raise ValueError("'{0}' is not a configuration file.".format(b))
+        raise ValueError("'{0}' is not a valid configuration file.".format(b))
     with open(b, "rt") as open_file:
         lines = open_file.readlines()
     outdirs = [line.replace("OutDir=", "") for line in lines
                if line.startswith("OutDir=")]
     if len(outdirs) != 1:
-        raise ValueError("Expect one destination folder in configuration file "
-                         "'{0}'.".format(b))
+        raise ValueError("Expect one destination folder ('OutDir=') in "
+                         "configuration file '{0}'.".format(b))
     niidir = outdirs[0].rstrip("\n")
 
     # Call dcm2nii
     dcm2niiprocess = Dcm2NiiWrapper("dcm2nii")
-    dcm2niiprocess()
+    dcm2niiprocess(cmd=["dcm2nii", "-o", o, "-b", b, input])
 
     # Format outputs: from nipype
     files = []
@@ -262,7 +262,7 @@ def add_meta_to_nii(nii_file, dicom_dir, dcm_tags, outdir, prefix="f",
 
         # > slice_duration: Time for 1 slice
         repetition_time = get_values(dataset, "get_repetition_time")
-        if repetition_time is not None:
+        if repetition_time is not None and len(niiimage.shape) > 2:
             repetition_time = float(repetition_time)
             header.set_dim_info(slice=2)
             nb_slices = header.get_n_slices()
@@ -293,7 +293,7 @@ def add_meta_to_nii(nii_file, dicom_dir, dcm_tags, outdir, prefix="f",
     # Unknwon image format
     else:
         raise ValueError(
-            "'{0}' is not a Nifti1 image but a '{0}' image.".format(
+            "'{0}' is not a Nifti1 image but a '{1}' image.".format(
                 nii_file, type(niiimage)))
 
     return filled_nii_file

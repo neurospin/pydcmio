@@ -27,14 +27,11 @@ def transcode_sids(sids, transcoding_table):
         the transcoding table in JSON format that will be updated if necessary.
     """
     # Load the transcoding table
-    if transcoding_table is not None:
-        if not os.path.isfile(transcoding_table):
-            raise ValueError("'{0}' is not a valid transcoding file.".format(
-                transcoding_table))
-        with open(transcoding_table, "rt") as open_file:
-            transcoding = json.load(open_file)
-    else:
-        transcoding = {}
+    if not os.path.isfile(transcoding_table):
+        raise ValueError("'{0}' is not a valid transcoding file.".format(
+            transcoding_table))
+    with open(transcoding_table, "rt") as open_file:
+        transcoding = json.load(open_file)
 
     # Go through each subject id
     for sid in sids:

@@ -26,7 +26,7 @@ from .utils import replace_by
 from .utils import repr_dataelement
 
 
-def anonymize_dicomdir(inputdir, outdir):
+def anonymize_dicomdir(inputdir, outdir, write_logs=True):
     """ Anonymize all DICOM files of the input directory.
 
     Parameters
@@ -35,6 +35,8 @@ def anonymize_dicomdir(inputdir, outdir):
         A folder that contains only DICOM files to be anonymized.
     outdir: str (mandatory)
         The anonimized DICOM files folder.
+    write_logs: bool (optional, default True)
+        If True write the anonimization logs.
 
     Returns
     -------
@@ -102,7 +104,7 @@ def anonymize_dicomdir(inputdir, outdir):
             statinfo.st_size / 10e5)
         progress_indicator.next(1)
         output_dicom, output_log = anonymize_dicomfile(
-            input_dicom, outdir, outname=str(cnt))
+            input_dicom, outdir, outname=str(cnt), write_log=write_logs)
         dcmfiles.append(output_dicom)
         logfiles.append(output_log)
     progress_indicator.finish()
@@ -110,7 +112,7 @@ def anonymize_dicomdir(inputdir, outdir):
     return dcmfiles, logfiles
 
 
-def anonymize_dicomfile(input_dicom, outdir, outname=None):
+def anonymize_dicomfile(input_dicom, outdir, outname=None, write_log=True):
     """ Anonymize DICOMs
 
     According to PS 3.15-2008, basic application level de-indentification of
@@ -152,13 +154,15 @@ def anonymize_dicomfile(input_dicom, outdir, outname=None):
     outname: str (optional, default None)
         the generated files base names, if None use the 'input_dicom' base
         name.
+    write_log: bool (optional, default True)
+        If True write the anonimization log.
 
     Returns
     -------
     output_dicom: str
         the path to the anonimized DICOM file.
     output_log: str
-        the path to the anonimization log.
+        If 'write_log' is set, the path to the anonimization log.
     """
     # Clean global log
     for key in ANON_LOG.keys():
@@ -180,9 +184,11 @@ def anonymize_dicomfile(input_dicom, outdir, outname=None):
     dataset.save_as(output_dicom)
 
     # Save the anonimized log
-    output_log = os.path.join(outdir, outname + ".json")
-    with open(output_log, "w") as open_file:
-        json.dump(ANON_LOG, open_file, indent=4)
+    output_log = None
+    if write_log:
+        output_log = os.path.join(outdir, outname + ".json")
+        with open(output_log, "w") as open_file:
+            json.dump(ANON_LOG, open_file, indent=4)
 
     return output_dicom, output_log
 

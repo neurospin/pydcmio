@@ -88,6 +88,9 @@ def walk(dataset_or_dcmpath, tag, stack_values=False):
                 dataset_or_dcmpath))
         dataset = dicom.read_file(dataset_or_dcmpath, force=True)
     else:
+        if not isinstance(dataset_or_dcmpath, dicom.dataset.Dataset):
+            raise ValueError("'{0}' is not a 'pydicom' Dataset.".format(
+                dataset_or_dcmpath))
         dataset = dataset_or_dcmpath
 
     # Go through each dataset tags
@@ -144,9 +147,9 @@ def get_values(dataset_or_dcmpath, extractor):
     """
     # Deal with input parameters
     if extractor not in STANDARD_EXTRACTOR:
-        raise ValueError("'{0}' is not a valid extractor, register extractor "
-                         "are in {1}.".format(extractor,
-                                              STANDARD_EXTRACTOR.keys()))
+        raise ValueError("'{0}' is not a valid extractor, registered "
+                         "extractor are in {1}.".format(
+                             extractor, STANDARD_EXTRACTOR.keys()))
     # Get tag associated values
     tag, stack_values = STANDARD_EXTRACTOR[extractor]
     values = walk(dataset_or_dcmpath, tag, stack_values=stack_values)

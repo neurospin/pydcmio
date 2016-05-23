@@ -107,10 +107,15 @@ def split_series(dicom_dir, outdir):
 
         # Find character encoding of DICOM attributes:
         # we currently expect encoding to be ISO_IR 100
-        SpecificCharacterSet = dataset[0x0008, 0x0005].value
-        if SpecificCharacterSet != "ISO_IR 100":
-            logger.error('file encoding is not ISO_IR 100 as expected')
-            continue
+        if (0x0008, 0x0005) in dataset:
+            SpecificCharacterSet = dataset[0x0008, 0x0005].value
+            if SpecificCharacterSet != "ISO_IR 100":
+                print("'{0}' file encoding is not ISO_IR 100 as "
+                      "expected.".format(dicom_file))
+                continue
+        else:
+            print("Can't check encoding of '{0}', missing (0x0008, 0x0005) "
+                  "tag.".format(dicom_file))
 
         # Process other DICOM attributes:
         # decode strings assuming 'ISO_IR 100'
@@ -138,7 +143,7 @@ def split_series(dicom_dir, outdir):
             serie_name = (SeriesDescription + "_" + str(EchoTime) + "_" +
                           str(SeriesNumber).rjust(6, "0"))
         else:
-            serie_name = EchoTime + "_" + str(SeriesNumber).rjust(6, "0")
+            serie_name = str(EchoTime) + "_" + str(SeriesNumber).rjust(6, "0")
         output_dicom_dir = os.path.join(outdir, serie_name)
 
         # Check that the destination folder exists
