@@ -42,7 +42,7 @@ PYDCMIO: Python DiCoM IO
 ========================
 
 
-[dcmio] A Python project that provides a wrapping over the 'dcm2nii' command,
+[pydcmio] A Python project that provides a wrapping over the 'dcm2nii' command,
 common tools to read and anonymize DICOM files, and transcoding features.
 """
 
