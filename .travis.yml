@@ -1,11 +1,14 @@
+sudo: required
+dist: trusty
 language: python
 
 python:
-    - 2.6
-    - 2.7
+    - "2.7"
+    - "3.4"
 
 before_install:
     - sudo apt-get update
+    - sudo apt-get install libopenctm1
     - if [ ${TRAVIS_PYTHON_VERSION:0:1} == "2" ]; then wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh; else wget http://repo.continuum.io/miniconda/Miniconda3-3.6.0-Linux-x86_64.sh -O miniconda.sh; fi
     - chmod +x miniconda.sh
     - ./miniconda.sh -b -p $HOME/miniconda
@@ -16,36 +19,15 @@ install:
     - conda update --yes conda
     - conda create -n testenv --yes pip python=$TRAVIS_PYTHON_VERSION
     - source activate testenv
-    - conda install --yes numpy scipy networkx dateutil
-    - sudo apt-get install mricron
-    - git clone https://github.com/neurospin/caps-mmutils.git /tmp/caps-mmutils
-    - export PYTHONPATH=$PYTHONPATH:/tmp/caps-mmutils
-    - pip install ez_setup
-    - pip install ordereddict
-    - pip install importlib
-    - pip install sklearn
-    - pip install nilearn
-    - pip install soma-workflow
-    - pip install capsul
-    - pip install matplotlib
-    - pip install nibabel
-    - pip install pydicom
-    - pip install nipype
+    - if [ ${TRAVIS_PYTHON_VERSION:0:1} == "2" ]; then pip install mock; fi
+    - conda install --yes numpy matplotlib
     - pip install nose
     - pip install nose-exclude
     - pip install coverage
     - pip install coveralls
     - pip install pep8
-    - git clone -b glossary https://github.com/AGrigis/capsul.git /tmp/capsul
-    - export PYTHONPATH=$PYTHONPATH:/tmp/capsul
-    - python setup.py install
+    - pip install nibabel
+    - pip install .
 
 script:
-    - python setup.py nosetests
-    - pep8 . --ignore="E121,E123,E126,E226,E24,E704,E402"
-
-after_success:
-    - cat .coverage | wc
-    - coveralls
-
-
+    - pep8 . --ignore="E121,E123,E126,E226,E24,E704,E402,E731"

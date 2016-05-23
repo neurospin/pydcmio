@@ -4,13 +4,15 @@
 *.so
 *.pyc
 
-# Logs and databases #
-######################
+# Logs and temporaries #
+########################
 *.log
 *~
 .coverage
 
 # Folders #
 ###########
-*.egg*/
 build/
+dist/
+*.egg*/
+__pycache__/

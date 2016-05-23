@@ -8,25 +8,31 @@
 ##########################################################################
 
 # System import
-from ez_setup import use_setuptools
-use_setuptools()
+from setuptools import setup, find_packages
 import os
-from setuptools import find_packages, setup
 
 
-# Select appropriate modules
-modules = find_packages()
-scripts = []
-pkgdata = {
-    "dcmio.dcmconverter": ["*.xml"]
-}
 release_info = {}
-execfile(os.path.join("dcmio", "info.py"), release_info)
+infopath = os.path.join(os.path.dirname(__file__), "pydcmio", "info.py")
+with open(infopath) as open_file:
+    exec(open_file.read(), release_info)
+pkgdata = {
+    "pydcmio": ["tests/*.py", "tests/*/*.py"],
+    "pydcmio": ["dcmconverter/dcm2nii_config.json"],
+    "pydcmio": ["dcmanonymizer/*.json"]
+}
+scripts = [
+    "pydcmio/scripts/pydcmio_dicom2nifti",
+    "pydcmio/scripts/pydcmio_dicomanonymizer",
+    "pydcmio/scripts/pydcmio_dicomreader",
+    "pydcmio/scripts/pydcmio_splitseries",
+    "pydcmio/scripts/pydcmio_transcode"
+]
 
 
 # Build the setup
 setup(
-    name="{0}".format(release_info["NAME"]),
+    name=release_info["NAME"],
     description=release_info["DESCRIPTION"],
     long_description=release_info["LONG_DESCRIPTION"],
     license=release_info["LICENSE"],
@@ -35,10 +41,10 @@ setup(
     author_email=release_info["AUTHOR_EMAIL"],
     version=release_info["VERSION"],
     url=release_info["URL"],
-    packages=modules,
-    package_data=pkgdata,
+    packages=find_packages(exclude="doc"),
     platforms=release_info["PLATFORMS"],
     extras_require=release_info["EXTRA_REQUIRES"],
     install_requires=release_info["REQUIRES"],
+    package_data=pkgdata,
     scripts=scripts
 )

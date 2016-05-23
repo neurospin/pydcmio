@@ -1,0 +1,121 @@
+#! /usr/bin/env python
+##########################################################################
+# NSAp - Copyright (C) CEA, 2013 - 2016
+# Distributed under the terms of the CeCILL-B license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+# for details.
+##########################################################################
+
+# System import
+from __future__ import print_function
+import argparse
+import os
+
+# Bredala import
+try:
+    import bredala
+    bredala.USE_PROFILER = False
+    bredala.register("pydcmio.dcmreader.reader",
+                     names=["get_values"])
+except:
+    pass
+
+# Dcmio import
+from pydcmio import __version__ as version
+from pydcmio.dcmreader.reader import walk
+from pydcmio.dcmreader.reader import get_values
+from pydcmio.dcmreader.reader import STANDARD_EXTRACTOR
+
+# Parameters to keep trace
+__hopla__ = ["tool", "version"]
+
+
+# Script documentation
+doc = """
+Dicom reader and value extractor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This code enables us to extract any kind of information from a Dicom file.
+
+Dicom field sequences are parsed recursively (deep search) to handle
+enhanced storage parsing.
+
+Steps:
+
+Chose which mode you want to use:
+
+* free (you provide the dicom tags)
+* guided (tags are automatically provided)
+
+Command:
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_dicomreader \
+    -t 0x0018 0x1312 \
+    -f /volatile/nsap/dcm2nii/dicom/dcm.dcm \
+    -s
+
+or
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_dicomreader \
+    -a get_sequence_name \
+    -f /volatile/nsap/dcm2nii/dicom/dcm.dcm
+"""
+
+
+def is_file(filearg):
+    """ Type for argparse - checks that output file exists.
+    """
+    if not os.path.isfile(filearg):
+        raise argparse.ArgumentError(
+            "The file '{0}' does not exist!".format(filearg))
+    return filearg
+
+
+parser = argparse.ArgumentParser(description=doc)
+parser.add_argument(
+    "-v", "--verbose", dest="verbose", type=int, choices=[0, 1, 2], default=0,
+    help="increase the verbosity level: 0 silent, [1, 2] verbose.")
+group = parser.add_mutually_exclusive_group()
+group.add_argument(
+    "-t", "--tag", dest="dcmtag",
+    help=("the tags you wich to extract from the dicom file, string such as "
+          "type(repr(<tag>)) == tuple."),
+    type=str, nargs=2)
+group.add_argument(
+    "-a", "--extractor", dest="extractor", choices=STANDARD_EXTRACTOR.keys(),
+    help="use an already provided extractor: {}".format(
+        STANDARD_EXTRACTOR.keys()))
+parser.add_argument(
+    "-f", "--dcmfile", dest="dcmfile", required=True, metavar="PATH",
+    help="the dicom file to parse",
+    type=is_file)
+parser.add_argument(
+    "-s", "--stack", dest="stack", action="store_true",
+    help=("if specified, the output file will contain all values that "
+          "correspond to a given tag, not only the first one."))
+args = parser.parse_args()
+
+
+"""
+Welcome message
+"""
+if args.verbose > 0:
+    print("[info] Start dicom tag extraction...")
+    print("[info] Dicom file: {0}.".format(args.dcmfile))
+
+
+"""
+Get tag
+"""
+if args.dcmtag:
+    print(args.dcmtag, ": ",
+          walk(args.dcmfile, args.dcmtag, stack_values=args.stack))
+
+
+"""
+Get extractor
+"""
+if args.extractor:
+    print(args.extractor, STANDARD_EXTRACTOR[args.extractor], ": ",
+          get_values(args.dcmfile, args.extractor))
