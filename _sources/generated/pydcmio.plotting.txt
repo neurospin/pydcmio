@@ -1,0 +1,27 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+:orphan:
+
+Documentation of *pydcmio.plotting*
+====================================
+
+
+Module that provides usefull functions to display conversion results.
+
+
+.. raw:: html
+
+    <br/>    <!-- Block section -->
+    <table border='1' class='docutils' style='width:100%'>
+    <colgroup><col width='25%'/><col width='75%'/></colgroup>
+    <tbody valign='top'>
+    <tr class='row-odd'>
+    <td><a class='reference internal' href='pydcmio.plotting.slicer.html'><em>pydcmio.plotting.slicer</em></a></td>
+    <td>
+    
+    </td>
+    </tr>
+    </tbody>
+
+
+    </table>

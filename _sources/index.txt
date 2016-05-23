@@ -1,0 +1,32 @@
+..  pydcmio documentation master file
+
+
+
+========================
+PYDCMIO: Python DiCoM IO
+========================
+
+
+[pydcmio] A Python project that provides a wrapping over the 'dcm2nii' command,
+common tools to read and anonymize DICOM files, and transcoding features.
+
+
+
+Contents
+========
+.. toctree::
+    :maxdepth: 1
+
+    generated/installation
+    generated/documentation
+
+
+Search
+=======
+
+:ref:`search`
+
+
+
+
+

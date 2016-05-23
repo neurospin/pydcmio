@@ -1,0 +1,66 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+Documentation of PYDCMIO
+=========================
+
+.. raw:: html
+
+    <!-- Block section -->
+
+    <div class='container-fluid'>
+
+    <div class='row'>
+
+    <div class='col-md-4'>
+    <h3><a href='pydcmio.html'>
+    pydcmio
+    </a></h3>
+    <blockquote>
+        <p>Package to read/split/convert/anonymize/transcode DICOM files.</p>    </blockquote>
+    </div>
+    <div class='col-md-4'>
+    <h3><a href='pydcmio.dcmanonymizer.html'>
+    pydcmio.dcmanonymizer
+    </a></h3>
+    <blockquote>
+        <p>Module that provides common tools to anonimize DICOM files. Note that this
+    module is experimental.</p>    </blockquote>
+    </div>
+    <div class='col-md-4'>
+    <h3><a href='pydcmio.dcmconverter.html'>
+    pydcmio.dcmconverter
+    </a></h3>
+    <blockquote>
+        <p>This module is proposes three main functionalitites:</p>
+    <ul class="simple">
+    <li>a functionality to convert DICOM files to Nifti format.</li>
+    <li>a functionality to split DICOM files by serie names.</li>
+    <li>a functionality to transcode the subject identifiers.</li>
+    </ul>    </blockquote>
+    </div>
+    <div class='col-md-4'>
+    <h3><a href='pydcmio.dcmreader.html'>
+    pydcmio.dcmreader
+    </a></h3>
+    <blockquote>
+        <p>Module that provides usefull functions to find a specific DICOM tag in a
+    DICOM dataset, exploring recursively sequences.</p>    </blockquote>
+    </div>
+    <div class='col-md-4'>
+    <h3><a href='pydcmio.dcm2nii.html'>
+    pydcmio.dcm2nii
+    </a></h3>
+    <blockquote>
+        <p>Module that provides a binding over the 'dcm2nii' command. This module
+    also defines custom exceptions.</p>    </blockquote>
+    </div>
+    <div class='col-md-4'>
+    <h3><a href='pydcmio.plotting.html'>
+    pydcmio.plotting
+    </a></h3>
+    <blockquote>
+        <p>Module that provides usefull functions to display conversion results.</p>    </blockquote>
+    </div>
+
+    </div>
+    </div>

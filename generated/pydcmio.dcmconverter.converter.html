@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>PYDCMIO &mdash; pyDcmio</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../_static/css/bootstrap.min.css" media="screen" />
+
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pyDcmio" href="../index.html" />
+  
+   
+       <script type="text/javascript" src="../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../_static/js/bootstrap.min.js" type="text/javascript"></script>
+
+  <script src="../_static/js/angular.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var app = angular.module("navApp", []);
+    app.controller('navCtrl', ['$scope', '$window', function($scope, $window) {
+      $scope.isActive = function (viewLocation) {
+        var rel = $window.location.pathname.split("/")
+        rel = rel[rel.length - 1]
+        rel = rel.split(".")[0]
+        var active = (viewLocation === rel);
+        return active;};
+    }]);
+  </script>
+
+  </head>
+  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+        <img alt="Logo" src="../_static/pydcmio.png">
+        </a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
+      <ul class="nav navbar-nav">
+        <li ng-class="{ active: isActive('index') }"><a href="../index.html">Home</a></li>
+        <li ng-class="{ active: isActive('installation') }"><a href="installation.html">Installation</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="documentation.html">Documentation</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+	        <li><a href="pydcmio.html">Pydcmio</a></li>
+<li><a href="pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
+<li><a href="pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="pydcmio.plotting.html">Pydcmio.plotting</a></li>
+          </ul>
+        </li>
+        <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for pydcmio <strong>version 2.0.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/pydcmio">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      <ul class="simple">
+</ul>
+
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="module-pydcmio.dcmconverter.converter"></span><dl class="function">
+<dt id="pydcmio.dcmconverter.converter.add_meta_to_nii">
+<code class="descclassname">pydcmio.dcmconverter.converter.</code><code class="descname">add_meta_to_nii</code><span class="sig-paren">(</span><em>nii_file</em>, <em>dicom_dir</em>, <em>dcm_tags</em>, <em>outdir</em>, <em>prefix='f'</em>, <em>additional_information=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pydcmio/dcmconverter/converter.html#add_meta_to_nii"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydcmio.dcmconverter.converter.add_meta_to_nii" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add dicom tags to Nifti1 image header.</p>
+<p>All selected dicom tag values are set in the &#8216;descrip&#8217; Nifti header
+field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nii_file: str</strong></p>
+<blockquote>
+<div><p>The nifti image to fill.</p>
+</div></blockquote>
+<p><strong>dicom_dir: str</strong></p>
+<blockquote>
+<div><p>The directory containing the dicoms used to generate the nifti image.
+We assume here that this folder contains only Dicom files.</p>
+</div></blockquote>
+<p><strong>dcm_tags: list</strong></p>
+<blockquote>
+<div><p>A list of 3-uplet of the form (name, tag, stack_values) that will
+be inserted in the &#8216;descrip&#8217; Nifti header field. If we want to stack
+all the Dicom dataset values, the &#8216;stack_values&#8217; option mist be set to
+True.</p>
+</div></blockquote>
+<p><strong>outdir: str</strong></p>
+<blockquote>
+<div><p>The destination folder.</p>
+</div></blockquote>
+<p><strong>prefix: str (optional, default &#8216;f&#8217;)</strong></p>
+<blockquote>
+<div><p>The output image name prefix.</p>
+</div></blockquote>
+<p><strong>additional_information: dict (optional, default None)</strong></p>
+<blockquote>
+<div><p>A free dictionary items to be inserted in the &#8216;descrip&#8217; image
+header field.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">filled_nii_file: str</p>
+<blockquote class="last">
+<div><p>The nifti image with filled header.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydcmio.dcmconverter.converter.dcm2nii">
+<code class="descclassname">pydcmio.dcmconverter.converter.</code><code class="descname">dcm2nii</code><span class="sig-paren">(</span><em>input</em>, <em>o</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pydcmio/dcmconverter/converter.html#dcm2nii"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydcmio.dcmconverter.converter.dcm2nii" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dicom to nifti conversion using &#8216;dcm2nii&#8217;.</p>
+<p>You can specify all the &#8216;dcm2nii&#8217; command options as input function
+parameters.</p>
+<p>The basic usage is:
+dcm2nii &lt;options&gt; &lt;sourcenames&gt;</p>
+<p>Options:
+a Anonymize [remove identifying information]: Y,N = Y
+b load settings from specified inifile, e.g. &#8216;-b C:set     1.ini&#8217;
+d Date in filename [filename.dcm -&gt; 20061230122032.nii]: Y,N = N
+e events (series/acq) in filename [filename.dcm -&gt; s002a003.nii]: Y,N = N
+f Source filename [e.g. filename.par -&gt; filename.nii]: Y,N = N
+g gzip output, filename.nii.gz [ignored if &#8216;-n n&#8217;]: Y,N = Y
+i ID  in filename [filename.dcm -&gt; johndoe.nii]: Y,N = N
+n output .nii file [if no, create .hdr/.img pair]: Y,N = Y
+o Output Directory, e.g. &#8216;C:TEMP&#8217; (if unspecified, source directory
+is used)
+p Protocol in filename [filename.dcm -&gt; TFE_T1.nii]: Y,N = Y
+r Reorient image to nearest orthogonal: Y,N
+s SPM2/Analyze not SPM5/NIfTI [ignored if &#8216;-n y&#8217;]: Y,N = N
+t Text report (patient and scan details): Y,N = N
+v Convert every image in the directory: Y,N = Y
+x Reorient and crop 3D NIfTI images: Y,N = N</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">files: list of str</p>
+<blockquote>
+<div><p>the converted files in nifti format.</p>
+</div></blockquote>
+<p>reoriented_files: list of str</p>
+<blockquote>
+<div><p>the reoriented converted files in nifti format.</p>
+</div></blockquote>
+<p>reoriented_and_cropped_files list of str</p>
+<blockquote>
+<div><p>the reoriented and cropped converted files in nifti format.</p>
+</div></blockquote>
+<p>bvecs: list of str</p>
+<blockquote>
+<div><p>the diffusion directions.</p>
+</div></blockquote>
+<p>bvals: list of str</p>
+<blockquote class="last">
+<div><p>the diffusion acquisiton b-values.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydcmio.dcmconverter.converter.generate_config">
+<code class="descclassname">pydcmio.dcmconverter.converter.</code><code class="descname">generate_config</code><span class="sig-paren">(</span><em>niidir</em>, <em>anonymized=True</em>, <em>gzip=True</em>, <em>add_date=True</em>, <em>add_acquisition_number=True</em>, <em>add_protocol_name=True</em>, <em>add_patient_name=True</em>, <em>add_source_filename=True</em>, <em>begin_clip=0</em>, <em>end_clip=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pydcmio/dcmconverter/converter.html#generate_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydcmio.dcmconverter.converter.generate_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dcm2nii configuration file that disable the interactive
+mode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>niidir: str</strong></p>
+<blockquote>
+<div><p>The nifti destination folder.</p>
+</div></blockquote>
+<p><strong>anonymized: bool (optional, default True)</strong></p>
+<blockquote>
+<div><p>If &#8216;True&#8217; then patient name will not be copied to NIfTI header.</p>
+</div></blockquote>
+<p><strong>gzip: bool (optional, default True)</strong></p>
+<blockquote>
+<div><p>If &#8216;True&#8217; then dcm2nii will create compressed .nii.gz files.</p>
+</div></blockquote>
+<p><strong>add_date: str (optional, default True)</strong></p>
+<blockquote>
+<div><p>If &#8216;True&#8217; then dcm2nii will add the requested element in the output
+filename.</p>
+</div></blockquote>
+<p><strong>add_acquisition_number: str (optional, default True)</strong></p>
+<blockquote>
+<div><p>If &#8216;True&#8217; then dcm2nii will add the requested element in the output
+filename.</p>
+</div></blockquote>
+<p><strong>add_protocol_name: str (optional, default True)</strong></p>
+<blockquote>
+<div><p>If &#8216;True&#8217; then dcm2nii will add the requested element in the output
+filename.</p>
+</div></blockquote>
+<p><strong>add_patient_name: str (optional, default True)</strong></p>
+<blockquote>
+<div><p>If &#8216;True&#8217; then dcm2nii will add the requested element in the output
+filename.</p>
+</div></blockquote>
+<p><strong>add_source_filename: str (optional, default True)</strong></p>
+<blockquote>
+<div><p>If &#8216;True&#8217; then dcm2nii will add the requested element in the output
+filename.</p>
+</div></blockquote>
+<p><strong>begin_clip: int (optional, default 0)</strong></p>
+<blockquote>
+<div><p>Specifies number of volumes to be removed from the beginning of a 4D
+acquisition.</p>
+</div></blockquote>
+<p><strong>end_clip: int (optional, default 0)</strong></p>
+<blockquote>
+<div><p>Specifies number of volumes to be removed from the end of a 4D
+acquisition.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">config_file: str</p>
+<blockquote class="last">
+<div><p>A dcm2nii configuration file written in the input &#8216;niidir&#8217; folder.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

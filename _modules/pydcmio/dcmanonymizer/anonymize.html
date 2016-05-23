@@ -1,0 +1,401 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>PYDCMIO &mdash; pyDcmio</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../_static/css/bootstrap.min.css" media="screen" />
+
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pyDcmio" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+
+  <script src="../../../_static/js/angular.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var app = angular.module("navApp", []);
+    app.controller('navCtrl', ['$scope', '$window', function($scope, $window) {
+      $scope.isActive = function (viewLocation) {
+        var rel = $window.location.pathname.split("/")
+        rel = rel[rel.length - 1]
+        rel = rel.split(".")[0]
+        var active = (viewLocation === rel);
+        return active;};
+    }]);
+  </script>
+
+  </head>
+  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+        <img alt="Logo" src="../../../_static/pydcmio.png">
+        </a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
+      <ul class="nav navbar-nav">
+        <li ng-class="{ active: isActive('index') }"><a href="../../../index.html">Home</a></li>
+        <li ng-class="{ active: isActive('installation') }"><a href="../../../generated/installation.html">Installation</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">Documentation</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+	        <li><a href="../../../generated/pydcmio.html">Pydcmio</a></li>
+<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
+<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="../../../generated/pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="../../../generated/pydcmio.plotting.html">Pydcmio.plotting</a></li>
+          </ul>
+        </li>
+        <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for pydcmio <strong>version 2.0.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/pydcmio">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pydcmio.dcmanonymizer.anonymize</h1><div class="highlight"><pre>
+<span></span><span class="c1">##########################################################################</span>
+<span class="c1"># NSAP - Copyright (C) CEA, 2015</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># System import</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">dicom</span>
+<span class="kn">from</span> <span class="nn">pip.utils.ui</span> <span class="kn">import</span> <span class="n">DownloadProgressBar</span>
+
+<span class="c1"># Dcmio import</span>
+<span class="kn">from</span> <span class="nn">.callbacks</span> <span class="kn">import</span> <span class="n">callback_private</span>
+<span class="kn">from</span> <span class="nn">.callbacks</span> <span class="kn">import</span> <span class="n">callback_xxxx</span>
+<span class="kn">from</span> <span class="nn">.callbacks</span> <span class="kn">import</span> <span class="n">ANON_LOG</span>
+<span class="kn">from</span> <span class="nn">.callbacks</span> <span class="kn">import</span> <span class="n">MANUFACTURER</span>
+<span class="kn">from</span> <span class="nn">.callbacks</span> <span class="kn">import</span> <span class="n">PRIVATE_DEIDENTIFY</span>
+<span class="kn">from</span> <span class="nn">.callbacks</span> <span class="kn">import</span> <span class="n">CALLBACKS</span>
+<span class="kn">from</span> <span class="nn">.callbacks</span> <span class="kn">import</span> <span class="n">TAGS</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">add_dataelement</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">replace_by</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">repr_dataelement</span>
+
+
+<div class="viewcode-block" id="anonymize_dicomdir"><a class="viewcode-back" href="../../../generated/pydcmio.dcmanonymizer.anonymize.html#pydcmio.dcmanonymizer.anonymize.anonymize_dicomdir">[docs]</a><span class="k">def</span> <span class="nf">anonymize_dicomdir</span><span class="p">(</span><span class="n">inputdir</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">write_logs</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Anonymize all DICOM files of the input directory.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inputdir: str (mandatory)</span>
+<span class="sd">        A folder that contains only DICOM files to be anonymized.</span>
+<span class="sd">    outdir: str (mandatory)</span>
+<span class="sd">        The anonimized DICOM files folder.</span>
+<span class="sd">    write_logs: bool (optional, default True)</span>
+<span class="sd">        If True write the anonimization logs.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dcmfiles: str</span>
+<span class="sd">        The anonimized DICOM files.</span>
+<span class="sd">    logfiles: list</span>
+<span class="sd">        The anonimization log files.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Load the first dataset</span>
+    <span class="n">input_dicoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inputdir</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">inputdir</span><span class="p">)]</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">input_dicoms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c1"># Load the tags to anonymize</span>
+    <span class="n">filedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filedir</span><span class="p">,</span> <span class="s2">&quot;deidentify.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
+        <span class="n">anon_tags</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">open_file</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="c1"># Set up the desired callbacks and tags to be anonymized</span>
+    <span class="c1"># Iterate over all the tag to anonymize according to PS 3.15-2008 and</span>
+    <span class="c1"># supplement 142</span>
+    <span class="k">for</span> <span class="n">tag_item</span> <span class="ow">in</span> <span class="n">anon_tags</span><span class="p">:</span>
+        <span class="n">tag_repr</span> <span class="o">=</span> <span class="n">tag_item</span><span class="p">[</span><span class="s2">&quot;Tag&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">tag_item</span><span class="p">[</span><span class="s2">&quot;Basic Profile&quot;</span><span class="p">]</span>
+        <span class="n">group</span><span class="p">,</span> <span class="n">element</span> <span class="o">=</span> <span class="n">tag_repr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Deal with special tags</span>
+        <span class="k">if</span> <span class="s2">&quot;xx&quot;</span> <span class="ow">in</span> <span class="n">group</span> <span class="ow">or</span> <span class="s2">&quot;xx&quot;</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">tag_repr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;[0-9A-Fa-f]&quot;</span><span class="p">))</span>
+            <span class="n">CALLBACKS</span><span class="p">[</span><span class="n">tag_repr</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">pattern</span><span class="p">,</span> <span class="n">callback_xxxx</span><span class="p">]</span>
+
+        <span class="c1"># Deal with private tags</span>
+        <span class="k">elif</span> <span class="s2">&quot;gggg&quot;</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="mh">0x0008</span><span class="p">,</span> <span class="mh">0x0070</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+                <span class="n">MANUFACTURER</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="mh">0x0008</span><span class="p">,</span> <span class="mh">0x0070</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">MANUFACTURER</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">CALLBACKS</span><span class="p">[</span><span class="n">tag_repr</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">callback_private</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s2">&quot;The &#39;(0008,0070)&#39; manufacturer tag is not specified and &quot;</span>
+                    <span class="s2">&quot;is required to anonymize private tags.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Deal with standard tags</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">TAGS</span><span class="p">[</span><span class="n">tag_repr</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="mi">16</span><span class="p">)),</span> <span class="n">action</span>
+
+    <span class="c1"># Now compile the diffusion private tags patterns</span>
+    <span class="n">filedir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filedir</span><span class="p">,</span> <span class="s2">&quot;private_deidentify.json&quot;</span><span class="p">),</span>
+              <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
+        <span class="n">private_anons</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">open_file</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">private_anons</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="s2">&quot;Tag&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;[0-9A-Fa-f]&quot;</span><span class="p">))</span>
+            <span class="n">PRIVATE_DEIDENTIFY</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+
+    <span class="c1"># Process all DICOM files</span>
+    <span class="n">progress_indicator</span> <span class="o">=</span> <span class="n">DownloadProgressBar</span><span class="p">(</span><span class="nb">max</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">input_dicoms</span><span class="p">))</span>
+    <span class="n">dcmfiles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">logfiles</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">input_dicom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_dicoms</span><span class="p">):</span>
+        <span class="n">statinfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">input_dicom</span><span class="p">)</span>
+        <span class="n">DownloadProgressBar</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;{0:.3f}MB&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">statinfo</span><span class="o">.</span><span class="n">st_size</span> <span class="o">/</span> <span class="mf">10e5</span><span class="p">)</span>
+        <span class="n">progress_indicator</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">output_dicom</span><span class="p">,</span> <span class="n">output_log</span> <span class="o">=</span> <span class="n">anonymize_dicomfile</span><span class="p">(</span>
+            <span class="n">input_dicom</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">cnt</span><span class="p">),</span> <span class="n">write_log</span><span class="o">=</span><span class="n">write_logs</span><span class="p">)</span>
+        <span class="n">dcmfiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_dicom</span><span class="p">)</span>
+        <span class="n">logfiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_log</span><span class="p">)</span>
+    <span class="n">progress_indicator</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">dcmfiles</span><span class="p">,</span> <span class="n">logfiles</span></div>
+
+
+<div class="viewcode-block" id="anonymize_dicomfile"><a class="viewcode-back" href="../../../generated/pydcmio.dcmanonymizer.anonymize.html#pydcmio.dcmanonymizer.anonymize.anonymize_dicomfile">[docs]</a><span class="k">def</span> <span class="nf">anonymize_dicomfile</span><span class="p">(</span><span class="n">input_dicom</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">write_log</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Anonymize DICOMs</span>
+
+<span class="sd">    According to PS 3.15-2008, basic application level de-indentification of</span>
+<span class="sd">    a DICOM file requires replacing the values of a set of data elements and</span>
+<span class="sd">    the supplement 142 on the clinical trial de-identification profiles. All</span>
+<span class="sd">    the anonymized fields are replaced and may be set in future into the</span>
+<span class="sd">    encrypted attributes sequence (0400,0550). In the standard it is not</span>
+<span class="sd">    required that the Encrypted Attributes Dataset be created; indeed, there</span>
+<span class="sd">    may be circumstances where the Dataset is expected to be archived long</span>
+<span class="sd">    enough that any contemporary encryption technology may be inadequate</span>
+<span class="sd">    to provide long term protection against unauthorized recovery of</span>
+<span class="sd">    identification.</span>
+
+<span class="sd">    The applied de-identification methods are:</span>
+
+<span class="sd">    * 113100 - Basic Application Confidentiality Profil</span>
+<span class="sd">    * 113103 - Clean Graphics Option</span>
+<span class="sd">    * 113109 - Retain Device Identity Option</span>
+
+<span class="sd">    To do:</span>
+
+<span class="sd">    * 113102 - Clean Recognizable Visual Features Option</span>
+
+<span class="sd">    What does this function:</span>
+
+<span class="sd">    * All fields specified in the &#39;anon_tags&#39; structure are replaced with</span>
+<span class="sd">      the &#39;anon_value&#39;.</span>
+<span class="sd">    * To remove all private tags a group &#39;gggg&#39; has to be specified in the</span>
+<span class="sd">      &#39;anon_tags&#39; structure.</span>
+<span class="sd">    * A log is save with all the anonymization operations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_dicom: str (mandatory)</span>
+<span class="sd">        a dicom file path to be processed.</span>
+<span class="sd">    outdir: str (mandatory)</span>
+<span class="sd">        the directory where the anonymized DICOM file and a Json file</span>
+<span class="sd">        containing a dictionary of the modified tags are generated.</span>
+<span class="sd">    outname: str (optional, default None)</span>
+<span class="sd">        the generated files base names, if None use the &#39;input_dicom&#39; base</span>
+<span class="sd">        name.</span>
+<span class="sd">    write_log: bool (optional, default True)</span>
+<span class="sd">        If True write the anonimization log.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output_dicom: str</span>
+<span class="sd">        the path to the anonimized DICOM file.</span>
+<span class="sd">    output_log: str</span>
+<span class="sd">        If &#39;write_log&#39; is set, the path to the anonimization log.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Clean global log</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">ANON_LOG</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">ANON_LOG</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="c1"># Load the DICOM dataset to anonymize</span>
+    <span class="k">if</span> <span class="n">outname</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">basedicom</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">input_dicom</span><span class="p">)</span>
+        <span class="n">outname</span> <span class="o">=</span> <span class="n">basedicom</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">basedicom</span> <span class="o">=</span> <span class="n">outname</span> <span class="o">+</span> <span class="s2">&quot;.dcm&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">input_dicom</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c1"># Anonymize the dataset</span>
+    <span class="n">anonymize_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="c1"># Save the anonymized DICOM</span>
+    <span class="n">output_dicom</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">basedicom</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">save_as</span><span class="p">(</span><span class="n">output_dicom</span><span class="p">)</span>
+
+    <span class="c1"># Save the anonimized log</span>
+    <span class="n">output_log</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">write_log</span><span class="p">:</span>
+        <span class="n">output_log</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span> <span class="o">+</span> <span class="s2">&quot;.json&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_log</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">ANON_LOG</span><span class="p">,</span> <span class="n">open_file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output_dicom</span><span class="p">,</span> <span class="n">output_log</span></div>
+
+
+<div class="viewcode-block" id="anonymize_dataset"><a class="viewcode-back" href="../../../generated/pydcmio.dcmanonymizer.anonymize.html#pydcmio.dcmanonymizer.anonymize.anonymize_dataset">[docs]</a><span class="k">def</span> <span class="nf">anonymize_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Anonymize a pydicom dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset: dicom.dataset.Dataset (mandatory)</span>
+<span class="sd">        a dataset to anonymize.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Anonymize the registered tags</span>
+    <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">TAGS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+            <span class="n">data_element</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+            <span class="n">tag_repr</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">anon_value</span> <span class="o">=</span> <span class="n">replace_by</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+            <span class="n">value_repr</span> <span class="o">=</span> <span class="n">repr_dataelement</span><span class="p">(</span><span class="n">data_element</span><span class="p">)</span>
+            <span class="n">ANON_LOG</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">tag_repr</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">value_repr</span><span class="p">,</span> <span class="n">anon_value</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">anon_value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">data_element</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_element</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">anon_value</span>
+
+    <span class="c1"># Anonymize the current dataset applying the registered callbacks</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">callback_main</span><span class="p">)</span>
+
+    <span class="c1"># In supplement 142 the attribute Patient Identity Removed shall be</span>
+    <span class="c1"># replaced or added to the dataset and the method used for identification</span>
+    <span class="c1"># need to be specified</span>
+    <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">add_dataelement</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="p">(</span><span class="mh">0x0012</span><span class="p">,</span> <span class="mh">0x0062</span><span class="p">),</span> <span class="s2">&quot;YES&quot;</span><span class="p">,</span> <span class="s2">&quot;CS&quot;</span><span class="p">)</span>
+        <span class="n">add_dataelement</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="p">(</span><span class="mh">0x0012</span><span class="p">,</span> <span class="mh">0x0063</span><span class="p">),</span> <span class="p">[</span>
+            <span class="s2">&quot;Basic Application Confidentiality Profil&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Clean Graphics Option&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Retain Device Identity Option&quot;</span><span class="p">],</span> <span class="s2">&quot;LO&quot;</span><span class="p">)</span>
+        <span class="n">sqdataset</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">&quot;113100&quot;</span><span class="p">,</span> <span class="s2">&quot;Basic Application Confidentiality Profil&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;113103&quot;</span><span class="p">,</span> <span class="s2">&quot;Clean Graphics Option&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;113103&quot;</span><span class="p">,</span> <span class="s2">&quot;Retain Device Identity Option&quot;</span><span class="p">)]:</span>
+            <span class="n">sqdataset</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
+                <span class="p">((</span><span class="mh">0x0008</span><span class="p">,</span> <span class="mh">0x0100</span><span class="p">),</span> <span class="n">value</span><span class="p">,</span> <span class="s2">&quot;CS&quot;</span><span class="p">),</span>
+                <span class="p">((</span><span class="mh">0x0008</span><span class="p">,</span> <span class="mh">0x0104</span><span class="p">),</span> <span class="n">desc</span><span class="p">,</span> <span class="s2">&quot;LO&quot;</span><span class="p">),</span>
+                <span class="p">((</span><span class="mh">0x0008</span><span class="p">,</span> <span class="mh">0x0102</span><span class="p">),</span> <span class="s2">&quot;DCM&quot;</span><span class="p">,</span> <span class="s2">&quot;CS&quot;</span><span class="p">)))</span>
+        <span class="n">add_dataelement</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="p">(</span><span class="mh">0x0012</span><span class="p">,</span> <span class="mh">0x0064</span><span class="p">),</span> <span class="n">sqdataset</span><span class="p">,</span> <span class="s2">&quot;SQ&quot;</span><span class="p">)</span></div>
+
+    <span class="c1"># Check that all tags with &#39;VR&#39; &#39;PN&#39; has been anonymized</span>
+    <span class="c1"># dataset.walk(callback_patient_name)</span>
+
+
+<div class="viewcode-block" id="callback_main"><a class="viewcode-back" href="../../../generated/pydcmio.dcmanonymizer.anonymize.html#pydcmio.dcmanonymizer.anonymize.callback_main">[docs]</a><span class="k">def</span> <span class="nf">callback_main</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">data_element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Called from the dataset &#39;walk&#39; recursive function, will anonymize</span>
+<span class="sd">    all DICOM fields by applying all the declared callbacks.&quot;&quot;&quot;</span>
+    <span class="c1"># Deal with sequence</span>
+    <span class="k">if</span> <span class="n">data_element</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">inner_dataset</span> <span class="ow">in</span> <span class="n">data_element</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">anonymize_dataset</span><span class="p">(</span><span class="n">inner_dataset</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Deal with typed tags</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">CALLBACKS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+
+            <span class="c1"># Form kwargs</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="n">dataset</span><span class="p">,</span>
+                <span class="s2">&quot;data_element&quot;</span><span class="p">:</span> <span class="n">data_element</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;pattern&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pattern</span>
+
+            <span class="c1"># Call the callback</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="k">break</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

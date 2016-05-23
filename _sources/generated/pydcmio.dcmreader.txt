@@ -1,0 +1,28 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+:orphan:
+
+Documentation of *pydcmio.dcmreader*
+=====================================
+
+
+Module that provides usefull functions to find a specific DICOM tag in a
+DICOM dataset, exploring recursively sequences.
+
+
+.. raw:: html
+
+    <br/>    <!-- Block section -->
+    <table border='1' class='docutils' style='width:100%'>
+    <colgroup><col width='25%'/><col width='75%'/></colgroup>
+    <tbody valign='top'>
+    <tr class='row-odd'>
+    <td><a class='reference internal' href='pydcmio.dcmreader.reader.html'><em>pydcmio.dcmreader.reader</em></a></td>
+    <td>
+        <p>Diverse Dicom reading functions to extract precise information.</p>
+    </td>
+    </tr>
+    </tbody>
+
+
+    </table>

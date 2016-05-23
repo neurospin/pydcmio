@@ -1,0 +1,433 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>PYDCMIO &mdash; pyDcmio</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../_static/css/bootstrap.min.css" media="screen" />
+
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pyDcmio" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+
+  <script src="../../../_static/js/angular.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var app = angular.module("navApp", []);
+    app.controller('navCtrl', ['$scope', '$window', function($scope, $window) {
+      $scope.isActive = function (viewLocation) {
+        var rel = $window.location.pathname.split("/")
+        rel = rel[rel.length - 1]
+        rel = rel.split(".")[0]
+        var active = (viewLocation === rel);
+        return active;};
+    }]);
+  </script>
+
+  </head>
+  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+        <img alt="Logo" src="../../../_static/pydcmio.png">
+        </a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
+      <ul class="nav navbar-nav">
+        <li ng-class="{ active: isActive('index') }"><a href="../../../index.html">Home</a></li>
+        <li ng-class="{ active: isActive('installation') }"><a href="../../../generated/installation.html">Installation</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">Documentation</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+	        <li><a href="../../../generated/pydcmio.html">Pydcmio</a></li>
+<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
+<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="../../../generated/pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="../../../generated/pydcmio.plotting.html">Pydcmio.plotting</a></li>
+          </ul>
+        </li>
+        <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for pydcmio <strong>version 2.0.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/pydcmio">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pydcmio.dcmconverter.converter</h1><div class="highlight"><pre>
+<span></span><span class="c1">##########################################################################</span>
+<span class="c1"># NSAp - Copyright (C) CEA, 2013 - 2016</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># System import</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">dicom</span>
+<span class="kn">import</span> <span class="nn">nibabel</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="c1"># Dcmio import</span>
+<span class="kn">from</span> <span class="nn">pydcmio.dcmreader.reader</span> <span class="kn">import</span> <span class="n">get_values</span>
+<span class="kn">from</span> <span class="nn">pydcmio.dcmreader.reader</span> <span class="kn">import</span> <span class="n">walk</span>
+<span class="kn">from</span> <span class="nn">pydcmio.dcm2nii.wrapper</span> <span class="kn">import</span> <span class="n">Dcm2NiiWrapper</span>
+
+
+<div class="viewcode-block" id="generate_config"><a class="viewcode-back" href="../../../generated/pydcmio.dcmconverter.converter.html#pydcmio.dcmconverter.converter.generate_config">[docs]</a><span class="k">def</span> <span class="nf">generate_config</span><span class="p">(</span><span class="n">niidir</span><span class="p">,</span> <span class="n">anonymized</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">gzip</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">add_date</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">add_acquisition_number</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">add_protocol_name</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">add_patient_name</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">add_source_filename</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                    <span class="n">begin_clip</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_clip</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generate a dcm2nii configuration file that disable the interactive</span>
+<span class="sd">    mode.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    niidir: str</span>
+<span class="sd">        The nifti destination folder.</span>
+<span class="sd">    anonymized: bool (optional, default True)</span>
+<span class="sd">        If &#39;True&#39; then patient name will not be copied to NIfTI header.</span>
+<span class="sd">    gzip: bool (optional, default True)</span>
+<span class="sd">        If &#39;True&#39; then dcm2nii will create compressed .nii.gz files.</span>
+<span class="sd">    add_date: str (optional, default True)</span>
+<span class="sd">        If &#39;True&#39; then dcm2nii will add the requested element in the output</span>
+<span class="sd">        filename.</span>
+<span class="sd">    add_acquisition_number: str (optional, default True)</span>
+<span class="sd">        If &#39;True&#39; then dcm2nii will add the requested element in the output</span>
+<span class="sd">        filename.</span>
+<span class="sd">    add_protocol_name: str (optional, default True)</span>
+<span class="sd">        If &#39;True&#39; then dcm2nii will add the requested element in the output</span>
+<span class="sd">        filename.</span>
+<span class="sd">    add_patient_name: str (optional, default True)</span>
+<span class="sd">        If &#39;True&#39; then dcm2nii will add the requested element in the output</span>
+<span class="sd">        filename.</span>
+<span class="sd">    add_source_filename: str (optional, default True)</span>
+<span class="sd">        If &#39;True&#39; then dcm2nii will add the requested element in the output</span>
+<span class="sd">        filename.</span>
+<span class="sd">    begin_clip: int (optional, default 0)</span>
+<span class="sd">        Specifies number of volumes to be removed from the beginning of a 4D</span>
+<span class="sd">        acquisition.</span>
+<span class="sd">    end_clip: int (optional, default 0)</span>
+<span class="sd">        Specifies number of volumes to be removed from the end of a 4D</span>
+<span class="sd">        acquisition.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    config_file: str</span>
+<span class="sd">        A dcm2nii configuration file written in the input &#39;niidir&#39; folder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check the the destination folder exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">niidir</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;{0}&#39; folder does not exists.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">niidir</span><span class="p">))</span>
+
+    <span class="c1"># Load the default configuration</span>
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span>
+                               <span class="s2">&quot;dcm2nii_config.json&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">open_file</span><span class="p">)</span>
+
+    <span class="c1"># Update the configuration</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;BOOL&quot;</span><span class="p">][</span><span class="s2">&quot;Anonymize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">anonymized</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;BOOL&quot;</span><span class="p">][</span><span class="s2">&quot;Gzip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">gzip</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;BOOL&quot;</span><span class="p">][</span><span class="s2">&quot;AppendDate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">add_date</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;BOOL&quot;</span><span class="p">][</span><span class="s2">&quot;AppendAcqSeries&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">add_acquisition_number</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;BOOL&quot;</span><span class="p">][</span><span class="s2">&quot;AppendProtocolName&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">add_protocol_name</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;BOOL&quot;</span><span class="p">][</span><span class="s2">&quot;AppendPatientName&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">add_patient_name</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;BOOL&quot;</span><span class="p">][</span><span class="s2">&quot;AppendFilename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">add_source_filename</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;INT&quot;</span><span class="p">][</span><span class="s2">&quot;BeginClip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">begin_clip</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;INT&quot;</span><span class="p">][</span><span class="s2">&quot;LastClip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">end_clip</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;INT&quot;</span><span class="p">][</span><span class="s2">&quot;OutDirMode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;STR&quot;</span><span class="p">][</span><span class="s2">&quot;OutDir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">niidir</span>
+
+    <span class="c1"># Write the configuration file</span>
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">niidir</span><span class="p">,</span> <span class="s2">&quot;dcm2nii.ini&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">section_name</span><span class="p">,</span> <span class="n">config_items</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">open_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;[{0}]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section_name</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">parameter_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">config_items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">open_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;{0}={1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">parameter_name</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">config_file</span></div>
+
+
+<div class="viewcode-block" id="dcm2nii"><a class="viewcode-back" href="../../../generated/pydcmio.dcmconverter.converter.html#pydcmio.dcmconverter.converter.dcm2nii">[docs]</a><span class="k">def</span> <span class="nf">dcm2nii</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Dicom to nifti conversion using &#39;dcm2nii&#39;.</span>
+
+<span class="sd">    You can specify all the &#39;dcm2nii&#39; command options as input function</span>
+<span class="sd">    parameters.</span>
+
+<span class="sd">    The basic usage is:</span>
+<span class="sd">    dcm2nii &lt;options&gt; &lt;sourcenames&gt;</span>
+
+<span class="sd">    Options:</span>
+<span class="sd">    a Anonymize [remove identifying information]: Y,N = Y</span>
+<span class="sd">    b load settings from specified inifile, e.g. &#39;-b C:\set\t1.ini&#39;</span>
+<span class="sd">    d Date in filename [filename.dcm -&gt; 20061230122032.nii]: Y,N = N</span>
+<span class="sd">    e events (series/acq) in filename [filename.dcm -&gt; s002a003.nii]: Y,N = N</span>
+<span class="sd">    f Source filename [e.g. filename.par -&gt; filename.nii]: Y,N = N</span>
+<span class="sd">    g gzip output, filename.nii.gz [ignored if &#39;-n n&#39;]: Y,N = Y</span>
+<span class="sd">    i ID  in filename [filename.dcm -&gt; johndoe.nii]: Y,N = N</span>
+<span class="sd">    n output .nii file [if no, create .hdr/.img pair]: Y,N = Y</span>
+<span class="sd">    o Output Directory, e.g. &#39;C:\TEMP&#39; (if unspecified, source directory</span>
+<span class="sd">    is used)</span>
+<span class="sd">    p Protocol in filename [filename.dcm -&gt; TFE_T1.nii]: Y,N = Y</span>
+<span class="sd">    r Reorient image to nearest orthogonal: Y,N</span>
+<span class="sd">    s SPM2/Analyze not SPM5/NIfTI [ignored if &#39;-n y&#39;]: Y,N = N</span>
+<span class="sd">    t Text report (patient and scan details): Y,N = N</span>
+<span class="sd">    v Convert every image in the directory: Y,N = Y</span>
+<span class="sd">    x Reorient and crop 3D NIfTI images: Y,N = N</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    files: list of str</span>
+<span class="sd">        the converted files in nifti format.</span>
+<span class="sd">    reoriented_files: list of str</span>
+<span class="sd">        the reoriented converted files in nifti format.</span>
+<span class="sd">    reoriented_and_cropped_files list of str</span>
+<span class="sd">        the reoriented and cropped converted files in nifti format.</span>
+<span class="sd">    bvecs: list of str</span>
+<span class="sd">        the diffusion directions.</span>
+<span class="sd">    bvals: list of str</span>
+<span class="sd">        the diffusion acquisiton b-values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the destination folder</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;{0}&#39; is not a valid configuration file.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">open_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">outdirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;OutDir=&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span>
+               <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;OutDir=&quot;</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outdirs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expect one destination folder (&#39;OutDir=&#39;) in &quot;</span>
+                         <span class="s2">&quot;configuration file &#39;{0}&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+    <span class="n">niidir</span> <span class="o">=</span> <span class="n">outdirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Call dcm2nii</span>
+    <span class="n">dcm2niiprocess</span> <span class="o">=</span> <span class="n">Dcm2NiiWrapper</span><span class="p">(</span><span class="s2">&quot;dcm2nii&quot;</span><span class="p">)</span>
+    <span class="n">dcm2niiprocess</span><span class="p">(</span><span class="n">cmd</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dcm2nii&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="s2">&quot;-b&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="nb">input</span><span class="p">])</span>
+
+    <span class="c1"># Format outputs: from nipype</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">reoriented_files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">reoriented_and_cropped_files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bvecs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bvals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">skip</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">last_added_file</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">dcm2niiprocess</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip</span><span class="p">:</span>
+            <span class="n">out_file</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="c1"># For notgzipped detect files</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Saving &quot;</span><span class="p">):</span>
+                <span class="n">out_file</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;Saving &quot;</span><span class="p">):]</span>
+            <span class="c1"># For gzipped outputs files are not absolute</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;GZip...&quot;</span><span class="p">):</span>
+                <span class="n">out_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">niidir</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;GZip...&quot;</span><span class="p">):]))</span>
+            <span class="c1"># For diffusion</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Number of diffusion directions &quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">last_added_file</span><span class="p">:</span>
+                    <span class="n">base</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                        <span class="n">last_added_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.nii&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                    <span class="n">bvecs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.bvec&quot;</span><span class="p">))</span>
+                    <span class="n">bvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.bval&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;.*--&gt;(.*)&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;.*--&gt;(.*)&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">niidir</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="n">out_file</span> <span class="o">=</span> <span class="n">val</span>
+
+            <span class="k">if</span> <span class="n">out_file</span><span class="p">:</span>
+                <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
+                <span class="n">last_added_file</span> <span class="o">=</span> <span class="n">out_file</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Reorienting as &quot;</span><span class="p">):</span>
+                <span class="n">reoriented_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;Reorienting as &quot;</span><span class="p">):])</span>
+                <span class="n">skip</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Cropping NIfTI/Analyze image &quot;</span><span class="p">):</span>
+                <span class="n">base</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                    <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;Cropping NIfTI/Analyze image &quot;</span><span class="p">):])</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;c&quot;</span> <span class="o">+</span> <span class="n">filename</span>
+                <span class="n">reoriented_and_cropped_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+                <span class="n">skip</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">continue</span>
+        <span class="n">skip</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">return</span> <span class="n">files</span><span class="p">,</span> <span class="n">reoriented_files</span><span class="p">,</span> <span class="n">reoriented_and_cropped_files</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span> <span class="n">bvals</span></div>
+
+
+<div class="viewcode-block" id="add_meta_to_nii"><a class="viewcode-back" href="../../../generated/pydcmio.dcmconverter.converter.html#pydcmio.dcmconverter.converter.add_meta_to_nii">[docs]</a><span class="k">def</span> <span class="nf">add_meta_to_nii</span><span class="p">(</span><span class="n">nii_file</span><span class="p">,</span> <span class="n">dicom_dir</span><span class="p">,</span> <span class="n">dcm_tags</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;f&quot;</span><span class="p">,</span>
+                    <span class="n">additional_information</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Add dicom tags to Nifti1 image header.</span>
+
+<span class="sd">    All selected dicom tag values are set in the &#39;descrip&#39; Nifti header</span>
+<span class="sd">    field.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nii_file: str</span>
+<span class="sd">        The nifti image to fill.</span>
+<span class="sd">    dicom_dir: str</span>
+<span class="sd">        The directory containing the dicoms used to generate the nifti image.</span>
+<span class="sd">        We assume here that this folder contains only Dicom files.</span>
+<span class="sd">    dcm_tags: list</span>
+<span class="sd">        A list of 3-uplet of the form (name, tag, stack_values) that will</span>
+<span class="sd">        be inserted in the &#39;descrip&#39; Nifti header field. If we want to stack</span>
+<span class="sd">        all the Dicom dataset values, the &#39;stack_values&#39; option mist be set to</span>
+<span class="sd">        True.</span>
+<span class="sd">    outdir: str</span>
+<span class="sd">        The destination folder.</span>
+<span class="sd">    prefix: str (optional, default &#39;f&#39;)</span>
+<span class="sd">        The output image name prefix.</span>
+<span class="sd">    additional_information: dict (optional, default None)</span>
+<span class="sd">        A free dictionary items to be inserted in the &#39;descrip&#39; image</span>
+<span class="sd">        header field.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    filled_nii_file: str</span>
+<span class="sd">        The nifti image with filled header.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Set default</span>
+    <span class="k">if</span> <span class="n">additional_information</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">additional_information</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Create the destination image path</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
+
+    <span class="c1"># Load the first listed dicom image</span>
+    <span class="n">dicom_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dicom_dir</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">dicom</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dicom_dir</span><span class="p">,</span> <span class="n">dicom_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                              <span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c1"># Load the nifti1 image</span>
+    <span class="n">niiimage</span> <span class="o">=</span> <span class="n">nibabel</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">nii_file</span><span class="p">)</span>
+
+    <span class="c1"># Check that we have a nifti1 format image</span>
+    <span class="n">filled_nii_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">nii_file</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">niiimage</span><span class="p">,</span> <span class="n">nibabel</span><span class="o">.</span><span class="n">nifti1</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">):</span>
+
+        <span class="c1"># Fill the nifti1 header</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">niiimage</span><span class="o">.</span><span class="n">get_header</span><span class="p">()</span>
+
+        <span class="c1"># &gt; slice_duration: Time for 1 slice</span>
+        <span class="n">repetition_time</span> <span class="o">=</span> <span class="n">get_values</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="s2">&quot;get_repetition_time&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">repetition_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">niiimage</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">repetition_time</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">repetition_time</span><span class="p">)</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">set_dim_info</span><span class="p">(</span><span class="nb">slice</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">nb_slices</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get_n_slices</span><span class="p">()</span>
+            <span class="n">slice_duration</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">repetition_time</span> <span class="o">/</span> <span class="n">nb_slices</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">set_slice_duration</span><span class="p">(</span><span class="n">slice_duration</span><span class="p">)</span>
+
+        <span class="c1"># &gt; add free dicom fields</span>
+        <span class="c1"># enhances storage: the value is burried under one or several layer(s)</span>
+        <span class="c1"># of sequence</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">stack_values</span> <span class="ow">in</span> <span class="n">dcm_tags</span><span class="p">:</span>
+            <span class="n">content</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)]</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">stack_values</span><span class="o">=</span><span class="n">stack_values</span><span class="p">)</span>
+
+        <span class="c1"># &gt; add/update free content</span>
+        <span class="n">content</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">additional_information</span><span class="p">)</span>
+
+        <span class="c1"># Overwrite the &#39;descrip&#39; header filed</span>
+        <span class="n">free_field</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
+                                 <span class="n">dtype</span><span class="o">=</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;descrip&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">niiimage</span><span class="o">.</span><span class="n">get_header</span><span class="p">()[</span><span class="s2">&quot;descrip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">free_field</span>
+
+        <span class="c1"># Update the image header</span>
+        <span class="n">niiimage</span><span class="o">.</span><span class="n">update_header</span><span class="p">()</span>
+
+        <span class="c1"># Save the filled image</span>
+        <span class="n">nibabel</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">niiimage</span><span class="p">,</span> <span class="n">filled_nii_file</span><span class="p">)</span>
+
+    <span class="c1"># Unknwon image format</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;&#39;{0}&#39; is not a Nifti1 image but a &#39;{1}&#39; image.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">nii_file</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">niiimage</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">filled_nii_file</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

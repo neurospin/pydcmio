@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>PYDCMIO &mdash; pyDcmio</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../_static/css/bootstrap.min.css" media="screen" />
+
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pyDcmio" href="../index.html" />
+  
+   
+       <script type="text/javascript" src="../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../_static/js/bootstrap.min.js" type="text/javascript"></script>
+
+  <script src="../_static/js/angular.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+    var app = angular.module("navApp", []);
+    app.controller('navCtrl', ['$scope', '$window', function($scope, $window) {
+      $scope.isActive = function (viewLocation) {
+        var rel = $window.location.pathname.split("/")
+        rel = rel[rel.length - 1]
+        rel = rel.split(".")[0]
+        var active = (viewLocation === rel);
+        return active;};
+    }]);
+  </script>
+
+  </head>
+  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+        <img alt="Logo" src="../_static/pydcmio.png">
+        </a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
+      <ul class="nav navbar-nav">
+        <li ng-class="{ active: isActive('index') }"><a href="../index.html">Home</a></li>
+        <li ng-class="{ active: isActive('installation') }"><a href="installation.html">Installation</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="documentation.html">Documentation</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+	        <li><a href="pydcmio.html">Pydcmio</a></li>
+<li><a href="pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
+<li><a href="pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="pydcmio.plotting.html">Pydcmio.plotting</a></li>
+          </ul>
+        </li>
+        <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for pydcmio <strong>version 2.0.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/pydcmio">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      <ul class="simple">
+</ul>
+
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="module-pydcmio.dcmreader.reader"></span><p>Diverse Dicom reading functions to extract precise information.</p>
+<dl class="function">
+<dt id="pydcmio.dcmreader.reader.get_values">
+<code class="descclassname">pydcmio.dcmreader.reader.</code><code class="descname">get_values</code><span class="sig-paren">(</span><em>dataset_or_dcmpath</em>, <em>extractor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pydcmio/dcmreader/reader.html#get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydcmio.dcmreader.reader.get_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an extractor associated value(s).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset_or_dcmpath: dataset or str (mandatory)</strong></p>
+<blockquote>
+<div><p>a pydicom dataset structure or a path to a valid Dicom file.</p>
+</div></blockquote>
+<p><strong>extractor: str (mandatory)</strong></p>
+<blockquote>
+<div><p>the name of the extractor specified in the &#8216;STANDARD_EXTRACTOR&#8217;
+global variable.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">values: list or an object</p>
+<blockquote class="last">
+<div><p>the phase encoding (none if not found).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pydcmio.dcmreader.reader.walk">
+<code class="descclassname">pydcmio.dcmreader.reader.</code><code class="descname">walk</code><span class="sig-paren">(</span><em>dataset_or_dcmpath</em>, <em>tag</em>, <em>stack_values=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pydcmio/dcmreader/reader.html#walk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydcmio.dcmreader.reader.walk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to extract a tag associated value(s) from a Dicom dataset.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Recusrive function is required as new enhanced storage presents only
+one Dicom containing several sub-sequence of fields.
+The walked is called on each sub-sequence.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataset_or_dcmpath: dataset or str (mandatory)</strong></p>
+<blockquote>
+<div><p>a pydicom dataset structure or a path to a valid Dicom file.</p>
+</div></blockquote>
+<p><strong>tag: 2-uplet (mandatory)</strong></p>
+<blockquote>
+<div><p>the Dicom tag of the field containing the value to extract.</p>
+</div></blockquote>
+<p><strong>stack_values: bool (optional, default False)</strong></p>
+<blockquote>
+<div><p>if set to True, returns all the detected occurences, otherwise the
+first occurence only.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">values: list</p>
+<blockquote class="last">
+<div><p>the tag associated value(s). None if the field has not been found in
+the dataset.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>
