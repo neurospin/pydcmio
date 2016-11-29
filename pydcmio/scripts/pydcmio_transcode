@@ -11,7 +11,10 @@
 from __future__ import print_function
 import argparse
 import os
+import json
 import shutil
+from datetime import datetime
+from pprint import pprint
 
 # Bredala import
 try:
@@ -27,7 +30,7 @@ from pydcmio import __version__ as version
 from pydcmio.dcmconverter.transcoder import transcode_sids
 
 # Parameters to keep trace
-__hopla__ = ["tool", "version", "inputs", "outputs", "sids", "transcode_table"]
+__hopla__ = ["runtime", "inputs", "outputs"]
 
 
 # Script documentation
@@ -80,21 +83,33 @@ parser.add_argument(
     help="a folder that contains the subject identifiers as sub folders.",
     type=is_directory)
 parser.add_argument(
-    "-r", "--transtable", dest="transcode_table", required=True,
+    "-r", "--transtable", dest="transcode_table", required=False,
     metavar="FILE", help="the transcoding table.", type=is_file)
 parser.add_argument(
     "-o", "--outdir", dest="outdir", required=True, metavar="PATH",
     help="the folder that contains the generated transcoded table.",
     type=is_directory)
 args = parser.parse_args()
+inputs = vars(args)
+verbose = inputs.pop("verbose")
 
 """
 Welcome message.
 """
-tool = "pydcmio_transcode"
-if args.verbose > 0:
-    print("[info] Start subject odentifiers transcoding...")
-    print("[info] Output: {0}.".format(args.outdir))
+tool = os.path.basename(__file__)
+tool_version = version
+timestamp = datetime.now().isoformat()
+params = locals()
+runtime = dict([(name, params[name])
+               for name in ("tool", "tool_version", "timestamp")])
+outputs = None
+if verbose > 0:
+    print("[info] Starting Transcoding ...")
+    print("[info] Runtime:")
+    pprint(runtime)
+    print("[info] Inputs:")
+    pprint(inputs)
+
 
 """
 First get the subject identifiers
@@ -107,19 +122,42 @@ if args.directory is not None:
                    if os.path.isdir(os.path.join(args.directory, name))]
     sids.extend(sub_folders)
     sids = set(sids)
-inputs = sids
+
 
 """
-Then copy the input transcoding table.
+Then copy or create the input transcoding table.
 """
-transcode_table = os.path.join(args.outdir,
-                               os.path.basename(args.transcode_table))
-shutil.copy(args.transcode_table, transcode_table)
-outputs = [transcode_table]
+if args.transcode_table is not None:
+    transcode_table = os.path.join(args.outdir,
+                                   os.path.basename(args.transcode_table))
+    shutil.copy(args.transcode_table, transcode_table)
+else:
+    transcode_table = os.path.join(args.outdir, "transcoding.json")
+    with open(transcode_table, "wt") as open_file:
+        json.dump({}, open_file, indent=4)
+
 
 """
 Execute the transcoding task.
 """
 transcode_sids(sids, transcode_table)
-if args.verbose > 1:
-    print("[result] Transcoding table: {0}.".format(transcode_table))
+
+
+"""
+Update the outputs and save them and the inputs in a 'logs' directory.
+"""
+logdir = os.path.join(inputs["outdir"], "logs")
+if not os.path.isdir(logdir):
+    os.mkdir(logdir)
+params = locals()
+outputs = dict([(name, params[name])
+                for name in ("sids", "transcode_table")])
+for name, final_struct in [("inputs", inputs), ("outputs", outputs),
+                           ("runtime", runtime)]:
+    log_file = os.path.join(logdir, "{0}.json".format(name))
+    with open(log_file, "wt") as open_file:
+        json.dump(final_struct, open_file, sort_keys=True, check_circular=True,
+                  indent=4)
+if verbose > 1:
+    print("[info] Outputs:")
+    pprint(outputs)
