@@ -47,7 +47,6 @@ class Dcm2NiiWrapper(object):
         # Update the command to execute
         self.cmd = [MAP[elem] if isinstance(elem, bool) else elem
                     for elem in cmd]
-        print self.cmd
 
         # Check Dcm2Nii has been configured so the command can be found
         process = subprocess.Popen(
