@@ -15,13 +15,16 @@ import shutil
 import numpy
 import json
 import glob
+from datetime import datetime
+from pprint import pprint
 
 # Bredala import
 try:
     import bredala
     bredala.USE_PROFILER = False
     bredala.register("pydcmio.dcmconverter.converter",
-                     names=["generate_config", "dcm2nii", "add_meta_to_nii"])
+                     names=["generate_config", "dcm2nii", "add_meta_to_nii",
+                            "dcm2niix"])
     bredala.register("pydcmio.plotting.slicer",
                      names=["mosaic"])
 except:
@@ -31,16 +34,14 @@ except:
 from pydcmio import __version__ as version
 from pydcmio.dcmconverter.converter import generate_config
 from pydcmio.dcmconverter.converter import dcm2nii
+from pydcmio.dcmconverter.converter import dcm2niix
 from pydcmio.dcmconverter.converter import add_meta_to_nii
 from pydcmio.plotting.slicer import mosaic
 from pydcmio.dcm2nii.wrapper import Dcm2NiiWrapper
 
 
 # Parameters to keep trace
-__hopla__ = ["tool", "tool_version", "version", "inputs", "outputs",
-             "dcmdir", "niidir", "config_file", "files, reoriented_files",
-             "protocol", "reoriented_and_cropped_files", "bvecs", "bvals",
-             "filled_nii_files", "figures"]
+__hopla__ = ["runtime", "inputs", "outputs"]
 
 
 # Script documentation
@@ -51,22 +52,22 @@ Dicom to Nifti conversion
 Wraps around the 'dcm2nii' command.
 
 This code enables us to convert DICOMs to Nifti using the Chris Rorden's
-'dcm2nii' command.
+'dcm2nii' or 'dcm2niix' command.
 
 The code is setup so that all the converted Nifti images are anonymized,
 compressed in Nifti compressed '.nii.gz' format, and stacked in the same
 image for 4D acquisitons. By default the proctocol is used to name the
-generated files. On top of that some DICOM tags are stored in the
-converted Nifti 'descrip' header field: the repetition
-time TR and the echo time TE.
+generated files. On top of that some DICOM tags can be stored in the
+converted Nifti 'descrip' header field (for instance the repetition
+time or the echo time).
 
 It is also possible to transcode the subject identifier. To generate the
 transcoding table you may want to use the 'pydcmio_transcode' script.
 
 Steps:
 
-1- create the 'dcm2nii' configuration file.
-2- execute the 'dcm2nii' conversion.
+1- perform the 'dcm2nii' or 'dcm2niix' conversion.
+2- force the normalization of the generated files.
 3- fill the nifti header.
 4- create a snap of the created volume(s).
 
@@ -124,68 +125,106 @@ parser.add_argument(
     help="the subject output folders.",
     type=is_directory)
 parser.add_argument(
-    "-t", "--transcode", dest="transcode", required=False, action="store_true",
+    "-t", "--transcode", dest="transcode", action="store_true",
     help="if activated, the subject ID is transcoded.")
+parser.add_argument(
+    "-x", "--dcm2niix", dest="dcm2niix", action="store_true",
+    help="if activated, use 'dcm2niix' instead of 'dcm2nii'.")
 parser.add_argument(
     "-r", "--transtable", dest="transcode_table", required=False,
     metavar="FILE", help="the transcoding table.", type=is_file)
 args = parser.parse_args()
+inputs = vars(args)
+verbose = inputs.pop("verbose")
 
 
 """
 First check if the output directory exists on the file system, and
 clean it if requested. Transcode also the subject identifier if requested.
 """
-tool = "pydcmio_dicom2nifti"
-tool_version = Dcm2NiiWrapper.version("dcm2nii")
-if args.verbose > 0:
-    print("[info] Start dicom conversion with dcm2nii...")
-    print("[info] Directory: {0}.".format(args.dcmdir))
-    print("[info] Output: {0}.".format(args.outdir))
-dcmdir = args.dcmdir
-inputs = [dcmdir]
-outputs = []
-dcmfile = glob.glob(os.path.join(dcmdir, "*"))[0]
-protocol = args.protocol
-if args.transcode:
-    with open(args.transcode_table, "rt") as open_file:
+tool = os.path.basename(__file__)
+tool_version = version
+if inputs["dcm2niix"]:
+    dcm2nii_version = Dcm2NiiWrapper.version("dcm2niix")
+else:
+    dcm2nii_version = Dcm2NiiWrapper.version("dcm2nii")
+timestamp = datetime.now().isoformat()
+params = locals()
+runtime = dict([(name, params[name])
+               for name in ("tool", "tool_version", "dcm2nii_version",
+                            "timestamp")])
+outputs = None
+if verbose > 0:
+    print("[info] Starting DICOM conversion ...")
+    print("[info] Runtime:")
+    pprint(runtime)
+    print("[info] Inputs:")
+    pprint(inputs)
+if inputs["transcode"]:
+    with open(inputs["transcode_table"], "rt") as open_file:
         transcoding = json.load(open_file)
-    if args.sid not in transcoding:
-        raise ValueError("'{0}' subject identifier not in '{1}' transcoding "
-                         "table.".format(args.sid, args.transcode_table))
-    niidir = os.path.join(args.outdir, transcoding[args.sid], protocol)
+    if inputs["sid"] not in transcoding:
+        raise ValueError(
+            "'{0}' subject identifier not in '{1}' transcoding table.".format(
+                inputs["sid"], inputs["transcode_table"]))
+    niidir = os.path.join(inputs["outdir"], transcoding[inputs["sid"]],
+                          inputs["protocol"])
 else:
-    niidir = os.path.join(args.outdir, args.sid, protocol)
-if os.path.isdir(niidir):
-    if args.erase:
-        shutil.rmtree(niidir)
-        os.makedirs(niidir)
-else:
+    niidir = os.path.join(inputs["outdir"], inputs["sid"], inputs["protocol"])
+if inputs["erase"] and os.path.isdir(niidir):
+    shutil.rmtree(niidir)
+if not os.path.isdir(niidir):
     os.makedirs(niidir)
 
-"""
-Step 1: create the 'dcm2nii' configuration file.
-"""
-config_file = generate_config(
-    niidir, anonymized=True, gzip=True, add_date=False,
-    add_acquisition_number=False, add_protocol_name=True,
-    add_patient_name=False, add_source_filename=False,
-    begin_clip=0, end_clip=0)
-if args.verbose > 1:
-    print("[result] Configuration: {0}.".format(config_file))
 
 """
-Step 2: execute the 'dcm2nii' conversion.
+Step 1: perform the 'dcm2nii' or 'dcm2niix' conversion.
 """
-files, reoriented_files, reoriented_and_cropped_files, bvecs, bvals = dcm2nii(
-    dcmdir, o=niidir, b=config_file)
-if args.verbose > 1:
+if inputs["dcm2niix"]:
+    reoriented_files = []
+    reoriented_and_cropped_files = []
+    config_file = None
+    files, bvecs, bvals, bids = dcm2niix(
+        inputs["dcmdir"], o=niidir, f="%p", z=True, b=True)
+else:
+    config_file = generate_config(
+        niidir, anonymized=True, gzip=True, add_date=False,
+        add_acquisition_number=False, add_protocol_name=True,
+        add_patient_name=False, add_source_filename=False,
+        begin_clip=0, end_clip=0)
+    bids = None
+    (files, reoriented_files, reoriented_and_cropped_files,
+     bvecs, bvals) = dcm2nii(
+        inputs["dcmdir"], o=niidir, b=config_file)
+
+
+"""
+Step 2: force the normalization of the generated files.
+"""
+for index, path in enumerate(files):
+    dirname, basename = os.path.split(path)
+    dest_path = os.path.join(dirname, inputs["protocol"] + ".nii.gz")
+    shutil.move(path, dest_path)
+    files[index] = dest_path
+for index, path in enumerate(bvecs):
+    dirname, basename = os.path.split(path)
+    dest_path = os.path.join(dirname, inputs["protocol"] + ".bvecs")
+    shutil.move(path, dest_path)
+    bvecs[index] = dest_path
+for index, path in enumerate(bvals):
+    dirname, basename = os.path.split(path)
+    dest_path = os.path.join(dirname, inputs["protocol"] + ".bvals")
+    shutil.move(path, dest_path)
+    bvals[index] = dest_path
+if verbose > 1:
     print("[result] Files: {0}.".format(files))
     print("[result] Reoriented files: {0}.".format(reoriented_files))
     print("[result] Reoriented and cropped files: {0}.".format(
         reoriented_and_cropped_files))
     print("[result] Bvecs: {0}.".format(bvecs))
     print("[result] Bvals: {0}.".format(bvals))
+    print("[result] BIDS: {0}.".format(bids))
+
 
 """
 Step 3: fill the Nifti header.
@@ -195,9 +234,9 @@ tags = [("TR", ("0x0018", "0x0080"), False),
 filled_nii_files = []
 for path in files:
     filled_nii_files.append(
-        add_meta_to_nii(path, dcmdir, dcm_tags=tags, outdir=niidir,
+        add_meta_to_nii(path, inputs["dcmdir"], dcm_tags=tags, outdir=niidir,
                         prefix="f"))
-if args.verbose > 1:
+if verbose > 1:
     print("[result] Filled files: {0}.".format(filled_nii_files))
 
 
@@ -205,20 +244,40 @@ if args.verbose > 1:
 Step 4: create a snap of the created volume(s).
 """
 figures = []
-for impath in filled_nii_files:
+for impath in files:
     if len(bvals) == 0:
         snap = mosaic(impath, niidir, strategy="average")
         figures.append(snap)
     else:
-        indices = numpy.where(numpy.loadtxt(bvals[0]) != 0)[0].tolist()
+        indices = numpy.where(numpy.loadtxt(bvals[0]) >= 10)[0].tolist()
         snap = mosaic(impath, niidir, strategy="pick", indices=indices,
                       title="dwi")
         figures.append(snap)
-        indices = numpy.where(numpy.loadtxt(bvals[0]) == 0)[0].tolist()
+        indices = numpy.where(numpy.loadtxt(bvals[0]) <= 10)[0].tolist()
         snap = mosaic(impath, niidir, strategy="pick", indices=indices,
                       title="b0")
         figures.append(snap)
-if args.verbose > 1:
+if verbose > 1:
     print("[result] Snaps: {0}.".format(figures))
-outputs = (files + reoriented_files + reoriented_and_cropped_files + bvecs +
-           bvals + filled_nii_files + figures)
+
+
+"""
+Update the outputs and save them and the inputs in a 'logs' directory.
+"""
+logdir = os.path.join(niidir, "logs")
+if not os.path.isdir(logdir):
+    os.mkdir(logdir)
+params = locals()
+outputs = dict([(name, params[name])
+                for name in ("config_file", "files", "reoriented_files",
+                             "reoriented_and_cropped_files", "bvecs",
+                             "bvals", "filled_nii_files", "figures", "bids")])
+for name, final_struct in [("inputs", inputs), ("outputs", outputs),
+                           ("runtime", runtime)]:
+    log_file = os.path.join(logdir, "{0}.json".format(name))
+    with open(log_file, "wt") as open_file:
+        json.dump(final_struct, open_file, sort_keys=True, check_circular=True,
+                  indent=4)
+if verbose > 1:
+    print("[info] Outputs:")
+    pprint(outputs)

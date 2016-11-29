@@ -205,6 +205,82 @@ def dcm2nii(input, o, b):
     return files, reoriented_files, reoriented_and_cropped_files, bvecs, bvals
 
 
+def dcm2niix(input, o, f="%p", z=True, b=True):
+    """ Dicom to nifti conversion using 'dcm2nii'.
+
+    You can specify all the 'dcm2niix' command options as input function
+    parameters.
+
+    The basic usage is:
+    dcm2niix [options] <in_folder>
+
+    Options :
+    -b : BIDS sidecar (y/n, default n)
+    -f : filename (%a=antenna  (coil) number, %c=comments, %d=description,
+         %e echo number, %f=folder name, %i ID of patient, %m=manufacturer,
+         %n=name of patient, %p=protocol, %s=series number, %t=time,
+         %u=acquisition number, %z sequence name; default '%f_%p_%t_%s')
+    -h : show help
+    -m : merge 2D slices from same series regardless of study time, echo,
+        coil, orientation, etc. (y/n, default n)
+    -o : output directory (omit to save to input folder)
+    -s : single file mode, do not convert other images in folder
+         (y/n, default n)
+    -t : text notes includes private patient details (y/n, default n)
+    -v : verbose (y/n, default n)
+    -x : crop (y/n, default n)
+    -z : gz compress images (y/i/n, default n) [y=pigz, i=internal, n=no]
+
+
+    Returns
+    -------
+    files: list of str
+        the converted files in nifti format.
+    bvecs: list of str
+        the diffusion directions.
+    bvals: list of str
+        the diffusion acquisiton b-values.
+    bids: str
+        BIDS sidecar.
+    """
+    # Call dcm2nii
+    dcm2niiprocess = Dcm2NiiWrapper("dcm2niix")
+    dcm2niiprocess(cmd=["dcm2niix", "-o", o, "-f", f, "-z", z, "-b", b, input])
+
+    # Format outputs: from nipype
+    files = []
+    bvecs = []
+    bvals = []
+    bids = []
+    skip = False
+    find_b = False
+    for line in dcm2niiprocess.stdout.split("\n"):
+        if not skip:
+            out_file = None
+            if line.startswith("Convert "):
+                fname = str(re.search("\S+/\S+", line).group(0))
+                output_dir = o
+                out_file = os.path.abspath(os.path.join(output_dir, fname))
+                # Extract bvals
+                if find_b:
+                    bvecs.append(out_file + ".bvec")
+                    bvals.append(out_file + ".bval")
+                    find_b = False
+            # Next scan will have bvals/bvecs
+            elif "DTI gradients" in line or "DTI gradient directions" in line:
+                find_b = True
+            else:
+                pass
+            if out_file:
+                files.append(out_file + ".nii.gz")
+                if b:
+                    bids.append(out_file + ".json")
+                continue
+        skip = False
+
+    return files, bvecs, bvals, bids
+
+
 def add_meta_to_nii(nii_file, dicom_dir, dcm_tags, outdir, prefix="f",
                     additional_information=None):
     """ Add dicom tags to Nifti1 image header.
