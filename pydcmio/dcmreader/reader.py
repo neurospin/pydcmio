@@ -112,9 +112,9 @@ def walk(dataset_or_dcmpath, tag, stack_values=False):
                     return values
 
     # Case 2: go deeper and check tag in Dicom sequences
-    for tag in dataset.keys():
-        if dataset[tag].VR == "SQ":
-            sequence = dataset[tag].value
+    for inner_tag in dataset.keys():
+        if dataset[inner_tag].VR == "SQ":
+            sequence = dataset[inner_tag].value
             for sub_dataset in sequence:
                 sub_values = walk(sub_dataset, tag, stack_values=stack_values)
                 if sub_values is not None:
