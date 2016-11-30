@@ -81,6 +81,7 @@ python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_dicom2nifti \
     -o /volatile/nsap/dcm2nii/convert \
     -t \
     -r /volatile/nsap/dcm2nii/transcoding_table.json \
+    -f TR,0x0018,0x0080,False TE,0x0018,0x0081,False \
     -e
 """
 
@@ -131,12 +132,14 @@ parser.add_argument(
     "-x", "--dcm2niix", dest="dcm2niix", action="store_true",
     help="if activated, use 'dcm2niix' instead of 'dcm2nii'.")
 parser.add_argument(
+    "-f", "--filledwithtags", dest="filledwithtags", nargs="*",
+    help="define some tags to be added in the 'descrip' Nifti header field.")
+parser.add_argument(
     "-r", "--transtable", dest="transcode_table", required=False,
     metavar="FILE", help="the transcoding table.", type=is_file)
 args = parser.parse_args()
 inputs = vars(args)
 verbose = inputs.pop("verbose")
-
 
 """
 First check if the output directory exists on the file system, and
@@ -229,15 +232,18 @@ if verbose > 1:
 """
 Step 3: fill the Nifti header.
 """
-tags = [("TR", ("0x0018", "0x0080"), False),
-        ("TE", ("0x0018", "0x0081"), False)]
 filled_nii_files = []
-for path in files:
-    filled_nii_files.append(
-        add_meta_to_nii(path, inputs["dcmdir"], dcm_tags=tags, outdir=niidir,
-                        prefix="f"))
-if verbose > 1:
-    print("[result] Filled files: {0}.".format(filled_nii_files))
+if inputs["filledwithtags"] is not None:
+    tags = []
+    for elem in inputs["filledwithtags"]:
+        name, t1, t2, stack = elem.split(",")
+        tags.append((name, (t1, t2), eval(stack)))
+    for path in files:
+        filled_nii_files.append(
+            add_meta_to_nii(path, inputs["dcmdir"], dcm_tags=tags,
+                            outdir=niidir, prefix="f"))
+    if verbose > 1:
+        print("[result] Filled files: {0}.".format(filled_nii_files))
 
 
 """
