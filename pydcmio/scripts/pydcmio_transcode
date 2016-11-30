@@ -121,7 +121,7 @@ if args.directory is not None:
     sub_folders = [name for name in os.listdir(args.directory)
                    if os.path.isdir(os.path.join(args.directory, name))]
     sids.extend(sub_folders)
-    sids = set(sids)
+    sids = list(set(sids))
 
 
 """
