@@ -145,7 +145,7 @@ verbose = inputs.pop("verbose")
 First check if the output directory exists on the file system, and
 clean it if requested. Transcode also the subject identifier if requested.
 """
-tool = os.path.basename(__file__)
+tool = "pydcmio_dicom2nifti"
 tool_version = version
 if inputs["dcm2niix"]:
     dcm2nii_version = Dcm2NiiWrapper.version("dcm2niix")

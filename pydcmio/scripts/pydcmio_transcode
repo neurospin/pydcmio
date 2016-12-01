@@ -96,7 +96,7 @@ verbose = inputs.pop("verbose")
 """
 Welcome message.
 """
-tool = os.path.basename(__file__)
+tool = "pydcmio_transcode"
 tool_version = version
 timestamp = datetime.now().isoformat()
 params = locals()
