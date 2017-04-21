@@ -19,6 +19,7 @@ try:
     from pyconnectome import DEFAULT_FSL_PATH
     from pyconnectome.wrapper import FSLWrapper
 except:
+    DEFAULT_FSL_PATH = ""
     warnings.warn("PyConnectome is not installed.")
 
 

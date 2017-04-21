@@ -18,6 +18,7 @@ try:
     from pyfreesurfer.wrapper import FSWrapper
     from pyfreesurfer import DEFAULT_FREESURFER_PATH
 except:
+    DEFAULT_FREESURFER_PATH = ""
     warnings.warn("PyFreeSurfer is not installed.")
 
 
