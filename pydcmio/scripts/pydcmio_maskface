@@ -1,0 +1,234 @@
+#! /usr/bin/env python
+##########################################################################
+# NSAp - Copyright (C) CEA, 2017
+# Distributed under the terms of the CeCILL-B license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+# for details.
+##########################################################################
+
+# System import
+import os
+import json
+import argparse
+from datetime import datetime
+from pprint import pprint
+
+# Bredala module
+try:
+    import bredala
+    bredala.USE_PROFILER = False
+    bredala.register("pydcmio.deface.mask_face",
+                     names=["deface"])
+    bredala.register("pydcmio.deface.mri_deface",
+                     names=["deface"])
+    bredala.register("pydcmio.deface.pydeface",
+                     names=["deface"])
+except:
+    pass
+
+# Package import
+from pydcmio import __version__ as version
+from pydcmio.deface import mask_face
+from pydcmio.deface import mri_deface
+from pydcmio.deface import pydeface
+
+# Pyconnectome import
+from pyconnectome import DEFAULT_FSL_PATH
+from pyconnectome import __version__ as pyconnectome_version
+from pyconnectome.wrapper import FSLWrapper
+
+# Pyfreesurfer import
+from pyfreesurfer import DEFAULT_FREESURFER_PATH
+from pyfreesurfer import __version__ as pyfreesurfer_version
+from pyfreesurfer.wrapper import FSWrapper
+
+
+# Parameters to keep trace
+__hopla__ = ["runtime", "inputs", "outputs"]
+
+
+# Script documentation
+doc = """
+Defacing with the mask_face command
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Wraps around the 'mask_face' command.
+
+This code enables us to deface Nifti images using the Marcus, D.
+'mask_face' command.
+
+The code is setup so that the mask_face matlab dependencies
+have been compiled. Thus you need the MathWorks MCR software installed
+on your computer to run this script.
+
+Steps:
+
+1- Convert input Nifti images to .img/.hdr Analyze images.
+2- Start defacing with the 'mask_face' command.
+
+Command:
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_maskface \
+    -i $HOME/Desktop/results/sample_T1_input.hdr \
+    -t mask_face \
+    -o $HOME/Desktop/results/001 \
+    -c /etc/fsl/5.0/fsl.sh \
+    -m /usr/local/MATLAB/MATLAB_Runtime/v901 \
+    -v 2 \
+    -e
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_maskface \
+    -i $HOME/Desktop/results/sample_T1_input.mgz \
+    -t mri_deface \
+    -o $HOME/Desktop/results/002 \
+    -q /i2bm/local/freesurfer/SetUpFreeSurfer.sh \
+    -v 2
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_maskface \
+    -i $HOME/Desktop/results/sample_T1_input.nii.gz \
+    -t pydeface \
+    -o $HOME/Desktop/results/003 \
+    -c /etc/fsl/5.0/fsl.sh \
+    -v 2 
+"""
+
+
+def is_file(filearg):
+    """ Type for argparse - checks that file exists but does not open.
+    """
+    if not os.path.isfile(filearg):
+        raise argparse.ArgumentError(
+            "The file '{0}' does not exist!".format(filearg))
+    return filearg
+
+
+def is_directory(dirarg):
+    """ Type for argparse - checks that directory exists.
+    """
+    if not os.path.isdir(dirarg):
+        raise argparse.ArgumentError(
+            "The directory '{0}' does not exist!".format(dirarg))
+    return dirarg
+
+
+parser = argparse.ArgumentParser(description=doc)
+parser.add_argument(
+    "-i", "--images", nargs="+", help="Input MRI head images to be defaced.",
+    required=True)
+parser.add_argument(
+    "-t", "--type", dest="defacing_type",
+    choices=("mask_face", "mri_deface", "pydeface"),
+    help="The defacing method to be applied.")
+parser.add_argument(
+    "-o", "--outdir", dest="outdir", required=True, metavar="PATH",
+    help="The output folder.", type=is_directory)
+parser.add_argument(
+    "-r", "--reference", dest="reference",
+    help="The image that must be used as reference if more than one image"
+         "have been supplied as input.",
+    type=is_file)
+parser.add_argument(
+    "-e", "--ears", dest="ears", action="store_true",
+    help="If activated, masks ears (only valid for 'mask_face').")
+parser.add_argument(
+    "-c", "--fslconfig", dest="fslconfig", metavar="FILE",
+    help="The FSL configuration file.",
+    type=is_file)
+parser.add_argument(
+    "-q", "--fsconfig", dest="fsconfig", metavar="FILE",
+    help="The FreeSurfer configuration file.",
+    type=is_file)
+parser.add_argument(
+    "-m", "--matlabmcr", dest="matlabmcr",
+    help="The MATLAB MCR directory for standalone applications (only required "
+         "for 'mask_face').",
+    type=is_directory)
+parser.add_argument(
+    "-v", "--verbose", dest="verbose", type=int, choices=[0, 1, 2],
+    help="Increase the verbosity level: 0 silent, [1, 2] verbose.")
+parser.add_argument(
+    "-k", "--keep", dest="keep_workspace", action="store_true",
+    help="If activated, keep the defacing workspace (require more "
+         "disk space).")
+args = parser.parse_args()
+inputs = vars(args)
+verbose = inputs.pop("verbose")
+fsl_config = inputs.pop("fslconfig") or DEFAULT_FSL_PATH
+freesurfer_config = inputs.pop("fsconfig") or DEFAULT_FREESURFER_PATH
+
+
+"""
+Welcome message.
+"""
+tool = "pydcmio_maskface"
+timestamp = datetime.now().isoformat()
+tool_version = version
+fsl_version, freesurfer_version = (None, None)
+if inputs["defacing_type"] == "mask_face":
+    fsl_version = FSLWrapper([], shfile=fsl_config).version
+elif inputs["defacing_type"] == "mri_deface":
+    freesurfer_version = FSWrapper([], freesurfer_config).version
+params = locals()
+runtime = dict([(name, params[name])
+               for name in ("fsl_config", "freesurfer_config", "tool",
+                            "tool_version", "fsl_version",
+                            "freesurfer_version", "timestamp", 
+                            "pyconnectome_version", "pyfreesurfer_version")])
+outputs = None
+if verbose > 0:
+    print("[info] Starting defacing ...")
+    print("[info] Runtime:")
+    pprint(runtime)
+    print("[info] Inputs:")
+    pprint(inputs)
+
+
+"""
+Defacing
+"""
+if inputs["defacing_type"] == "mask_face":
+    deface_files, snap_files = mask_face(
+        input_files=inputs["images"],
+        outdir=inputs["outdir"],
+        reference_file=inputs["reference"],
+        mask_ears=inputs["ears"],
+        fsl_sh=fsl_config,
+        matlab_mcr=inputs["matlabmcr"],
+        verbose=verbose,
+        rm_workspace=(not inputs["keep_workspace"]))
+elif inputs["defacing_type"] == "mri_deface":
+    deface_files, snap_files = mri_deface(
+        input_files=inputs["images"],
+        outdir=inputs["outdir"],
+        reference_file=None,
+        verbose=verbose,
+        fs_config=freesurfer_config)
+elif inputs["defacing_type"] == "pydeface":
+    deface_files, snap_files = pydeface(
+        input_files=inputs["images"],
+        outdir=inputs["outdir"],
+        reference_file=None,
+        fsl_sh=fsl_config)
+else:
+    raise ValueError("Invalid defacing type.")
+
+
+"""
+Update the outputs and save them and the inputs in a 'logs' directory.
+"""
+logdir = os.path.join(inputs["outdir"], "logs")
+if not os.path.isdir(logdir):
+    os.mkdir(logdir)
+params = locals()
+outputs = dict([(name, params[name])
+               for name in ("deface_files", "snap_files")])
+for name, final_struct in [("inputs", inputs), ("outputs", outputs),
+                           ("runtime", runtime)]:
+    log_file = os.path.join(logdir, "{0}.json".format(name))
+    with open(log_file, "wt") as open_file:
+        json.dump(final_struct, open_file, sort_keys=True, check_circular=True,
+                  indent=4)
+if verbose > 1:
+    print("[info] Outputs:")
+    pprint(outputs)
