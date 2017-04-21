@@ -14,10 +14,14 @@ Defacing with the Marcus, D. 'mask_face' command.
 import os
 import shutil
 import nibabel
+import warnings
 
 # Pyconnectome
-from pyconnectome import DEFAULT_FSL_PATH
-from pyconnectome.wrapper import FSLWrapper
+try:
+    from pyconnectome import DEFAULT_FSL_PATH
+    from pyconnectome.wrapper import FSLWrapper
+except:
+    warnings.warn("PyConnectome is not installed.")
 
 
 def deface(input_files, outdir, matlab_mcr, reference_file=None,

@@ -14,8 +14,11 @@ Defacing with the FreeSurfer 'mri_deface' command.
 import os
 
 # Pyfreesurfer import
-from pyfreesurfer.wrapper import FSWrapper
-from pyfreesurfer import DEFAULT_FREESURFER_PATH
+try:
+    from pyfreesurfer.wrapper import FSWrapper
+    from pyfreesurfer import DEFAULT_FREESURFER_PATH
+except:
+    warnings.warn("PyFreeSurfer is not installed.")
 
 
 def deface(input_files, outdir, reference_file=None,

@@ -15,8 +15,11 @@ import warnings
 import os
 
 # Pyconnectome
-from pyconnectome import DEFAULT_FSL_PATH
-from pyconnectome.wrapper import FSLWrapper
+try:
+    from pyconnectome import DEFAULT_FSL_PATH
+    from pyconnectome.wrapper import FSLWrapper
+except:
+    warnings.warn("PyConnectome is not installed.")
 
 
 def deface(input_files, outdir, reference_file=None, fsl_sh=DEFAULT_FSL_PATH):
