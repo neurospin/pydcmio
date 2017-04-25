@@ -11,8 +11,8 @@ Defacing with the Poldrack, R. 'pydeface' Python module.
 """
 
 # System import
-import warnings
 import os
+import warnings
 
 # Pyconnectome
 try:

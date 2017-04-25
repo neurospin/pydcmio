@@ -12,6 +12,7 @@ Defacing with the FreeSurfer 'mri_deface' command.
 
 # System import
 import os
+import warnings
 
 # Pyfreesurfer import
 try:
