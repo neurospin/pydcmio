@@ -295,11 +295,11 @@ for impath in files:
     else:
         indices = numpy.where(numpy.loadtxt(bvals[0]) >= 10)[0].tolist()
         snap = mosaic(impath, niidir, strategy="pick", indices=indices,
-                      title="dwi")
+                      title="dwi", basename="dwi")
         figures.append(snap)
         indices = numpy.where(numpy.loadtxt(bvals[0]) <= 10)[0].tolist()
         snap = mosaic(impath, niidir, strategy="pick", indices=indices,
-                      title="b0")
+                      title="b0", basename="b0")
         figures.append(snap)
 if verbose > 1:
     print("[result] Snaps: {0}.".format(figures))
