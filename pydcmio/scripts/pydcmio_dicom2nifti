@@ -17,6 +17,8 @@ import json
 import glob
 from datetime import datetime
 from pprint import pprint
+import textwrap
+from argparse import RawTextHelpFormatter
 
 # Bredala import
 try:
@@ -45,7 +47,7 @@ __hopla__ = ["runtime", "inputs", "outputs"]
 
 
 # Script documentation
-doc = """
+DOC = """
 Dicom to Nifti conversion
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -104,47 +106,74 @@ def is_directory(dirarg):
     return dirarg
 
 
-parser = argparse.ArgumentParser(description=doc)
-parser.add_argument(
-    "-v", "--verbose", dest="verbose", type=int, choices=[0, 1, 2], default=0,
-    help="increase the verbosity level: 0 silent, [1, 2] verbose.")
-parser.add_argument(
-    "-e", "--erase", dest="erase", action="store_true",
-    help="if activated, clean the conversion output folder.")
-parser.add_argument(
-    "-s", "--sid", dest="sid", required=True, type=str,
-    help="the subject identifier.")
-parser.add_argument(
-    "-p", "--protocol", dest="protocol", required=True, type=str,
-    help="the protocol name.")
-parser.add_argument(
-    "-d", "--dcmdir", dest="dcmdir", required=True, metavar="PATH",
-    help="the folder that contains the DICOMs to be converted.",
-    type=is_directory)
-parser.add_argument(
-    "-o", "--outdir", dest="outdir", required=True, metavar="PATH",
-    help="the subject output folders.",
-    type=is_directory)
-parser.add_argument(
-    "-t", "--transcode", dest="transcode", action="store_true",
-    help="if activated, the subject ID is transcoded.")
-parser.add_argument(
-    "-x", "--dcm2niix", dest="dcm2niix", action="store_true",
-    help="if activated, use 'dcm2niix' instead of 'dcm2nii'.")
-parser.add_argument(
-    "-f", "--filledwithtags", dest="filledwithtags", nargs="*",
-    help="define some tags to be added in the 'descrip' Nifti header field.")
-parser.add_argument(
-    "-r", "--transtable", dest="transcode_table", required=False,
-    metavar="FILE", help="the transcoding table.", type=is_file)
-args = parser.parse_args()
-inputs = vars(args)
-verbose = inputs.pop("verbose")
+def get_cmd_line_args():
+    """
+    Create a command line argument parser and return a dict mapping
+    <argument name> -> <argument value>.
+    """
+    parser = argparse.ArgumentParser(
+        prog="python pydcmio_dicom2nifti",
+        description=textwrap.dedent(DOC),
+        formatter_class=RawTextHelpFormatter)
+
+    # Required arguments
+    required = parser.add_argument_group("required arguments")
+    required.add_argument(
+        "-s", "--sid",
+        required=True, metavar="<str>",
+        help="the subject identifier.")
+    required.add_argument(
+        "-p", "--protocol",
+        required=True, metavar="<str>",
+        help="the protocol name.")
+    required.add_argument(
+        "-d", "--dcmdir",
+        required=True, metavar="<path>", type=is_directory,
+        help="the folder that contains the DICOMs to be converted.")
+    required.add_argument(
+        "-o", "--outdir",
+        required=True, metavar="<path>", type=is_directory,
+        help="the subject output folders.")
+
+    # Optional arguments
+    parser.add_argument(
+        "-t", "--transcode",
+        action="store_true",
+        help="if activated, the subject ID is transcoded.")
+    parser.add_argument(
+        "-x", "--dcm2niix",
+        action="store_true",
+        help="if activated, use 'dcm2niix' instead of 'dcm2nii'.")
+    parser.add_argument(
+        "-f", "--filledwithtags",
+        nargs="*",
+        help="define some tags to be added in the 'descrip' Nifti header "
+             "field.")
+    parser.add_argument(
+        "-r", "--transtable", dest="transcode_table",
+        metavar="<file>", type=is_file,
+        help="an existing transcoding table.")
+    parser.add_argument(
+        "-e", "--erase",
+        action="store_true",
+        help="if activated, clean the conversion output folder.")
+    parser.add_argument(
+        "-v", "--verbose",
+        type=int, choices=[0, 1, 2], default=0,
+        help="increase the verbosity level: 0 silent, [1, 2] verbose.")
+
+    # Create a dict of arguments to pass to the 'main' function
+    args = parser.parse_args()
+    kwargs = vars(args)
+    verbose = kwargs.pop("verbose")
+
+    return kwargs, verbose
 
 """
 First check if the output directory exists on the file system, and
 clean it if requested. Transcode also the subject identifier if requested.
 """
+inputs, verbose = get_cmd_line_args()
 tool = "pydcmio_dicom2nifti"
 tool_version = version
 if inputs["dcm2niix"]:
@@ -188,7 +217,7 @@ if inputs["dcm2niix"]:
     reoriented_and_cropped_files = []
     config_file = None
     files, bvecs, bvals, bids = dcm2niix(
-        inputs["dcmdir"], o=niidir, f="%p", z=True, b=True)
+        inputs["dcmdir"], o=niidir, f=inputs["protocol"], z="y", b="y")
 else:
     config_file = generate_config(
         niidir, anonymized=True, gzip=True, add_date=False,
@@ -206,17 +235,26 @@ Step 2: force the normalization of the generated files.
 """
 for index, path in enumerate(files):
     dirname, basename = os.path.split(path)
-    dest_path = os.path.join(dirname, inputs["protocol"] + ".nii.gz")
+    suffix = "" if index == 0 else str(index)
+    dest_path = os.path.join(
+        dirname,
+        inputs["protocol"] + suffix + ".nii.gz")
     shutil.move(path, dest_path)
     files[index] = dest_path
 for index, path in enumerate(bvecs):
     dirname, basename = os.path.split(path)
-    dest_path = os.path.join(dirname, inputs["protocol"] + ".bvecs")
+    suffix = "" if index == 0 else str(index)
+    dest_path = os.path.join(
+        dirname,
+        inputs["protocol"] + suffix + ".bvecs")
     shutil.move(path, dest_path)
     bvecs[index] = dest_path
 for index, path in enumerate(bvals):
     dirname, basename = os.path.split(path)
-    dest_path = os.path.join(dirname, inputs["protocol"] + ".bvals")
+    suffix = "" if index == 0 else str(index)
+    dest_path = os.path.join(
+        dirname,
+        inputs["protocol"] + suffix + ".bvals")
     shutil.move(path, dest_path)
     bvals[index] = dest_path
 if verbose > 1:
