@@ -19,7 +19,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import FigureCanvasPdf as FigureCanvas
 
 
-def mosaic(impath, outdir, strategy="average", indices=None, title=None):
+def mosaic(impath, outdir, strategy="average", indices=None, title=None,
+           overlay=None, overlay_alpha=None, basename=None, ext=".pdf"):
     """ Create a snap of an input 3D or 4D image.
 
     If a 4D image is provided, select the 'index'th element or create an
@@ -31,12 +32,21 @@ def mosaic(impath, outdir, strategy="average", indices=None, title=None):
         the path to the image to slice.
     outdir: str
         the destination folder.
-    strategy (optional, default 'average')
+    strategy: str, default 'average'
         in the case of 4d image the slice strategy: 'pick' or 'average'.
-    indices (optional, default None)
+    indices: list of int, default None
         in the case of 4d image the indices of the volumes to average.
-    title (optional, default None)
+    title: str, default None
         the mosaic title.
+    overlay: str, default None
+        the path to an mask to be overlayed.
+    overlay_alpha: float, default None
+        fix the overlay alpha value (0-1).
+    basename: str, default None
+        filename without extension of output file. By default None, means
+        the input file basename will be used.
+    ext: str, default '.png'
+        snapshot extension, used to specify the output format.
 
     Returns
     -------
@@ -65,20 +75,20 @@ def mosaic(impath, outdir, strategy="average", indices=None, title=None):
                              "shape '{1}'.".format(indices, array.shape))
 
     # Create the snap with qap
-    basename = os.path.basename(impath).split(".")[0]
+    if basename is None:
+        basename = os.path.basename(impath).split(".")[0]
     if title is None:
         title = basename
-    else:
-        basename = basename + "_" + title
     title += ": shape {0}".format(shape)
-    snap = os.path.join(outdir, basename + ".pdf")
-    fig = plot_mosaic(array, title=title)
+    snap = os.path.join(outdir, basename + ext)
+    fig = plot_mosaic(array, title=title, overlay_mask=overlay,
+                      overlay_alpha=overlay_alpha)
     fig.savefig(snap, dpi=300)
 
     return snap
 
 
-def plot_mosaic(nifti_file, title=None, overlay_mask=None,
+def plot_mosaic(nifti_file, title=None, overlay_mask=None, overlay_alpha=None,
                 figsize=(11.7, 8.3)):
     """ From the qap module.
     """
@@ -91,12 +101,13 @@ def plot_mosaic(nifti_file, title=None, overlay_mask=None,
         mean_data = nifti_file
 
     z_vals = np.array(range(0, mean_data.shape[2]))
+
+    # Crop inferior and posterior
+    rem = 15
+    mean_data = mean_data[..., rem:-rem]
+    z_vals = z_vals[rem:-rem]
     # Reduce the number of slices shown
     if mean_data.shape[2] > 70:
-        rem = 15
-        # Crop inferior and posterior
-        mean_data = mean_data[..., rem:-rem]
-        z_vals = z_vals[rem:-rem]
         # Discard one every two slices
         mean_data = mean_data[..., ::2]
         z_vals = z_vals[::2]
@@ -104,8 +115,21 @@ def plot_mosaic(nifti_file, title=None, overlay_mask=None,
     n_images = mean_data.shape[2]
     row, col = _calc_rows_columns(figsize[0] / figsize[1], n_images)
 
-    if overlay_mask:
+    if overlay_mask is not None:
         overlay_data = nibabel.load(overlay_mask).get_data()
+        # Crop inferior and posterior
+        overlay_data = overlay_data[..., rem:-rem]
+        # Reduce the number of slices shown
+        if mean_data.shape[2] > 70:
+            # Discard one every two slices
+            overlay_data = overlay_data[..., ::2]
+        vmin = numpy.nanmin(overlay_data)
+        vmax = numpy.nanmax(overlay_data)
+        overlay_mask = np.logical_not(np.isnan(mean_data))
+        if vmin != 0:
+            vmin=np.percentile(overlay_data[overlay_mask], 1.0)
+        if vmax != 1:
+            vmax=np.percentile(overlay_data[overlay_mask], 99.0)
 
     # create figures
     fig = plt.Figure(figsize=figsize)
@@ -115,7 +139,7 @@ def plot_mosaic(nifti_file, title=None, overlay_mask=None,
     for image, z_val in enumerate(z_vals):
         ax = fig.add_subplot(row, col, image + 1)
         data_mask = np.logical_not(np.isnan(mean_data))
-        if overlay_mask:
+        if overlay_mask is not None:
             ax.set_rasterized(True)
 
         ax.imshow(np.fliplr(mean_data[:, :, image].T), vmin=np.percentile(
@@ -123,13 +147,17 @@ def plot_mosaic(nifti_file, title=None, overlay_mask=None,
             vmax=np.percentile(mean_data[data_mask], 99.5),
             cmap=cm.Greys_r, interpolation='nearest', origin='lower')
 
-        if overlay_mask:
-            cmap = cm.Reds  # @UndefinedVariable
+        if overlay_mask is not None:
+            cmap = cm.Reds
             cmap._init()
-            alphas = np.linspace(0, 0.75, cmap.N + 3)
-            cmap._lut[:, -1] = alphas
-            ax.imshow(np.fliplr(overlay_data[:, :, image].T), vmin=0, vmax=1,
-                      cmap=cmap, interpolation='nearest', origin='lower')
+            if overlay_alpha is None:
+                alphas = np.linspace(0, 0.75, cmap.N + 3)
+                cmap._lut[:, -1] = alphas
+            else:
+                cmap._lut[:, -1] = overlay_alpha
+            ax.imshow(np.fliplr(overlay_data[:, :, image].T), vmin=vmin,
+                      vmax=vmax, cmap=cmap, interpolation='nearest',
+                      origin='lower')
 
         ax.annotate(
             str(z_val), xy=(.95, .015), xycoords='axes fraction',
