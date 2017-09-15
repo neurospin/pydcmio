@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*
 ##########################################################################
 # NSAp - Copyright (C) CEA, 2017
 # Distributed under the terms of the CeCILL-B license, as published by
@@ -13,17 +14,16 @@ import json
 import argparse
 from datetime import datetime
 from pprint import pprint
+import textwrap
+from argparse import RawTextHelpFormatter
 
 # Bredala module
 try:
     import bredala
     bredala.USE_PROFILER = False
-    bredala.register("pydcmio.deface.mask_face",
-                     names=["deface"])
-    bredala.register("pydcmio.deface.mri_deface",
-                     names=["deface"])
-    bredala.register("pydcmio.deface.pydeface",
-                     names=["deface"])
+    bredala.register("pydcmio.deface.mask_face", names=["deface"])
+    bredala.register("pydcmio.deface.mri_deface", names=["deface"])
+    bredala.register("pydcmio.deface.pydeface", names=["deface"])
 except:
     pass
 
@@ -49,7 +49,7 @@ __hopla__ = ["runtime", "inputs", "outputs"]
 
 
 # Script documentation
-doc = """
+DOC = """
 Defacing with the mask_face command
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -67,29 +67,33 @@ Steps:
 1- Convert input Nifti images to .img/.hdr Analyze images.
 2- Start defacing with the 'mask_face' command.
 
-Command:
-
-python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_maskface \
-    -i $HOME/Desktop/results/sample_T1_input.hdr \
-    -t mask_face \
-    -o $HOME/Desktop/results/001 \
-    -c /etc/fsl/5.0/fsl.sh \
-    -m /usr/local/MATLAB/MATLAB_Runtime/v901 \
-    -v 2 \
-    -e
-
-python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_maskface \
-    -i $HOME/Desktop/results/sample_T1_input.mgz \
-    -t mri_deface \
-    -o $HOME/Desktop/results/002 \
-    -q /i2bm/local/freesurfer/SetUpFreeSurfer.sh \
-    -v 2
+MaskFace command example:
 
 python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_maskface \
     -i $HOME/Desktop/results/sample_T1_input.nii.gz \
-    -t pydeface \
+    -o $HOME/Desktop/results/001 \
+    -T mask_face \
+    -F /etc/fsl/5.0/fsl.sh \
+    -M /usr/local/MATLAB/MATLAB_Runtime/v901 \
+    -v 2 \
+    -E
+
+FreeSurfer 'mri_deface' command example:
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_maskface \
+    -i $HOME/Desktop/results/sample_T1_input.mgz \
+    -o $HOME/Desktop/results/002 \
+    -T mri_deface \
+    -H /i2bm/local/freesurfer/SetUpFreeSurfer.sh \
+    -v 2
+
+PyDeface command example:
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_maskface \
+    -i $HOME/Desktop/results/sample_T1_input.nii.gz \
     -o $HOME/Desktop/results/003 \
-    -c /etc/fsl/5.0/fsl.sh \
+    -T pydeface \
+    -F /etc/fsl/5.0/fsl.sh \
     -v 2 
 """
 
@@ -112,67 +116,91 @@ def is_directory(dirarg):
     return dirarg
 
 
-parser = argparse.ArgumentParser(description=doc)
-parser.add_argument(
-    "-i", "--images", nargs="+", help="Input MRI head images to be defaced.",
-    required=True)
-parser.add_argument(
-    "-t", "--type", dest="defacing_type",
-    choices=("mask_face", "mri_deface", "pydeface"),
-    help="The defacing method to be applied.")
-parser.add_argument(
-    "-o", "--outdir", dest="outdir", required=True, metavar="PATH",
-    help="The output folder.", type=is_directory)
-parser.add_argument(
-    "-r", "--reference", dest="reference",
-    help="The image that must be used as reference if more than one image"
-         "have been supplied as input.",
-    type=is_file)
-parser.add_argument(
-    "-e", "--ears", dest="ears", action="store_true",
-    help="If activated, masks ears (only valid for 'mask_face').")
-parser.add_argument(
-    "-c", "--fslconfig", dest="fslconfig", metavar="FILE",
-    help="The FSL configuration file.",
-    type=is_file)
-parser.add_argument(
-    "-q", "--fsconfig", dest="fsconfig", metavar="FILE",
-    help="The FreeSurfer configuration file.",
-    type=is_file)
-parser.add_argument(
-    "-m", "--matlabmcr", dest="matlabmcr",
-    help="The MATLAB MCR directory for standalone applications (only required "
-         "for 'mask_face').",
-    type=is_directory)
-parser.add_argument(
-    "-v", "--verbose", dest="verbose", type=int, choices=[0, 1, 2],
-    help="Increase the verbosity level: 0 silent, [1, 2] verbose.")
-parser.add_argument(
-    "-k", "--keep", dest="keep_workspace", action="store_true",
-    help="If activated, keep the defacing workspace (require more "
-         "disk space).")
-args = parser.parse_args()
-inputs = vars(args)
-verbose = inputs.pop("verbose")
-fsl_config = inputs.pop("fslconfig") or DEFAULT_FSL_PATH
-freesurfer_config = inputs.pop("fsconfig") or DEFAULT_FREESURFER_PATH
+def get_cmd_line_args():
+    """
+    Create a command line argument parser and return a dict mapping
+    <argument name> -> <argument value>.
+    """
+    parser = argparse.ArgumentParser(
+        prog="python pydcmio_maskface",
+        description=textwrap.dedent(DOC),
+        formatter_class=RawTextHelpFormatter)
+
+    # Required arguments
+    required = parser.add_argument_group("required arguments")
+    required.add_argument(
+        "-i", "--images",
+        required=True, nargs="+",
+        help="Input MRI head images to be defaced.")
+    required.add_argument(
+        "-o", "--outdir",
+        required=True, type=is_directory, metavar="<path>",
+        help="The destination folder.")
+
+    # Optional arguments
+    parser.add_argument(
+        "-R", "--reference",
+        required=True, type=is_file,
+        help="The image that must be used as reference if more than one image"
+             "have been supplied as input or if the input volume is 4d.")
+    parser.add_argument(
+        "-T", "--type",
+        dest="defacing_type", choices=("mask_face", "mri_deface", "pydeface"),
+        help="The defacing method to be applied.")
+    parser.add_argument(
+        "-E", "--ears",
+        action="store_true",
+        help="If activated, masks ears (only valid for 'mask_face').")
+    parser.add_argument(
+        "-H", "--fs-sh",
+        type=is_file, metavar="<path>",
+        help="Bash script initializing FreeSurfer's environment.")
+    parser.add_argument(
+        "-F", "--fsl-sh",
+        type=is_file, metavar="<path>",
+        help="Bash script initializing FSL's environment.")
+    parser.add_argument(
+        "-M", "--matlabmcr",
+        type=is_directory,
+        help="The MATLAB MCR directory for standalone applications (only "
+             "required for 'mask_face').")
+    parser.add_argument(
+        "-K", "--keep",
+        dest="keep_workspace", action="store_true",
+        help="If activated, keep the defacing workspace (require more "
+             "disk space).")
+    parser.add_argument(
+        "-v", "--verbose",
+        type=int, choices=[0, 1, 2],
+        help="Increase the verbosity level: 0 silent, [1, 2] verbose.")
+
+    # Create a dict of arguments to pass to the 'main' function
+    args = parser.parse_args()
+    kwargs = vars(args)
+    verbose = kwargs.pop("verbose")
+    if kwargs["fs_sh"] is None:
+        kwargs["fs_sh"] = DEFAULT_FREESURFER_PATH
+    if kwargs["fsl_sh"] is None:
+        kwargs["fsl_sh"] = DEFAULT_FSL_PATH
+
+    return kwargs, verbose
 
 
 """
-Welcome message.
+Parse the command line.
 """
+inputs, verbose = get_cmd_line_args()
 tool = "pydcmio_maskface"
 timestamp = datetime.now().isoformat()
 tool_version = version
 fsl_version, freesurfer_version = (None, None)
 if inputs["defacing_type"] == "mask_face":
-    fsl_version = FSLWrapper([], shfile=fsl_config).version
+    fsl_version = FSLWrapper([], shfile=inputs["fsl_sh"]).version
 elif inputs["defacing_type"] == "mri_deface":
-    freesurfer_version = FSWrapper([], freesurfer_config).version
+    freesurfer_version = FSWrapper([], inputs["fs_sh"]).version
 params = locals()
 runtime = dict([(name, params[name])
-               for name in ("fsl_config", "freesurfer_config", "tool",
-                            "tool_version", "fsl_version",
+               for name in ("tool","tool_version", "fsl_version",
                             "freesurfer_version", "timestamp", 
                             "pyconnectome_version", "pyfreesurfer_version")])
 outputs = None
@@ -193,7 +221,7 @@ if inputs["defacing_type"] == "mask_face":
         outdir=inputs["outdir"],
         reference_file=inputs["reference"],
         mask_ears=inputs["ears"],
-        fsl_sh=fsl_config,
+        fsl_sh=inputs["fsl_sh"],
         matlab_mcr=inputs["matlabmcr"],
         verbose=verbose,
         rm_workspace=(not inputs["keep_workspace"]))
@@ -203,13 +231,13 @@ elif inputs["defacing_type"] == "mri_deface":
         outdir=inputs["outdir"],
         reference_file=None,
         verbose=verbose,
-        fs_config=freesurfer_config)
+        fs_config=inputs["fs_sh"])
 elif inputs["defacing_type"] == "pydeface":
     deface_files, snap_files = pydeface(
         input_files=inputs["images"],
         outdir=inputs["outdir"],
         reference_file=None,
-        fsl_sh=fsl_config)
+        fsl_sh=inputs["fsl_sh"])
 else:
     raise ValueError("Invalid defacing type.")
 
