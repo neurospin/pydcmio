@@ -127,9 +127,9 @@ def plot_mosaic(nifti_file, title=None, overlay_mask=None, overlay_alpha=None,
         vmax = numpy.nanmax(overlay_data)
         overlay_mask = np.logical_not(np.isnan(mean_data))
         if vmin != 0:
-            vmin=np.percentile(overlay_data[overlay_mask], 1.0)
+            vmin = np.percentile(overlay_data[overlay_mask], 1.0)
         if vmax != 1:
-            vmax=np.percentile(overlay_data[overlay_mask], 99.0)
+            vmax = np.percentile(overlay_data[overlay_mask], 99.0)
 
     # create figures
     fig = plt.Figure(figsize=figsize)
