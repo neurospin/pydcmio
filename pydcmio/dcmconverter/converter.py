@@ -205,7 +205,7 @@ def dcm2nii(input, o, b):
     return files, reoriented_files, reoriented_and_cropped_files, bvecs, bvals
 
 
-def dcm2niix(input, o, f="%p", z=True, b=True):
+def dcm2niix(input, o, f="%p", z="y", b="y"):
     """ Dicom to nifti conversion using 'dcm2nii'.
 
     You can specify all the 'dcm2niix' command options as input function
