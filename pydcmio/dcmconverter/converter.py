@@ -250,7 +250,8 @@ def dcm2niix(input, o, f="%p", z="y", b="y"):
     """
     # Call dcm2nii
     dcm2niiprocess = Dcm2NiiWrapper("dcm2niix")
-    dcm2niiprocess(cmd=["dcm2niix", "-o", o, "-f", f, "-z", z, "-ba", b, input])
+    dcm2niiprocess(cmd=["dcm2niix", "-o", o, "-f", f, "-z", z, "-ba", b,
+                        input])
 
     # Format outputs: from nipype
     files = []
