@@ -6,6 +6,11 @@
 # for details.
 ##########################################################################
 
+"""
+Module that provides tools to anonymize DICOM files.
+"""
+
+
 # System import
 import dicom
 

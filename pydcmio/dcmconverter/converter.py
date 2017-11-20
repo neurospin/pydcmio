@@ -6,6 +6,11 @@
 # for details.
 ##########################################################################
 
+"""
+Module that provides tools to convert DICOM files.
+"""
+
+
 # System import
 import os
 import re
@@ -214,22 +219,22 @@ def dcm2niix(input, o, f="%p", z="y", b="y"):
     The basic usage is:
     dcm2niix [options] <in_folder>
 
-    Options :
-    -b : BIDS sidecar (y/n, default n)
-    -f : filename (%a=antenna  (coil) number, %c=comments, %d=description,
-         %e echo number, %f=folder name, %i ID of patient, %m=manufacturer,
-         %n=name of patient, %p=protocol, %s=series number, %t=time,
-         %u=acquisition number, %z sequence name; default '%f_%p_%t_%s')
-    -h : show help
-    -m : merge 2D slices from same series regardless of study time, echo,
-        coil, orientation, etc. (y/n, default n)
-    -o : output directory (omit to save to input folder)
-    -s : single file mode, do not convert other images in folder
-         (y/n, default n)
-    -t : text notes includes private patient details (y/n, default n)
-    -v : verbose (y/n, default n)
-    -x : crop (y/n, default n)
-    -z : gz compress images (y/i/n, default n) [y=pigz, i=internal, n=no]
+    Options:
+    b: BIDS sidecar (y/n, default n)
+    f: filename (%a=antenna  (coil) number, %c=comments, %d=description,
+    %e echo number, %f=folder name, %i ID of patient, %m=manufacturer,
+    %n=name of patient, %p=protocol, %s=series number, %t=time,
+    %u=acquisition number, %z sequence name; default '%f_%p_%t_%s')
+    h: show help
+    m: merge 2D slices from same series regardless of study time, echo,
+    coil, orientation, etc. (y/n, default n)
+    o: output directory (omit to save to input folder)
+    s: single file mode, do not convert other images in folder
+    (y/n, default n)
+    t: text notes includes private patient details (y/n, default n)
+    v: verbose (y/n, default n)
+    x: crop (y/n, default n)
+    z: gz compress images (y/i/n, default n) [y=pigz, i=internal, n=no]
 
 
     Returns

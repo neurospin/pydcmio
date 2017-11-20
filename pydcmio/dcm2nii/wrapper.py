@@ -7,6 +7,11 @@
 # for details.
 ##########################################################################
 
+"""
+Dcm2Nii package wrapper tools.
+"""
+
+
 # System import
 import os
 import subprocess

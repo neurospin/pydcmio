@@ -12,4 +12,4 @@ Module that provides usefull functions to deface an image.
 
 from .mask_face import deface as mask_face
 from .mri_deface import deface as mri_deface
-from .pydeface import deface as pydeface
+from .pdeface import deface as pdeface

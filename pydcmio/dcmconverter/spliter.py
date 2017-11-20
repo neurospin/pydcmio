@@ -6,6 +6,11 @@
 # for details.
 ##########################################################################
 
+"""
+Module that provides tools to reorganize DICOM files.
+"""
+
+
 # System import
 import os
 import sys

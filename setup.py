@@ -21,13 +21,6 @@ pkgdata = {
     "pydcmio": ["dcmconverter/dcm2nii_config.json"],
     "pydcmio": ["dcmanonymizer/*.json"]
 }
-scripts = [
-    "pydcmio/scripts/pydcmio_dicom2nifti",
-    "pydcmio/scripts/pydcmio_dicomanonymizer",
-    "pydcmio/scripts/pydcmio_dicomreader",
-    "pydcmio/scripts/pydcmio_splitseries",
-    "pydcmio/scripts/pydcmio_transcode"
-]
 
 
 # Build the setup
@@ -46,5 +39,5 @@ setup(
     extras_require=release_info["EXTRA_REQUIRES"],
     install_requires=release_info["REQUIRES"],
     package_data=pkgdata,
-    scripts=scripts
+    scripts=release_info["SCRIPTS"]
 )

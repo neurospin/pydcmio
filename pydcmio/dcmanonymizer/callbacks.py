@@ -6,6 +6,11 @@
 # for details.
 ##########################################################################
 
+"""
+Module that provides DICOM anonymization callbacks.
+"""
+
+
 # Dcmio import
 from .utils import replace_by
 from .utils import repr_dataelement

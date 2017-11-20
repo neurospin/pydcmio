@@ -6,6 +6,10 @@
 # for details.
 ##########################################################################
 
+"""
+Dcm2Nii package excaptions.
+"""
+
 
 class Dcm2NiiError(Exception):
     """ Base exception type for the package.

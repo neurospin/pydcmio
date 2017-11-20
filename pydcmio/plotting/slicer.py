@@ -6,6 +6,11 @@
 # for details.
 ##########################################################################
 
+"""
+Module that provides image snap tools.
+"""
+
+
 # System import
 import numpy
 import nibabel
