@@ -1,13 +1,28 @@
 .. AUTO-GENERATED FILE -- DO NOT EDIT!
 
-Documentation of PYDCMIO
-=========================
+API documentation of PYDCMIO
+=============================
+
+This is the classes and functions reference in pydcmio. Please refer to the gallery for further details, as the class and function raw specifications may not be enough to give full guidelines on their uses.
+
+.. rst-class:: documentation-contents
+
+  **Contents**:
+    * `pydcmio <pydcmio.html>`_
+    * `pydcmio.deface <pydcmio.deface.html>`_
+    * `pydcmio.dcm2nii <pydcmio.dcm2nii.html>`_
+    * `pydcmio.dcmconverter <pydcmio.dcmconverter.html>`_
+    * `pydcmio.plotting <pydcmio.plotting.html>`_
+    * `pydcmio.dcmanonymizer <pydcmio.dcmanonymizer.html>`_
+    * `pydcmio.dcmreader <pydcmio.dcmreader.html>`_
 
 .. raw:: html
 
     <!-- Block section -->
 
     <div class='container-fluid'>
+
+    <div class='float-left'>
 
     <div class='row'>
 
@@ -19,14 +34,23 @@ Documentation of PYDCMIO
         <p>Package to read/split/convert/anonymize/transcode DICOM files.</p>    </blockquote>
     </div>
     <div class='col-md-4'>
-    <h3><a href='pydcmio.dcmanonymizer.html'>
-    pydcmio.dcmanonymizer
+    <h3><a href='pydcmio.deface.html'>
+    pydcmio.deface
     </a></h3>
     <blockquote>
-        <p>Module that provides common tools to anonimize DICOM files. Note that this
-    module is experimental.</p>    </blockquote>
+        <p>Module that provides usefull functions to deface an image.</p>    </blockquote>
     </div>
     <div class='col-md-4'>
+    <h3><a href='pydcmio.dcm2nii.html'>
+    pydcmio.dcm2nii
+    </a></h3>
+    <blockquote>
+        <p>Module that provides a binding over the 'dcm2nii' command. This module
+    also defines custom exceptions.</p>    </blockquote>
+    </div>
+
+    </div>
+    <div class='row'>    <div class='col-md-4'>
     <h3><a href='pydcmio.dcmconverter.html'>
     pydcmio.dcmconverter
     </a></h3>
@@ -39,6 +63,23 @@ Documentation of PYDCMIO
     </ul>    </blockquote>
     </div>
     <div class='col-md-4'>
+    <h3><a href='pydcmio.plotting.html'>
+    pydcmio.plotting
+    </a></h3>
+    <blockquote>
+        <p>Module that provides usefull functions to display conversion results.</p>    </blockquote>
+    </div>
+    <div class='col-md-4'>
+    <h3><a href='pydcmio.dcmanonymizer.html'>
+    pydcmio.dcmanonymizer
+    </a></h3>
+    <blockquote>
+        <p>Module that provides common tools to anonimize DICOM files. Note that this
+    module is experimental.</p>    </blockquote>
+    </div>
+
+    </div>
+    <div class='row'>    <div class='col-md-4'>
     <h3><a href='pydcmio.dcmreader.html'>
     pydcmio.dcmreader
     </a></h3>
@@ -46,21 +87,7 @@ Documentation of PYDCMIO
         <p>Module that provides usefull functions to find a specific DICOM tag in a
     DICOM dataset, exploring recursively sequences.</p>    </blockquote>
     </div>
-    <div class='col-md-4'>
-    <h3><a href='pydcmio.dcm2nii.html'>
-    pydcmio.dcm2nii
-    </a></h3>
-    <blockquote>
-        <p>Module that provides a binding over the 'dcm2nii' command. This module
-    also defines custom exceptions.</p>    </blockquote>
-    </div>
-    <div class='col-md-4'>
-    <h3><a href='pydcmio.plotting.html'>
-    pydcmio.plotting
-    </a></h3>
-    <blockquote>
-        <p>Module that provides usefull functions to display conversion results.</p>    </blockquote>
-    </div>
 
+    </div>
     </div>
     </div>

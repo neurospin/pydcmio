@@ -1,0 +1,39 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+:orphan:
+
+API documentation of *pydcmio.deface*
+======================================
+
+
+Module that provides usefull functions to deface an image.
+
+
+.. raw:: html
+
+    <br/>    <!-- Block section -->
+    <table border='1' class='docutils' style='width:100%'>
+    <colgroup><col width='25%'/><col width='75%'/></colgroup>
+    <tbody valign='top'>
+    <tr class='row-odd'>
+    <td><a class='reference internal' href='pydcmio.deface.pdeface.html'><em>pydcmio.deface.pdeface</em></a></td>
+    <td>
+        <p>Defacing with the Poldrack, R. 'pydeface' Python module.</p>
+    </td>
+    </tr>
+    <tr class='row-even'>
+    <td><a class='reference internal' href='pydcmio.deface.mask_face.html'><em>pydcmio.deface.mask_face</em></a></td>
+    <td>
+        <p>Defacing with the Marcus, D. 'mask_face' command.</p>
+    </td>
+    </tr>
+    <tr class='row-odd'>
+    <td><a class='reference internal' href='pydcmio.deface.mri_deface.html'><em>pydcmio.deface.mri_deface</em></a></td>
+    <td>
+        <p>Defacing with the FreeSurfer 'mri_deface' command.</p>
+    </td>
+    </tr>
+    </tbody>
+
+
+    </table>

@@ -1,0 +1,223 @@
+
+
+.. _sphx_glr_auto_gallery_pydcmio_transcode.py:
+
+
+Pydcmio Transcode
+=================
+
+Example automatically generated from package script.
+
+
+
+.. code-block:: python
+
+
+
+    # System import
+    from __future__ import print_function
+    import argparse
+    import os
+    import json
+    import shutil
+    from datetime import datetime
+    from pprint import pprint
+
+    # Bredala import
+    try:
+        import bredala
+        bredala.USE_PROFILER = False
+        bredala.register("pydcmio.dcmconverter.transcoder",
+                         names=["transcode_sids"])
+    except:
+        pass
+
+    # Dcmio import
+    from pydcmio import __version__ as version
+    from pydcmio.dcmconverter.transcoder import transcode_sids
+
+    # Parameters to keep trace
+    __hopla__ = ["runtime", "inputs", "outputs"]
+
+
+    # Script documentation
+    doc = """
+    Transcode the subject identifiers
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    The transcoded subject identifier is generated randomly (12 digits random
+    number between 100000000000 and 999999999999). The procedure checks
+    if the subject identifier has already been transcoded.
+
+    Command:
+
+    python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_transcode \
+        -v 2 \
+        -s Lola \
+        -d /volatile/nsap/dcm2nii/convert \
+        -o /volatile/nsap/dcm2nii/convert \
+        -r /volatile/nsap/dcm2nii/transcoding_table.json
+    """
+
+
+    def is_file(filearg):
+        """ Type for argparse - checks that file exists but does not open.
+        """
+        if not os.path.isfile(filearg):
+            raise argparse.ArgumentError(
+                "The file '{0}' does not exist!".format(filearg))
+        return filearg
+
+
+    def is_directory(dirarg):
+        """ Type for argparse - checks that directory exists.
+        """
+        if not os.path.isdir(dirarg):
+            raise argparse.ArgumentError(
+                "The directory '{0}' does not exist!".format(dirarg))
+        return dirarg
+
+
+    parser = argparse.ArgumentParser(description=doc)
+    parser.add_argument(
+        "-v", "--verbose", dest="verbose", type=int, choices=[0, 1, 2], default=0,
+        help="increase the verbosity level: 0 silent, [1, 2] verbose.")
+    parser.add_argument(
+        "-s", "--sid", dest="sid", required=False, type=str,
+        help="the subject identifier.")
+    parser.add_argument(
+        "-d", "--dir", dest="directory", required=False, metavar="PATH",
+        help="a folder that contains the subject identifiers as sub folders.",
+        type=is_directory)
+    parser.add_argument(
+        "-r", "--transtable", dest="transcode_table", required=False,
+        metavar="FILE", help="the transcoding table.", type=is_file)
+    parser.add_argument(
+        "-o", "--outdir", dest="outdir", required=True, metavar="PATH",
+        help="the folder that contains the generated transcoded table.",
+        type=is_directory)
+    args = parser.parse_args()
+    inputs = vars(args)
+    verbose = inputs.pop("verbose")
+
+
+Welcome message.
+
+
+
+.. code-block:: python
+
+
+    tool = "pydcmio_transcode"
+    tool_version = version
+    timestamp = datetime.now().isoformat()
+    params = locals()
+    runtime = dict([(name, params[name])
+                   for name in ("tool", "tool_version", "timestamp")])
+    outputs = None
+    if verbose > 0:
+        print("[info] Starting Transcoding ...")
+        print("[info] Runtime:")
+        pprint(runtime)
+        print("[info] Inputs:")
+        pprint(inputs)
+
+
+
+First get the subject identifiers
+
+
+
+.. code-block:: python
+
+
+    sids = []
+    if args.sid is not None:
+        sids.append(args.sid)
+    if args.directory is not None:
+        sub_folders = [name for name in os.listdir(args.directory)
+                       if os.path.isdir(os.path.join(args.directory, name))]
+        sids.extend(sub_folders)
+        sids = list(set(sids))
+
+
+
+Then copy or create the input transcoding table.
+
+
+
+.. code-block:: python
+
+
+    if args.transcode_table is not None:
+        transcode_table = os.path.join(args.outdir,
+                                       os.path.basename(args.transcode_table))
+        shutil.copy(args.transcode_table, transcode_table)
+    else:
+        transcode_table = os.path.join(args.outdir, "transcoding.json")
+        with open(transcode_table, "wt") as open_file:
+            json.dump({}, open_file, indent=4)
+
+
+
+Execute the transcoding task.
+
+
+
+.. code-block:: python
+
+
+    transcode_sids(sids, transcode_table)
+
+
+
+Update the outputs and save them and the inputs in a 'logs' directory.
+
+
+
+.. code-block:: python
+
+
+    logdir = os.path.join(inputs["outdir"], "logs")
+    if not os.path.isdir(logdir):
+        os.mkdir(logdir)
+    params = locals()
+    outputs = dict([(name, params[name])
+                    for name in ("sids", "transcode_table")])
+    for name, final_struct in [("inputs", inputs), ("outputs", outputs),
+                               ("runtime", runtime)]:
+        log_file = os.path.join(logdir, "{0}.json".format(name))
+        with open(log_file, "wt") as open_file:
+            json.dump(final_struct, open_file, sort_keys=True, check_circular=True,
+                      indent=4)
+    if verbose > 1:
+        print("[info] Outputs:")
+        pprint(outputs)
+
+**Total running time of the script:** ( 0 minutes  0.000 seconds)
+
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Python source code: pydcmio_transcode.py <pydcmio_transcode.py>`
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Jupyter notebook: pydcmio_transcode.ipynb <pydcmio_transcode.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    Gallery generated by Sphinx-Gallery
+
+

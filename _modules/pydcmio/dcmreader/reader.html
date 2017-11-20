@@ -15,11 +15,12 @@
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -52,7 +53,18 @@
   </script>
 
   </head>
-  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <body role="document"><div class="banner">
+  <div class="container-fluid banner-container">
+    <div class="row banner-inner">
+      <div class="col-xs-4">
+        <img alt="Logo" src="../../../_static/pydcmio.png">
+      </div>
+      <div class="col-xs-8">
+            <p>DICOM managment package.</p>
+      </div>
+    </div>  
+  </div>
+</div><nav class="navbar navbar-default navbar-static-top">
   <div class="container-fluid">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -62,39 +74,38 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../../../index.html">
-        <img alt="Logo" src="../../../_static/pydcmio.png">
         </a>
     </div>
     <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
       <ul class="nav navbar-nav">
         <li ng-class="{ active: isActive('index') }"><a href="../../../index.html">Home</a></li>
         <li ng-class="{ active: isActive('installation') }"><a href="../../../generated/installation.html">Installation</a></li>
-        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">Documentation</a></li>
-        <li class="dropdown">
+        <li ng-class="{ active: isActive('gallery') }"><a href="../../../auto_gallery/gallery.html">Gallery</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">API documentation</a></li>
+        <!--<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
           <ul class="dropdown-menu">
 	        <li><a href="../../../generated/pydcmio.html">Pydcmio</a></li>
-<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
-<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
-<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="../../../generated/pydcmio.deface.html">Pydcmio.deface</a></li>
 <li><a href="../../../generated/pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
 <li><a href="../../../generated/pydcmio.plotting.html">Pydcmio.plotting</a></li>
+<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
           </ul>
-        </li>
+        </li>-->
         <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
       </ul>
     </div>
   </div>
 </nav>
-
-
 <div class="content-wrapper">
     <div class="sphinxsidebar">
       <div class="sphinxsidebarwrapper">
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for pydcmio <strong>version 2.0.0</strong>
+           This documentation is for pydcmio <strong>version 2.0.1</strong>
           </p>
         <p class="citing">
           If you use the software, please do not esitate to 
@@ -230,9 +241,9 @@
                     <span class="k">return</span> <span class="n">values</span>
 
     <span class="c1"># Case 2: go deeper and check tag in Dicom sequences</span>
-    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">dataset</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>
-            <span class="n">sequence</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">for</span> <span class="n">inner_tag</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">dataset</span><span class="p">[</span><span class="n">inner_tag</span><span class="p">]</span><span class="o">.</span><span class="n">VR</span> <span class="o">==</span> <span class="s2">&quot;SQ&quot;</span><span class="p">:</span>
+            <span class="n">sequence</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">inner_tag</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
             <span class="k">for</span> <span class="n">sub_dataset</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
                 <span class="n">sub_values</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">sub_dataset</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">stack_values</span><span class="o">=</span><span class="n">stack_values</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">sub_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -271,6 +282,8 @@
     <span class="c1"># Get tag associated values</span>
     <span class="n">tag</span><span class="p">,</span> <span class="n">stack_values</span> <span class="o">=</span> <span class="n">STANDARD_EXTRACTOR</span><span class="p">[</span><span class="n">extractor</span><span class="p">]</span>
     <span class="n">values</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">dataset_or_dcmpath</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">stack_values</span><span class="o">=</span><span class="n">stack_values</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">stack_values</span> <span class="ow">and</span> <span class="n">stack_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -286,6 +299,7 @@
           </div>
         </div>
       </div>
+
     <div class="clearer">
     </div>
   </div>
@@ -293,7 +307,7 @@
 </div>
 
 <div class="footer">
-    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+    &copy; 2017, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
 </div>
   </body>
 </html>

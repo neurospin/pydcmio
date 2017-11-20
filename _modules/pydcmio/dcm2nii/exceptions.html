@@ -15,11 +15,12 @@
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -52,7 +53,18 @@
   </script>
 
   </head>
-  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <body role="document"><div class="banner">
+  <div class="container-fluid banner-container">
+    <div class="row banner-inner">
+      <div class="col-xs-4">
+        <img alt="Logo" src="../../../_static/pydcmio.png">
+      </div>
+      <div class="col-xs-8">
+            <p>DICOM managment package.</p>
+      </div>
+    </div>  
+  </div>
+</div><nav class="navbar navbar-default navbar-static-top">
   <div class="container-fluid">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -62,39 +74,38 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../../../index.html">
-        <img alt="Logo" src="../../../_static/pydcmio.png">
         </a>
     </div>
     <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
       <ul class="nav navbar-nav">
         <li ng-class="{ active: isActive('index') }"><a href="../../../index.html">Home</a></li>
         <li ng-class="{ active: isActive('installation') }"><a href="../../../generated/installation.html">Installation</a></li>
-        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">Documentation</a></li>
-        <li class="dropdown">
+        <li ng-class="{ active: isActive('gallery') }"><a href="../../../auto_gallery/gallery.html">Gallery</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">API documentation</a></li>
+        <!--<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
           <ul class="dropdown-menu">
 	        <li><a href="../../../generated/pydcmio.html">Pydcmio</a></li>
-<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
-<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
-<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="../../../generated/pydcmio.deface.html">Pydcmio.deface</a></li>
 <li><a href="../../../generated/pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
 <li><a href="../../../generated/pydcmio.plotting.html">Pydcmio.plotting</a></li>
+<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
           </ul>
-        </li>
+        </li>-->
         <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
       </ul>
     </div>
   </div>
 </nav>
-
-
 <div class="content-wrapper">
     <div class="sphinxsidebar">
       <div class="sphinxsidebarwrapper">
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for pydcmio <strong>version 2.0.0</strong>
+           This documentation is for pydcmio <strong>version 2.0.1</strong>
           </p>
         <p class="citing">
           If you use the software, please do not esitate to 
@@ -124,44 +135,49 @@
 <span class="c1"># for details.</span>
 <span class="c1">##########################################################################</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Dcm2Nii package excaptions.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 
 <div class="viewcode-block" id="Dcm2NiiError"><a class="viewcode-back" href="../../../generated/pydcmio.dcm2nii.exceptions.html#pydcmio.dcm2nii.exceptions.Dcm2NiiError">[docs]</a><span class="k">class</span> <span class="nc">Dcm2NiiError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Base exception type for the package.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Dcm2NiiError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Dcm2NiiError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Dcm2NiiRuntimeError"><a class="viewcode-back" href="../../../generated/pydcmio.dcm2nii.exceptions.html#pydcmio.dcm2nii.exceptions.Dcm2NiiRuntimeError">[docs]</a><span class="k">class</span> <span class="nc">Dcm2NiiRuntimeError</span><span class="p">(</span><span class="n">Dcm2NiiError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Error thrown when call to the Dcm2Nii software failed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm_name</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">algorithm_name</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;Dcm2Nii call for &#39;{0}&#39; failed, with parameters: &#39;{1}&#39;. Error:: &quot;</span>
             <span class="s2">&quot;{2}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">error</span><span class="p">))</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Dcm2NiiRuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Dcm2NiiRuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Dcm2NiiConfigurationError"><a class="viewcode-back" href="../../../generated/pydcmio.dcm2nii.exceptions.html#pydcmio.dcm2nii.exceptions.Dcm2NiiConfigurationError">[docs]</a><span class="k">class</span> <span class="nc">Dcm2NiiConfigurationError</span><span class="p">(</span><span class="n">Dcm2NiiError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Error thrown when call to the Dcm2Nii software failed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_name</span><span class="p">):</span>
         <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Dcm2Nii command &#39;{0}&#39; not found.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">command_name</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Dcm2NiiConfigurationError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Dcm2NiiConfigurationError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Dcm2NiiResultError"><a class="viewcode-back" href="../../../generated/pydcmio.dcm2nii.exceptions.html#pydcmio.dcm2nii.exceptions.Dcm2NiiResultError">[docs]</a><span class="k">class</span> <span class="nc">Dcm2NiiResultError</span><span class="p">(</span><span class="n">Dcm2NiiError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Error thrown when the Dcm2Nii software has returned a strange result.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
         <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Dcm2Nii command &#39;{0}&#39; may have returned a strange &quot;</span>
                    <span class="s2">&quot;result.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">FSLResultError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FSLResultError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
         </div>
       </div>
+
     <div class="clearer">
     </div>
   </div>
@@ -169,7 +185,7 @@
 </div>
 
 <div class="footer">
-    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+    &copy; 2017, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
 </div>
   </body>
 </html>

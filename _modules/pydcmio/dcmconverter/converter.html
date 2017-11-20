@@ -15,11 +15,12 @@
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -52,7 +53,18 @@
   </script>
 
   </head>
-  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <body role="document"><div class="banner">
+  <div class="container-fluid banner-container">
+    <div class="row banner-inner">
+      <div class="col-xs-4">
+        <img alt="Logo" src="../../../_static/pydcmio.png">
+      </div>
+      <div class="col-xs-8">
+            <p>DICOM managment package.</p>
+      </div>
+    </div>  
+  </div>
+</div><nav class="navbar navbar-default navbar-static-top">
   <div class="container-fluid">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -62,39 +74,38 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../../../index.html">
-        <img alt="Logo" src="../../../_static/pydcmio.png">
         </a>
     </div>
     <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
       <ul class="nav navbar-nav">
         <li ng-class="{ active: isActive('index') }"><a href="../../../index.html">Home</a></li>
         <li ng-class="{ active: isActive('installation') }"><a href="../../../generated/installation.html">Installation</a></li>
-        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">Documentation</a></li>
-        <li class="dropdown">
+        <li ng-class="{ active: isActive('gallery') }"><a href="../../../auto_gallery/gallery.html">Gallery</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">API documentation</a></li>
+        <!--<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
           <ul class="dropdown-menu">
 	        <li><a href="../../../generated/pydcmio.html">Pydcmio</a></li>
-<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
-<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
-<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="../../../generated/pydcmio.deface.html">Pydcmio.deface</a></li>
 <li><a href="../../../generated/pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
 <li><a href="../../../generated/pydcmio.plotting.html">Pydcmio.plotting</a></li>
+<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
           </ul>
-        </li>
+        </li>-->
         <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
       </ul>
     </div>
   </div>
 </nav>
-
-
 <div class="content-wrapper">
     <div class="sphinxsidebar">
       <div class="sphinxsidebarwrapper">
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for pydcmio <strong>version 2.0.0</strong>
+           This documentation is for pydcmio <strong>version 2.0.1</strong>
           </p>
         <p class="citing">
           If you use the software, please do not esitate to 
@@ -123,6 +134,11 @@
 <span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
 <span class="c1"># for details.</span>
 <span class="c1">##########################################################################</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module that provides tools to convert DICOM files.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 
 <span class="c1"># System import</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -185,7 +201,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;{0}&#39; folder does not exists.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">niidir</span><span class="p">))</span>
 
     <span class="c1"># Load the default configuration</span>
-    <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span>
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
                                <span class="s2">&quot;dcm2nii_config.json&quot;</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_file</span><span class="p">:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">open_file</span><span class="p">)</span>
@@ -323,6 +339,82 @@
     <span class="k">return</span> <span class="n">files</span><span class="p">,</span> <span class="n">reoriented_files</span><span class="p">,</span> <span class="n">reoriented_and_cropped_files</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span> <span class="n">bvals</span></div>
 
 
+<div class="viewcode-block" id="dcm2niix"><a class="viewcode-back" href="../../../generated/pydcmio.dcmconverter.converter.html#pydcmio.dcmconverter.converter.dcm2niix">[docs]</a><span class="k">def</span> <span class="nf">dcm2niix</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="s2">&quot;%p&quot;</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Dicom to nifti conversion using &#39;dcm2nii&#39;.</span>
+
+<span class="sd">    You can specify all the &#39;dcm2niix&#39; command options as input function</span>
+<span class="sd">    parameters.</span>
+
+<span class="sd">    The basic usage is:</span>
+<span class="sd">    dcm2niix [options] &lt;in_folder&gt;</span>
+
+<span class="sd">    Options:</span>
+<span class="sd">    b: BIDS sidecar (y/n, default n)</span>
+<span class="sd">    f: filename (%a=antenna  (coil) number, %c=comments, %d=description,</span>
+<span class="sd">    %e echo number, %f=folder name, %i ID of patient, %m=manufacturer,</span>
+<span class="sd">    %n=name of patient, %p=protocol, %s=series number, %t=time,</span>
+<span class="sd">    %u=acquisition number, %z sequence name; default &#39;%f_%p_%t_%s&#39;)</span>
+<span class="sd">    h: show help</span>
+<span class="sd">    m: merge 2D slices from same series regardless of study time, echo,</span>
+<span class="sd">    coil, orientation, etc. (y/n, default n)</span>
+<span class="sd">    o: output directory (omit to save to input folder)</span>
+<span class="sd">    s: single file mode, do not convert other images in folder</span>
+<span class="sd">    (y/n, default n)</span>
+<span class="sd">    t: text notes includes private patient details (y/n, default n)</span>
+<span class="sd">    v: verbose (y/n, default n)</span>
+<span class="sd">    x: crop (y/n, default n)</span>
+<span class="sd">    z: gz compress images (y/i/n, default n) [y=pigz, i=internal, n=no]</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    files: list of str</span>
+<span class="sd">        the converted files in nifti format.</span>
+<span class="sd">    bvecs: list of str</span>
+<span class="sd">        the diffusion directions.</span>
+<span class="sd">    bvals: list of str</span>
+<span class="sd">        the diffusion acquisiton b-values.</span>
+<span class="sd">    bids: str</span>
+<span class="sd">        BIDS sidecar.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Call dcm2nii</span>
+    <span class="n">dcm2niiprocess</span> <span class="o">=</span> <span class="n">Dcm2NiiWrapper</span><span class="p">(</span><span class="s2">&quot;dcm2niix&quot;</span><span class="p">)</span>
+    <span class="n">dcm2niiprocess</span><span class="p">(</span><span class="n">cmd</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;dcm2niix&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="s2">&quot;-z&quot;</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="s2">&quot;-ba&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="nb">input</span><span class="p">])</span>
+
+    <span class="c1"># Format outputs: from nipype</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bvecs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bvals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">skip</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">find_b</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">dcm2niiprocess</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip</span><span class="p">:</span>
+            <span class="n">out_file</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Convert &quot;</span><span class="p">):</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;\S+/\S+&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                <span class="n">output_dir</span> <span class="o">=</span> <span class="n">o</span>
+                <span class="n">out_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span>
+                <span class="c1"># Extract bvals</span>
+                <span class="k">if</span> <span class="n">find_b</span><span class="p">:</span>
+                    <span class="n">bvecs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_file</span> <span class="o">+</span> <span class="s2">&quot;.bvec&quot;</span><span class="p">)</span>
+                    <span class="n">bvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_file</span> <span class="o">+</span> <span class="s2">&quot;.bval&quot;</span><span class="p">)</span>
+                    <span class="n">find_b</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="c1"># Next scan will have bvals/bvecs</span>
+            <span class="k">elif</span> <span class="s2">&quot;DTI gradients&quot;</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">or</span> <span class="s2">&quot;DTI gradient directions&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">find_b</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">if</span> <span class="n">out_file</span><span class="p">:</span>
+                <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_file</span> <span class="o">+</span> <span class="s2">&quot;.nii.gz&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">b</span><span class="p">:</span>
+                    <span class="n">bids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_file</span> <span class="o">+</span> <span class="s2">&quot;.json&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+        <span class="n">skip</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">return</span> <span class="n">files</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bids</span></div>
+
+
 <div class="viewcode-block" id="add_meta_to_nii"><a class="viewcode-back" href="../../../generated/pydcmio.dcmconverter.converter.html#pydcmio.dcmconverter.converter.add_meta_to_nii">[docs]</a><span class="k">def</span> <span class="nf">add_meta_to_nii</span><span class="p">(</span><span class="n">nii_file</span><span class="p">,</span> <span class="n">dicom_dir</span><span class="p">,</span> <span class="n">dcm_tags</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;f&quot;</span><span class="p">,</span>
                     <span class="n">additional_information</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Add dicom tags to Nifti1 image header.</span>
@@ -420,6 +512,7 @@
           </div>
         </div>
       </div>
+
     <div class="clearer">
     </div>
   </div>
@@ -427,7 +520,7 @@
 </div>
 
 <div class="footer">
-    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+    &copy; 2017, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
 </div>
   </body>
 </html>

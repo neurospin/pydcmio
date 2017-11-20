@@ -2,8 +2,8 @@
 
 :orphan:
 
-Documentation of *pydcmio.dcmreader*
-=====================================
+API documentation of *pydcmio.dcmreader*
+=========================================
 
 
 Module that provides usefull functions to find a specific DICOM tag in a
@@ -17,6 +17,12 @@ DICOM dataset, exploring recursively sequences.
     <colgroup><col width='25%'/><col width='75%'/></colgroup>
     <tbody valign='top'>
     <tr class='row-odd'>
+    <td><a class='reference internal' href='pydcmio.dcmreader.csa2.html'><em>pydcmio.dcmreader.csa2</em></a></td>
+    <td>
+        <p>Parse private Siemens CSA2 header field.</p>
+    </td>
+    </tr>
+    <tr class='row-even'>
     <td><a class='reference internal' href='pydcmio.dcmreader.reader.html'><em>pydcmio.dcmreader.reader</em></a></td>
     <td>
         <p>Diverse Dicom reading functions to extract precise information.</p>

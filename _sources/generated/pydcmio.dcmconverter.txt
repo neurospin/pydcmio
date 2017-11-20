@@ -2,8 +2,8 @@
 
 :orphan:
 
-Documentation of *pydcmio.dcmconverter*
-========================================
+API documentation of *pydcmio.dcmconverter*
+============================================
 
 
 This module is proposes three main functionalitites:
@@ -20,21 +20,21 @@ This module is proposes three main functionalitites:
     <colgroup><col width='25%'/><col width='75%'/></colgroup>
     <tbody valign='top'>
     <tr class='row-odd'>
-    <td><a class='reference internal' href='pydcmio.dcmconverter.converter.html'><em>pydcmio.dcmconverter.converter</em></a></td>
+    <td><a class='reference internal' href='pydcmio.dcmconverter.transcoder.html'><em>pydcmio.dcmconverter.transcoder</em></a></td>
     <td>
-    
+        <p>Module that provides tools to anonymize DICOM files.</p>
     </td>
     </tr>
     <tr class='row-even'>
-    <td><a class='reference internal' href='pydcmio.dcmconverter.spliter.html'><em>pydcmio.dcmconverter.spliter</em></a></td>
+    <td><a class='reference internal' href='pydcmio.dcmconverter.converter.html'><em>pydcmio.dcmconverter.converter</em></a></td>
     <td>
-    
+        <p>Module that provides tools to convert DICOM files.</p>
     </td>
     </tr>
     <tr class='row-odd'>
-    <td><a class='reference internal' href='pydcmio.dcmconverter.transcoder.html'><em>pydcmio.dcmconverter.transcoder</em></a></td>
+    <td><a class='reference internal' href='pydcmio.dcmconverter.spliter.html'><em>pydcmio.dcmconverter.spliter</em></a></td>
     <td>
-    
+        <p>Module that provides tools to reorganize DICOM files.</p>
     </td>
     </tr>
     </tbody>

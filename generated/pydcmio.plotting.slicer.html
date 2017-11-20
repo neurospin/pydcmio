@@ -15,11 +15,12 @@
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -51,7 +52,18 @@
   </script>
 
   </head>
-  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <body role="document"><div class="banner">
+  <div class="container-fluid banner-container">
+    <div class="row banner-inner">
+      <div class="col-xs-4">
+        <img alt="Logo" src="../_static/pydcmio.png">
+      </div>
+      <div class="col-xs-8">
+            <p>DICOM managment package.</p>
+      </div>
+    </div>  
+  </div>
+</div><nav class="navbar navbar-default navbar-static-top">
   <div class="container-fluid">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -61,39 +73,38 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../index.html">
-        <img alt="Logo" src="../_static/pydcmio.png">
         </a>
     </div>
     <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
       <ul class="nav navbar-nav">
         <li ng-class="{ active: isActive('index') }"><a href="../index.html">Home</a></li>
         <li ng-class="{ active: isActive('installation') }"><a href="installation.html">Installation</a></li>
-        <li ng-class="{ active: isActive('documentation') }"><a href="documentation.html">Documentation</a></li>
-        <li class="dropdown">
+        <li ng-class="{ active: isActive('gallery') }"><a href="../auto_gallery/gallery.html">Gallery</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="documentation.html">API documentation</a></li>
+        <!--<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
           <ul class="dropdown-menu">
 	        <li><a href="pydcmio.html">Pydcmio</a></li>
-<li><a href="pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
-<li><a href="pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
-<li><a href="pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="pydcmio.deface.html">Pydcmio.deface</a></li>
 <li><a href="pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
 <li><a href="pydcmio.plotting.html">Pydcmio.plotting</a></li>
+<li><a href="pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
           </ul>
-        </li>
+        </li>-->
         <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
       </ul>
     </div>
   </div>
 </nav>
-
-
 <div class="content-wrapper">
     <div class="sphinxsidebar">
       <div class="sphinxsidebarwrapper">
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for pydcmio <strong>version 2.0.0</strong>
+           This documentation is for pydcmio <strong>version 2.0.1</strong>
           </p>
         <p class="citing">
           If you use the software, please do not esitate to 
@@ -116,9 +127,10 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <span class="target" id="module-pydcmio.plotting.slicer"></span><dl class="function">
+  <span class="target" id="module-pydcmio.plotting.slicer"></span><p>Module that provides image snap tools.</p>
+<dl class="function">
 <dt id="pydcmio.plotting.slicer.mosaic">
-<code class="descclassname">pydcmio.plotting.slicer.</code><code class="descname">mosaic</code><span class="sig-paren">(</span><em>impath</em>, <em>outdir</em>, <em>strategy='average'</em>, <em>indices=None</em>, <em>title=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pydcmio/plotting/slicer.html#mosaic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydcmio.plotting.slicer.mosaic" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydcmio.plotting.slicer.</code><code class="descname">mosaic</code><span class="sig-paren">(</span><em>impath</em>, <em>outdir</em>, <em>strategy='average'</em>, <em>indices=None</em>, <em>title=None</em>, <em>overlay=None</em>, <em>overlay_alpha=None</em>, <em>basename=None</em>, <em>ext='.pdf'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pydcmio/plotting/slicer.html#mosaic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydcmio.plotting.slicer.mosaic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a snap of an input 3D or 4D image.</p>
 <p>If a 4D image is provided, select the &#8216;index&#8217;th element or create an
 average volume.</p>
@@ -134,17 +146,34 @@ average volume.</p>
 <blockquote>
 <div><p>the destination folder.</p>
 </div></blockquote>
-<p><strong>strategy (optional, default &#8216;average&#8217;)</strong></p>
+<p><strong>strategy: str, default &#8216;average&#8217;</strong></p>
 <blockquote>
 <div><p>in the case of 4d image the slice strategy: &#8216;pick&#8217; or &#8216;average&#8217;.</p>
 </div></blockquote>
-<p><strong>indices (optional, default None)</strong></p>
+<p><strong>indices: list of int, default None</strong></p>
 <blockquote>
 <div><p>in the case of 4d image the indices of the volumes to average.</p>
 </div></blockquote>
-<p><strong>title (optional, default None)</strong></p>
+<p><strong>title: str, default None</strong></p>
 <blockquote>
 <div><p>the mosaic title.</p>
+</div></blockquote>
+<p><strong>overlay: str, default None</strong></p>
+<blockquote>
+<div><p>the path to an mask to be overlayed.</p>
+</div></blockquote>
+<p><strong>overlay_alpha: float, default None</strong></p>
+<blockquote>
+<div><p>fix the overlay alpha value (0-1).</p>
+</div></blockquote>
+<p><strong>basename: str, default None</strong></p>
+<blockquote>
+<div><p>filename without extension of output file. By default None, means
+the input file basename will be used.</p>
+</div></blockquote>
+<p><strong>ext: str, default &#8216;.png&#8217;</strong></p>
+<blockquote>
+<div><p>snapshot extension, used to specify the output format.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -160,7 +189,7 @@ average volume.</p>
 
 <dl class="function">
 <dt id="pydcmio.plotting.slicer.plot_mosaic">
-<code class="descclassname">pydcmio.plotting.slicer.</code><code class="descname">plot_mosaic</code><span class="sig-paren">(</span><em>nifti_file</em>, <em>title=None</em>, <em>overlay_mask=None</em>, <em>figsize=(11.7</em>, <em>8.3)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pydcmio/plotting/slicer.html#plot_mosaic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydcmio.plotting.slicer.plot_mosaic" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pydcmio.plotting.slicer.</code><code class="descname">plot_mosaic</code><span class="sig-paren">(</span><em>nifti_file</em>, <em>title=None</em>, <em>overlay_mask=None</em>, <em>overlay_alpha=None</em>, <em>figsize=(11.7</em>, <em>8.3)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pydcmio/plotting/slicer.html#plot_mosaic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pydcmio.plotting.slicer.plot_mosaic" title="Permalink to this definition">¶</a></dt>
 <dd><p>From the qap module.</p>
 </dd></dl>
 
@@ -169,6 +198,7 @@ average volume.</p>
           </div>
         </div>
       </div>
+
     <div class="clearer">
     </div>
   </div>
@@ -176,7 +206,7 @@ average volume.</p>
 </div>
 
 <div class="footer">
-    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+    &copy; 2017, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
 </div>
   </body>
 </html>

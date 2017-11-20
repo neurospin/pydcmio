@@ -2,8 +2,8 @@
 
 :orphan:
 
-Documentation of *pydcmio.dcm2nii*
-===================================
+API documentation of *pydcmio.dcm2nii*
+=======================================
 
 
 Module that provides a binding over the 'dcm2nii' command. This module
@@ -19,13 +19,13 @@ also defines custom exceptions.
     <tr class='row-odd'>
     <td><a class='reference internal' href='pydcmio.dcm2nii.exceptions.html'><em>pydcmio.dcm2nii.exceptions</em></a></td>
     <td>
-    
+        <p>Dcm2Nii package excaptions.</p>
     </td>
     </tr>
     <tr class='row-even'>
     <td><a class='reference internal' href='pydcmio.dcm2nii.wrapper.html'><em>pydcmio.dcm2nii.wrapper</em></a></td>
     <td>
-    
+        <p>Dcm2Nii package wrapper tools.</p>
     </td>
     </tr>
     </tbody>

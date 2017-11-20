@@ -2,8 +2,8 @@
 
 :orphan:
 
-Documentation of *pydcmio.dcmanonymizer*
-=========================================
+API documentation of *pydcmio.dcmanonymizer*
+=============================================
 
 
 Module that provides common tools to anonimize DICOM files. Note that this
@@ -17,21 +17,21 @@ module is experimental.
     <colgroup><col width='25%'/><col width='75%'/></colgroup>
     <tbody valign='top'>
     <tr class='row-odd'>
-    <td><a class='reference internal' href='pydcmio.dcmanonymizer.anonymize.html'><em>pydcmio.dcmanonymizer.anonymize</em></a></td>
+    <td><a class='reference internal' href='pydcmio.dcmanonymizer.callbacks.html'><em>pydcmio.dcmanonymizer.callbacks</em></a></td>
     <td>
-    
+        <p>Module that provides DICOM anonymization callbacks.</p>
     </td>
     </tr>
     <tr class='row-even'>
-    <td><a class='reference internal' href='pydcmio.dcmanonymizer.callbacks.html'><em>pydcmio.dcmanonymizer.callbacks</em></a></td>
+    <td><a class='reference internal' href='pydcmio.dcmanonymizer.utils.html'><em>pydcmio.dcmanonymizer.utils</em></a></td>
     <td>
-    
+        <p>Module that provides tools to anonymize DICOM files.</p>
     </td>
     </tr>
     <tr class='row-odd'>
-    <td><a class='reference internal' href='pydcmio.dcmanonymizer.utils.html'><em>pydcmio.dcmanonymizer.utils</em></a></td>
+    <td><a class='reference internal' href='pydcmio.dcmanonymizer.anonymize.html'><em>pydcmio.dcmanonymizer.anonymize</em></a></td>
     <td>
-    
+        <p>Module that provides tools to anonymize DICOM files.</p>
     </td>
     </tr>
     </tbody>

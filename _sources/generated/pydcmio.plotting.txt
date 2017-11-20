@@ -2,8 +2,8 @@
 
 :orphan:
 
-Documentation of *pydcmio.plotting*
-====================================
+API documentation of *pydcmio.plotting*
+========================================
 
 
 Module that provides usefull functions to display conversion results.
@@ -18,7 +18,7 @@ Module that provides usefull functions to display conversion results.
     <tr class='row-odd'>
     <td><a class='reference internal' href='pydcmio.plotting.slicer.html'><em>pydcmio.plotting.slicer</em></a></td>
     <td>
-    
+        <p>Module that provides image snap tools.</p>
     </td>
     </tr>
     </tbody>

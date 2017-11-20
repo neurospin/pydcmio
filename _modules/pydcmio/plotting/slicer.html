@@ -15,11 +15,12 @@
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -52,7 +53,18 @@
   </script>
 
   </head>
-  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <body role="document"><div class="banner">
+  <div class="container-fluid banner-container">
+    <div class="row banner-inner">
+      <div class="col-xs-4">
+        <img alt="Logo" src="../../../_static/pydcmio.png">
+      </div>
+      <div class="col-xs-8">
+            <p>DICOM managment package.</p>
+      </div>
+    </div>  
+  </div>
+</div><nav class="navbar navbar-default navbar-static-top">
   <div class="container-fluid">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -62,39 +74,38 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../../../index.html">
-        <img alt="Logo" src="../../../_static/pydcmio.png">
         </a>
     </div>
     <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
       <ul class="nav navbar-nav">
         <li ng-class="{ active: isActive('index') }"><a href="../../../index.html">Home</a></li>
         <li ng-class="{ active: isActive('installation') }"><a href="../../../generated/installation.html">Installation</a></li>
-        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">Documentation</a></li>
-        <li class="dropdown">
+        <li ng-class="{ active: isActive('gallery') }"><a href="../../../auto_gallery/gallery.html">Gallery</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="../../../generated/documentation.html">API documentation</a></li>
+        <!--<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
           <ul class="dropdown-menu">
 	        <li><a href="../../../generated/pydcmio.html">Pydcmio</a></li>
-<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
-<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
-<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="../../../generated/pydcmio.deface.html">Pydcmio.deface</a></li>
 <li><a href="../../../generated/pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="../../../generated/pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
 <li><a href="../../../generated/pydcmio.plotting.html">Pydcmio.plotting</a></li>
+<li><a href="../../../generated/pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="../../../generated/pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
           </ul>
-        </li>
+        </li>-->
         <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
       </ul>
     </div>
   </div>
 </nav>
-
-
 <div class="content-wrapper">
     <div class="sphinxsidebar">
       <div class="sphinxsidebarwrapper">
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for pydcmio <strong>version 2.0.0</strong>
+           This documentation is for pydcmio <strong>version 2.0.1</strong>
           </p>
         <p class="citing">
           If you use the software, please do not esitate to 
@@ -124,6 +135,11 @@
 <span class="c1"># for details.</span>
 <span class="c1">##########################################################################</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module that provides image snap tools.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
 <span class="c1"># System import</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">nibabel</span>
@@ -137,7 +153,8 @@
 <span class="kn">from</span> <span class="nn">matplotlib.backends.backend_pdf</span> <span class="kn">import</span> <span class="n">FigureCanvasPdf</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
 
 
-<div class="viewcode-block" id="mosaic"><a class="viewcode-back" href="../../../generated/pydcmio.plotting.slicer.html#pydcmio.plotting.slicer.mosaic">[docs]</a><span class="k">def</span> <span class="nf">mosaic</span><span class="p">(</span><span class="n">impath</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;average&quot;</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="mosaic"><a class="viewcode-back" href="../../../generated/pydcmio.plotting.slicer.html#pydcmio.plotting.slicer.mosaic">[docs]</a><span class="k">def</span> <span class="nf">mosaic</span><span class="p">(</span><span class="n">impath</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;average&quot;</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+           <span class="n">overlay</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">overlay_alpha</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">basename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.pdf&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Create a snap of an input 3D or 4D image.</span>
 
 <span class="sd">    If a 4D image is provided, select the &#39;index&#39;th element or create an</span>
@@ -149,12 +166,21 @@
 <span class="sd">        the path to the image to slice.</span>
 <span class="sd">    outdir: str</span>
 <span class="sd">        the destination folder.</span>
-<span class="sd">    strategy (optional, default &#39;average&#39;)</span>
+<span class="sd">    strategy: str, default &#39;average&#39;</span>
 <span class="sd">        in the case of 4d image the slice strategy: &#39;pick&#39; or &#39;average&#39;.</span>
-<span class="sd">    indices (optional, default None)</span>
+<span class="sd">    indices: list of int, default None</span>
 <span class="sd">        in the case of 4d image the indices of the volumes to average.</span>
-<span class="sd">    title (optional, default None)</span>
+<span class="sd">    title: str, default None</span>
 <span class="sd">        the mosaic title.</span>
+<span class="sd">    overlay: str, default None</span>
+<span class="sd">        the path to an mask to be overlayed.</span>
+<span class="sd">    overlay_alpha: float, default None</span>
+<span class="sd">        fix the overlay alpha value (0-1).</span>
+<span class="sd">    basename: str, default None</span>
+<span class="sd">        filename without extension of output file. By default None, means</span>
+<span class="sd">        the input file basename will be used.</span>
+<span class="sd">    ext: str, default &#39;.png&#39;</span>
+<span class="sd">        snapshot extension, used to specify the output format.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -183,20 +209,20 @@
                              <span class="s2">&quot;shape &#39;{1}&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 
     <span class="c1"># Create the snap with qap</span>
-    <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">impath</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">basename</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">impath</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">title</span> <span class="o">=</span> <span class="n">basename</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">basename</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">title</span>
     <span class="n">title</span> <span class="o">+=</span> <span class="s2">&quot;: shape {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-    <span class="n">snap</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">basename</span> <span class="o">+</span> <span class="s2">&quot;.pdf&quot;</span><span class="p">)</span>
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_mosaic</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">snap</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">basename</span> <span class="o">+</span> <span class="n">ext</span><span class="p">)</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_mosaic</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">overlay_mask</span><span class="o">=</span><span class="n">overlay</span><span class="p">,</span>
+                      <span class="n">overlay_alpha</span><span class="o">=</span><span class="n">overlay_alpha</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">snap</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">snap</span></div>
 
 
-<div class="viewcode-block" id="plot_mosaic"><a class="viewcode-back" href="../../../generated/pydcmio.plotting.slicer.html#pydcmio.plotting.slicer.plot_mosaic">[docs]</a><span class="k">def</span> <span class="nf">plot_mosaic</span><span class="p">(</span><span class="n">nifti_file</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">overlay_mask</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_mosaic"><a class="viewcode-back" href="../../../generated/pydcmio.plotting.slicer.html#pydcmio.plotting.slicer.plot_mosaic">[docs]</a><span class="k">def</span> <span class="nf">plot_mosaic</span><span class="p">(</span><span class="n">nifti_file</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">overlay_mask</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">overlay_alpha</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                 <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">11.7</span><span class="p">,</span> <span class="mf">8.3</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot; From the qap module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -209,12 +235,13 @@
         <span class="n">mean_data</span> <span class="o">=</span> <span class="n">nifti_file</span>
 
     <span class="n">z_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mean_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+    <span class="c1"># Crop inferior and posterior</span>
+    <span class="n">rem</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">mean_data</span> <span class="o">=</span> <span class="n">mean_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">rem</span><span class="p">:</span><span class="o">-</span><span class="n">rem</span><span class="p">]</span>
+    <span class="n">z_vals</span> <span class="o">=</span> <span class="n">z_vals</span><span class="p">[</span><span class="n">rem</span><span class="p">:</span><span class="o">-</span><span class="n">rem</span><span class="p">]</span>
     <span class="c1"># Reduce the number of slices shown</span>
     <span class="k">if</span> <span class="n">mean_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">70</span><span class="p">:</span>
-        <span class="n">rem</span> <span class="o">=</span> <span class="mi">15</span>
-        <span class="c1"># Crop inferior and posterior</span>
-        <span class="n">mean_data</span> <span class="o">=</span> <span class="n">mean_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">rem</span><span class="p">:</span><span class="o">-</span><span class="n">rem</span><span class="p">]</span>
-        <span class="n">z_vals</span> <span class="o">=</span> <span class="n">z_vals</span><span class="p">[</span><span class="n">rem</span><span class="p">:</span><span class="o">-</span><span class="n">rem</span><span class="p">]</span>
         <span class="c1"># Discard one every two slices</span>
         <span class="n">mean_data</span> <span class="o">=</span> <span class="n">mean_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">::</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">z_vals</span> <span class="o">=</span> <span class="n">z_vals</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
@@ -222,8 +249,21 @@
     <span class="n">n_images</span> <span class="o">=</span> <span class="n">mean_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">_calc_rows_columns</span><span class="p">(</span><span class="n">figsize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">figsize</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_images</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">overlay_mask</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">overlay_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">overlay_data</span> <span class="o">=</span> <span class="n">nibabel</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">overlay_mask</span><span class="p">)</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+        <span class="c1"># Crop inferior and posterior</span>
+        <span class="n">overlay_data</span> <span class="o">=</span> <span class="n">overlay_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">rem</span><span class="p">:</span><span class="o">-</span><span class="n">rem</span><span class="p">]</span>
+        <span class="c1"># Reduce the number of slices shown</span>
+        <span class="k">if</span> <span class="n">mean_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">70</span><span class="p">:</span>
+            <span class="c1"># Discard one every two slices</span>
+            <span class="n">overlay_data</span> <span class="o">=</span> <span class="n">overlay_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">::</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">vmin</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">overlay_data</span><span class="p">)</span>
+        <span class="n">vmax</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">overlay_data</span><span class="p">)</span>
+        <span class="n">overlay_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mean_data</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">vmin</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">vmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">overlay_data</span><span class="p">[</span><span class="n">overlay_mask</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vmax</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">overlay_data</span><span class="p">[</span><span class="n">overlay_mask</span><span class="p">],</span> <span class="mf">99.0</span><span class="p">)</span>
 
     <span class="c1"># create figures</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
@@ -233,7 +273,7 @@
     <span class="k">for</span> <span class="n">image</span><span class="p">,</span> <span class="n">z_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">z_vals</span><span class="p">):</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">image</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">data_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mean_data</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">overlay_mask</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">overlay_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">set_rasterized</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
 
         <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">mean_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">image</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span>
@@ -241,13 +281,17 @@
             <span class="n">vmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">mean_data</span><span class="p">[</span><span class="n">data_mask</span><span class="p">],</span> <span class="mf">99.5</span><span class="p">),</span>
             <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="o">.</span><span class="n">Greys_r</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">overlay_mask</span><span class="p">:</span>
-            <span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">Reds</span>  <span class="c1"># @UndefinedVariable</span>
+        <span class="k">if</span> <span class="n">overlay_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">Reds</span>
             <span class="n">cmap</span><span class="o">.</span><span class="n">_init</span><span class="p">()</span>
-            <span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="n">cmap</span><span class="o">.</span><span class="n">_lut</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">alphas</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">overlay_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">image</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                      <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">overlay_alpha</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="n">cmap</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="n">cmap</span><span class="o">.</span><span class="n">_lut</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">alphas</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cmap</span><span class="o">.</span><span class="n">_lut</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">overlay_alpha</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">overlay_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">image</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+                      <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span>
+                      <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span>
 
         <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
             <span class="nb">str</span><span class="p">(</span><span class="n">z_val</span><span class="p">),</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">.</span><span class="mi">95</span><span class="p">,</span> <span class="o">.</span><span class="mo">015</span><span class="p">),</span> <span class="n">xycoords</span><span class="o">=</span><span class="s1">&#39;axes fraction&#39;</span><span class="p">,</span>
@@ -288,6 +332,7 @@
           </div>
         </div>
       </div>
+
     <div class="clearer">
     </div>
   </div>
@@ -295,7 +340,7 @@
 </div>
 
 <div class="footer">
-    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+    &copy; 2017, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
 </div>
   </body>
 </html>

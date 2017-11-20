@@ -15,11 +15,12 @@
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -52,7 +53,18 @@
   </script>
 
   </head>
-  <body role="document"><nav class="navbar navbar-default navbar-static-top">
+  <body role="document"><div class="banner">
+  <div class="container-fluid banner-container">
+    <div class="row banner-inner">
+      <div class="col-xs-4">
+        <img alt="Logo" src="../_static/pydcmio.png">
+      </div>
+      <div class="col-xs-8">
+            <p>DICOM managment package.</p>
+      </div>
+    </div>  
+  </div>
+</div><nav class="navbar navbar-default navbar-static-top">
   <div class="container-fluid">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -62,39 +74,38 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="../index.html">
-        <img alt="Logo" src="../_static/pydcmio.png">
         </a>
     </div>
     <div id="navbar" class="navbar-collapse collapse" ng-controller="navCtrl" ng-app="navApp">
       <ul class="nav navbar-nav">
         <li ng-class="{ active: isActive('index') }"><a href="../index.html">Home</a></li>
         <li ng-class="{ active: isActive('installation') }"><a href="installation.html">Installation</a></li>
-        <li ng-class="{ active: isActive('documentation') }"><a href="#">Documentation</a></li>
-        <li class="dropdown">
+        <li ng-class="{ active: isActive('gallery') }"><a href="../auto_gallery/gallery.html">Gallery</a></li>
+        <li ng-class="{ active: isActive('documentation') }"><a href="#">API documentation</a></li>
+        <!--<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></a>
           <ul class="dropdown-menu">
 	        <li><a href="pydcmio.html">Pydcmio</a></li>
-<li><a href="pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
-<li><a href="pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
-<li><a href="pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
+<li><a href="pydcmio.deface.html">Pydcmio.deface</a></li>
 <li><a href="pydcmio.dcm2nii.html">Pydcmio.dcm2nii</a></li>
+<li><a href="pydcmio.dcmconverter.html">Pydcmio.dcmconverter</a></li>
 <li><a href="pydcmio.plotting.html">Pydcmio.plotting</a></li>
+<li><a href="pydcmio.dcmanonymizer.html">Pydcmio.dcmanonymizer</a></li>
+<li><a href="pydcmio.dcmreader.html">Pydcmio.dcmreader</a></li>
           </ul>
-        </li>
+        </li>-->
         <li><a href="https://github.com/AGrigis/pysphinxdoc">PYSPHINXDOC</a></li>
       </ul>
     </div>
   </div>
 </nav>
-
-
 <div class="content-wrapper">
     <div class="sphinxsidebar">
       <div class="sphinxsidebarwrapper">
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for pydcmio <strong>version 2.0.0</strong>
+           This documentation is for pydcmio <strong>version 2.0.1</strong>
           </p>
         <p class="citing">
           If you use the software, please do not esitate to 
@@ -104,7 +115,7 @@
 
       <!-- toc tree -->
       <ul>
-<li><a class="reference internal" href="#">Documentation of PYDCMIO</a></li>
+<li><a class="reference internal" href="#">API documentation of PYDCMIO</a></li>
 </ul>
 
 
@@ -118,11 +129,27 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="documentation-of-pydcmio">
-<h1>Documentation of PYDCMIO<a class="headerlink" href="#documentation-of-pydcmio" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="api-documentation-of-pydcmio">
+<h1>API documentation of PYDCMIO<a class="headerlink" href="#api-documentation-of-pydcmio" title="Permalink to this headline">¶</a></h1>
+<p>This is the classes and functions reference in pydcmio. Please refer to the gallery for further details, as the class and function raw specifications may not be enough to give full guidelines on their uses.</p>
+<dl class="documentation-contents docutils">
+<dt><strong>Contents</strong>:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="pydcmio.html">pydcmio</a></li>
+<li><a class="reference external" href="pydcmio.deface.html">pydcmio.deface</a></li>
+<li><a class="reference external" href="pydcmio.dcm2nii.html">pydcmio.dcm2nii</a></li>
+<li><a class="reference external" href="pydcmio.dcmconverter.html">pydcmio.dcmconverter</a></li>
+<li><a class="reference external" href="pydcmio.plotting.html">pydcmio.plotting</a></li>
+<li><a class="reference external" href="pydcmio.dcmanonymizer.html">pydcmio.dcmanonymizer</a></li>
+<li><a class="reference external" href="pydcmio.dcmreader.html">pydcmio.dcmreader</a></li>
+</ul>
+</dd>
+</dl>
 <!-- Block section -->
 
 <div class='container-fluid'>
+
+<div class='float-left'>
 
 <div class='row'>
 
@@ -134,14 +161,23 @@ pydcmio
     <p>Package to read/split/convert/anonymize/transcode DICOM files.</p>    </blockquote>
 </div>
 <div class='col-md-4'>
-<h3><a href='pydcmio.dcmanonymizer.html'>
-pydcmio.dcmanonymizer
+<h3><a href='pydcmio.deface.html'>
+pydcmio.deface
 </a></h3>
 <blockquote>
-    <p>Module that provides common tools to anonimize DICOM files. Note that this
-module is experimental.</p>    </blockquote>
+    <p>Module that provides usefull functions to deface an image.</p>    </blockquote>
 </div>
 <div class='col-md-4'>
+<h3><a href='pydcmio.dcm2nii.html'>
+pydcmio.dcm2nii
+</a></h3>
+<blockquote>
+    <p>Module that provides a binding over the 'dcm2nii' command. This module
+also defines custom exceptions.</p>    </blockquote>
+</div>
+
+</div>
+<div class='row'>    <div class='col-md-4'>
 <h3><a href='pydcmio.dcmconverter.html'>
 pydcmio.dcmconverter
 </a></h3>
@@ -154,6 +190,23 @@ pydcmio.dcmconverter
 </ul>    </blockquote>
 </div>
 <div class='col-md-4'>
+<h3><a href='pydcmio.plotting.html'>
+pydcmio.plotting
+</a></h3>
+<blockquote>
+    <p>Module that provides usefull functions to display conversion results.</p>    </blockquote>
+</div>
+<div class='col-md-4'>
+<h3><a href='pydcmio.dcmanonymizer.html'>
+pydcmio.dcmanonymizer
+</a></h3>
+<blockquote>
+    <p>Module that provides common tools to anonimize DICOM files. Note that this
+module is experimental.</p>    </blockquote>
+</div>
+
+</div>
+<div class='row'>    <div class='col-md-4'>
 <h3><a href='pydcmio.dcmreader.html'>
 pydcmio.dcmreader
 </a></h3>
@@ -161,22 +214,8 @@ pydcmio.dcmreader
     <p>Module that provides usefull functions to find a specific DICOM tag in a
 DICOM dataset, exploring recursively sequences.</p>    </blockquote>
 </div>
-<div class='col-md-4'>
-<h3><a href='pydcmio.dcm2nii.html'>
-pydcmio.dcm2nii
-</a></h3>
-<blockquote>
-    <p>Module that provides a binding over the 'dcm2nii' command. This module
-also defines custom exceptions.</p>    </blockquote>
-</div>
-<div class='col-md-4'>
-<h3><a href='pydcmio.plotting.html'>
-pydcmio.plotting
-</a></h3>
-<blockquote>
-    <p>Module that provides usefull functions to display conversion results.</p>    </blockquote>
-</div>
 
+</div>
 </div>
 </div></div>
 
@@ -184,6 +223,7 @@ pydcmio.plotting
           </div>
         </div>
       </div>
+
     <div class="clearer">
     </div>
   </div>
@@ -191,7 +231,7 @@ pydcmio.plotting
 </div>
 
 <div class="footer">
-    &copy; 2016, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
+    &copy; 2017, pyDcmio developers &lt;antoine.grigis@cea.fr&gt;.
 </div>
   </body>
 </html>

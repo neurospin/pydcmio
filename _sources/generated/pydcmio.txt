@@ -2,8 +2,8 @@
 
 :orphan:
 
-Documentation of *pydcmio*
-===========================
+API documentation of *pydcmio*
+===============================
 
 
 Package to read/split/convert/anonymize/transcode DICOM files.

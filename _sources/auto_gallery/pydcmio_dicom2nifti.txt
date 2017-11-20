@@ -1,0 +1,392 @@
+
+
+.. _sphx_glr_auto_gallery_pydcmio_dicom2nifti.py:
+
+
+Pydcmio Dicom2Nifti
+===================
+
+Example automatically generated from package script.
+
+
+
+.. code-block:: python
+
+
+
+    # System import
+    from __future__ import print_function
+    import argparse
+    import os
+    import shutil
+    import numpy
+    import json
+    import glob
+    from datetime import datetime
+    from pprint import pprint
+    import textwrap
+    from argparse import RawTextHelpFormatter
+
+    # Bredala import
+    try:
+        import bredala
+        bredala.USE_PROFILER = False
+        bredala.register("pydcmio.dcmconverter.converter",
+                         names=["generate_config", "dcm2nii", "add_meta_to_nii",
+                                "dcm2niix"])
+        bredala.register("pydcmio.plotting.slicer",
+                         names=["mosaic"])
+    except:
+        pass
+
+    # Dcmio import
+    from pydcmio import __version__ as version
+    from pydcmio.dcmconverter.converter import generate_config
+    from pydcmio.dcmconverter.converter import dcm2nii
+    from pydcmio.dcmconverter.converter import dcm2niix
+    from pydcmio.dcmconverter.converter import add_meta_to_nii
+    from pydcmio.plotting.slicer import mosaic
+    from pydcmio.dcm2nii.wrapper import Dcm2NiiWrapper
+
+
+    # Parameters to keep trace
+    __hopla__ = ["runtime", "inputs", "outputs"]
+
+
+    # Script documentation
+    DOC = """
+    Dicom to Nifti conversion
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Wraps around the 'dcm2nii' command.
+
+    This code enables us to convert DICOMs to Nifti using the Chris Rorden's
+    'dcm2nii' or 'dcm2niix' command.
+
+    The code is setup so that all the converted Nifti images are anonymized,
+    compressed in Nifti compressed '.nii.gz' format, and stacked in the same
+    image for 4D acquisitons. By default the proctocol is used to name the
+    generated files. On top of that some DICOM tags can be stored in the
+    converted Nifti 'descrip' header field (for instance the repetition
+    time or the echo time).
+
+    It is also possible to transcode the subject identifier. To generate the
+    transcoding table you may want to use the 'pydcmio_transcode' script.
+
+    Steps:
+
+    1- perform the 'dcm2nii' or 'dcm2niix' conversion.
+    2- force the normalization of the generated files.
+    3- fill the nifti header.
+    4- create a snap of the created volume(s).
+
+    Command:
+
+    python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_dicom2nifti \
+        -v 2 \
+        -s Lola \
+        -p T2_GRE_1 \
+        -d /volatile/nsap/dcm2nii/dicom/T2GRE \
+        -o /volatile/nsap/dcm2nii/convert \
+        -t \
+        -r /volatile/nsap/dcm2nii/transcoding_table.json \
+        -f TR,0x0018,0x0080,False TE,0x0018,0x0081,False \
+        -e
+    """
+
+
+    def is_file(filearg):
+        """ Type for argparse - checks that file exists but does not open.
+        """
+        if not os.path.isfile(filearg):
+            raise argparse.ArgumentError(
+                "The file '{0}' does not exist!".format(filearg))
+        return filearg
+
+
+    def is_directory(dirarg):
+        """ Type for argparse - checks that directory exists.
+        """
+        if not os.path.isdir(dirarg):
+            raise argparse.ArgumentError(
+                "The directory '{0}' does not exist!".format(dirarg))
+        return dirarg
+
+
+    def get_cmd_line_args():
+        """
+        Create a command line argument parser and return a dict mapping
+        <argument name> -> <argument value>.
+        """
+        parser = argparse.ArgumentParser(
+            prog="python pydcmio_dicom2nifti",
+            description=textwrap.dedent(DOC),
+            formatter_class=RawTextHelpFormatter)
+
+        # Required arguments
+        required = parser.add_argument_group("required arguments")
+        required.add_argument(
+            "-s", "--sid",
+            required=True, metavar="<str>",
+            help="the subject identifier.")
+        required.add_argument(
+            "-p", "--protocol",
+            required=True, metavar="<str>",
+            help="the protocol name.")
+        required.add_argument(
+            "-d", "--dcmdir",
+            required=True, metavar="<path>", type=is_directory,
+            help="the folder that contains the DICOMs to be converted.")
+        required.add_argument(
+            "-o", "--outdir",
+            required=True, metavar="<path>", type=is_directory,
+            help="the subject output folders.")
+
+        # Optional arguments
+        parser.add_argument(
+            "-t", "--transcode",
+            action="store_true",
+            help="if activated, the subject ID is transcoded.")
+        parser.add_argument(
+            "-x", "--dcm2niix",
+            action="store_true",
+            help="if activated, use 'dcm2niix' instead of 'dcm2nii'.")
+        parser.add_argument(
+            "-f", "--filledwithtags",
+            nargs="*",
+            help="define some tags to be added in the 'descrip' Nifti header "
+                 "field.")
+        parser.add_argument(
+            "-r", "--transtable", dest="transcode_table",
+            metavar="<file>", type=is_file,
+            help="an existing transcoding table.")
+        parser.add_argument(
+            "-e", "--erase",
+            action="store_true",
+            help="if activated, clean the conversion output folder.")
+        parser.add_argument(
+            "-v", "--verbose",
+            type=int, choices=[0, 1, 2], default=0,
+            help="increase the verbosity level: 0 silent, [1, 2] verbose.")
+
+        # Create a dict of arguments to pass to the 'main' function
+        args = parser.parse_args()
+        kwargs = vars(args)
+        verbose = kwargs.pop("verbose")
+
+        return kwargs, verbose
+
+
+First check if the output directory exists on the file system, and
+clean it if requested. Transcode also the subject identifier if requested.
+
+
+
+.. code-block:: python
+
+
+    inputs, verbose = get_cmd_line_args()
+    tool = "pydcmio_dicom2nifti"
+    tool_version = version
+    if inputs["dcm2niix"]:
+        dcm2nii_version = Dcm2NiiWrapper.version("dcm2niix")
+    else:
+        dcm2nii_version = Dcm2NiiWrapper.version("dcm2nii")
+    timestamp = datetime.now().isoformat()
+    params = locals()
+    runtime = dict([(name, params[name])
+                   for name in ("tool", "tool_version", "dcm2nii_version",
+                                "timestamp")])
+    outputs = None
+    if verbose > 0:
+        print("[info] Starting DICOM conversion ...")
+        print("[info] Runtime:")
+        pprint(runtime)
+        print("[info] Inputs:")
+        pprint(inputs)
+    if inputs["transcode"]:
+        with open(inputs["transcode_table"], "rt") as open_file:
+            transcoding = json.load(open_file)
+        if inputs["sid"] not in transcoding:
+            raise ValueError(
+                "'{0}' subject identifier not in '{1}' transcoding table.".format(
+                    inputs["sid"], inputs["transcode_table"]))
+        niidir = os.path.join(inputs["outdir"], transcoding[inputs["sid"]],
+                              inputs["protocol"])
+    else:
+        niidir = os.path.join(inputs["outdir"], inputs["sid"], inputs["protocol"])
+    if inputs["erase"] and os.path.isdir(niidir):
+        shutil.rmtree(niidir)
+    if not os.path.isdir(niidir):
+        os.makedirs(niidir)
+
+
+
+Step 1: perform the 'dcm2nii' or 'dcm2niix' conversion.
+
+
+
+.. code-block:: python
+
+
+    if inputs["dcm2niix"]:
+        reoriented_files = []
+        reoriented_and_cropped_files = []
+        config_file = None
+        files, bvecs, bvals, bids = dcm2niix(
+            inputs["dcmdir"], o=niidir, f=inputs["protocol"], z="y", b="y")
+    else:
+        config_file = generate_config(
+            niidir, anonymized=True, gzip=True, add_date=False,
+            add_acquisition_number=False, add_protocol_name=True,
+            add_patient_name=False, add_source_filename=False,
+            begin_clip=0, end_clip=0)
+        bids = None
+        (files, reoriented_files, reoriented_and_cropped_files,
+         bvecs, bvals) = dcm2nii(
+            inputs["dcmdir"], o=niidir, b=config_file)
+
+
+
+Step 2: force the normalization of the generated files.
+
+
+
+.. code-block:: python
+
+
+    for index, path in enumerate(files):
+        dirname, basename = os.path.split(path)
+        suffix = "" if index == 0 else str(index)
+        dest_path = os.path.join(
+            dirname,
+            inputs["protocol"] + suffix + ".nii.gz")
+        shutil.move(path, dest_path)
+        files[index] = dest_path
+    for index, path in enumerate(bvecs):
+        dirname, basename = os.path.split(path)
+        suffix = "" if index == 0 else str(index)
+        dest_path = os.path.join(
+            dirname,
+            inputs["protocol"] + suffix + ".bvecs")
+        shutil.move(path, dest_path)
+        bvecs[index] = dest_path
+    for index, path in enumerate(bvals):
+        dirname, basename = os.path.split(path)
+        suffix = "" if index == 0 else str(index)
+        dest_path = os.path.join(
+            dirname,
+            inputs["protocol"] + suffix + ".bvals")
+        shutil.move(path, dest_path)
+        bvals[index] = dest_path
+    if verbose > 1:
+        print("[result] Files: {0}.".format(files))
+        print("[result] Reoriented files: {0}.".format(reoriented_files))
+        print("[result] Reoriented and cropped files: {0}.".format(
+            reoriented_and_cropped_files))
+        print("[result] Bvecs: {0}.".format(bvecs))
+        print("[result] Bvals: {0}.".format(bvals))
+        print("[result] BIDS: {0}.".format(bids))
+
+
+
+Step 3: fill the Nifti header.
+
+
+
+.. code-block:: python
+
+
+    filled_nii_files = []
+    if inputs["filledwithtags"] is not None:
+        tags = []
+        for elem in inputs["filledwithtags"]:
+            name, t1, t2, stack = elem.split(",")
+            tags.append((name, (t1, t2), eval(stack)))
+        for path in files:
+            filled_nii_files.append(
+                add_meta_to_nii(path, inputs["dcmdir"], dcm_tags=tags,
+                                outdir=niidir, prefix="f"))
+        if verbose > 1:
+            print("[result] Filled files: {0}.".format(filled_nii_files))
+
+
+
+Step 4: create a snap of the created volume(s).
+
+
+
+.. code-block:: python
+
+
+    figures = []
+    for impath in files:
+        if len(bvals) == 0:
+            snap = mosaic(impath, niidir, strategy="average")
+            figures.append(snap)
+        else:
+            indices = numpy.where(numpy.loadtxt(bvals[0]) >= 10)[0].tolist()
+            snap = mosaic(impath, niidir, strategy="pick", indices=indices,
+                          title="dwi", basename="dwi")
+            figures.append(snap)
+            indices = numpy.where(numpy.loadtxt(bvals[0]) <= 10)[0].tolist()
+            snap = mosaic(impath, niidir, strategy="pick", indices=indices,
+                          title="b0", basename="b0")
+            figures.append(snap)
+    if verbose > 1:
+        print("[result] Snaps: {0}.".format(figures))
+
+
+
+Update the outputs and save them and the inputs in a 'logs' directory.
+
+
+
+.. code-block:: python
+
+
+    logdir = os.path.join(niidir, "logs")
+    if not os.path.isdir(logdir):
+        os.mkdir(logdir)
+    params = locals()
+    outputs = dict([(name, params[name])
+                    for name in ("config_file", "files", "reoriented_files",
+                                 "reoriented_and_cropped_files", "bvecs",
+                                 "bvals", "filled_nii_files", "figures", "bids")])
+    for name, final_struct in [("inputs", inputs), ("outputs", outputs),
+                               ("runtime", runtime)]:
+        log_file = os.path.join(logdir, "{0}.json".format(name))
+        with open(log_file, "wt") as open_file:
+            json.dump(final_struct, open_file, sort_keys=True, check_circular=True,
+                      indent=4)
+    if verbose > 1:
+        print("[info] Outputs:")
+        pprint(outputs)
+
+**Total running time of the script:** ( 0 minutes  0.000 seconds)
+
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Python source code: pydcmio_dicom2nifti.py <pydcmio_dicom2nifti.py>`
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Jupyter notebook: pydcmio_dicom2nifti.ipynb <pydcmio_dicom2nifti.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    Gallery generated by Sphinx-Gallery
+
+
