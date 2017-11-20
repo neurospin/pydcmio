@@ -153,6 +153,8 @@ def get_values(dataset_or_dcmpath, extractor):
     # Get tag associated values
     tag, stack_values = STANDARD_EXTRACTOR[extractor]
     values = walk(dataset_or_dcmpath, tag, stack_values=stack_values)
+    if values is None:
+        return None
     if not stack_values and stack_values is not None:
         values = values[0]
 
