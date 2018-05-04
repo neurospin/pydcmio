@@ -70,7 +70,8 @@ def cleanup(attribute):
     return attribute.translate(_CLEANUP_TABLE)
 
 
-def split_series(dicom_dir, outdir):
+def split_series(dicom_dir, outdir, skip_non_dicom_files=False,
+                 check_session=True, check_encoding=True):
     """ Split all the folder Dicom files by series in different folders.
 
     Dicom files are searched recursively in the input folder and all files
@@ -84,6 +85,15 @@ def split_series(dicom_dir, outdir):
         a folder containing Dicom files to organize by series.
     outdir: str (mandatory)
         the destination folder.
+    skip_non_dicom_files: bool (optional, default False)
+        if True skip non DICOM files, otherwise raise an error.
+    check_session: bool (optional, default True)
+        if True check if the DICOM files are in the same session and split
+        files by sequences (raise an error if it is not the case), otherwise
+        simply rename the DICOM files using the SOP instance UID.
+    check_encoding: bool (optional, default True)
+        if True check if the DICOM files encoding (expect ISO_IR 100). If the
+        file is not encoded properly, the file is not considered.
     """
     # Read the incoming directory:
     # process each file in this directory and its sub-directories
@@ -108,19 +118,25 @@ def split_series(dicom_dir, outdir):
         mtime = os.path.getmtime(dicom_file)
 
         # Read DICOM dataset
-        dataset = dicom.read_file(dicom_file)
+        try:
+            dataset = dicom.read_file(dicom_file)
+        except:
+            if skip_non_dicom_files:
+                continue
+            raise      
 
         # Find character encoding of DICOM attributes:
         # we currently expect encoding to be ISO_IR 100
-        if (0x0008, 0x0005) in dataset:
-            SpecificCharacterSet = dataset[0x0008, 0x0005].value
-            if SpecificCharacterSet != "ISO_IR 100":
-                print("'{0}' file encoding is not ISO_IR 100 as "
-                      "expected.".format(dicom_file))
-                continue
-        else:
-            print("Can't check encoding of '{0}', missing (0x0008, 0x0005) "
-                  "tag.".format(dicom_file))
+        if check_encoding:
+            if (0x0008, 0x0005) in dataset:
+                SpecificCharacterSet = dataset[0x0008, 0x0005].value
+                if SpecificCharacterSet != "ISO_IR 100":
+                    print("'{0}' file encoding is not ISO_IR 100 as "
+                          "expected.".format(dicom_file))
+                    continue
+            else:
+                print("Can't check encoding of '{0}', missing "
+                      "(0x0008, 0x0005) tag.".format(dicom_file))
 
         # Process other DICOM attributes:
         # decode strings assuming 'ISO_IR 100'
@@ -128,27 +144,33 @@ def split_series(dicom_dir, outdir):
         SOPInstanceUID = dataset[0x0008, 0x0018].value
         if (0x0008, 0x103e) in dataset:
             SeriesDescription = cleanup(decode(dataset[0x0008, 0x103e].value))
-        SeriesNumber = dataset[0x0020, 0x0011].value
-        EchoTime = dataset[0x0018, 0x0081].value
+        if check_session:
+            SeriesNumber = dataset[0x0020, 0x0011].value
+            EchoTime = dataset[0x0018, 0x0081].value
 
         # Check the session time
-        current_acquisition_datetime = (dataset[0x0008, 0x0020].value +
-                                        dataset[0x0008, 0x0030].value)
-        if acquisition_datetime is None:
-            acquisition_datetime = current_acquisition_datetime
-        elif acquisition_datetime != current_acquisition_datetime:
-            raise ValueError(
-                "Two sessions detected in the input folder '{0}': {1} - "
-                "{2}.".format(dicom_dir, acquisition_datetime,
-                              current_acquisition_datetime))
+        if check_session:
+            current_acquisition_datetime = (dataset[0x0008, 0x0020].value +
+                                            dataset[0x0008, 0x0030].value)
+            if acquisition_datetime is None:
+                acquisition_datetime = current_acquisition_datetime
+            elif acquisition_datetime != current_acquisition_datetime:
+                raise ValueError(
+                    "Two sessions detected in the input folder '{0}': {1} - "
+                    "{2}.".format(dicom_dir, acquisition_datetime,
+                                  current_acquisition_datetime))
 
         # Build the full path to the outgoing directory:
         # we assume that there is only one session
-        if SeriesDescription:
-            serie_name = (SeriesDescription + "_" + str(EchoTime) + "_" +
-                          str(SeriesNumber).rjust(6, "0"))
+        if check_session:
+            if SeriesDescription:
+                serie_name = (SeriesDescription + "_" + str(EchoTime) + "_" +
+                              str(SeriesNumber).rjust(6, "0"))
+            else:
+                serie_name = (str(EchoTime) + "_" +
+                              str(SeriesNumber).rjust(6, "0"))
         else:
-            serie_name = str(EchoTime) + "_" + str(SeriesNumber).rjust(6, "0")
+            serie_name = "all_dicoms"
         output_dicom_dir = os.path.join(outdir, serie_name)
 
         # Check that the destination folder exists
