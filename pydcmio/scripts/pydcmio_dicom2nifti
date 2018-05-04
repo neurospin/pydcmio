@@ -66,6 +66,11 @@ time or the echo time).
 It is also possible to transcode the subject identifier. To generate the
 transcoding table you may want to use the 'pydcmio_transcode' script.
 
+Images with non-equidistant slices (not legal in NIfTI) get the _Eq suffix.
+CT scans acquired with a gantry tilt (which in theory could be supported in
+the NIfTI spatial transform, but would disrupt most tools) will gain
+the _Tilt suffix.
+
 Steps:
 
 1- perform the 'dcm2nii' or 'dcm2niix' conversion.
@@ -119,10 +124,6 @@ def get_cmd_line_args():
     # Required arguments
     required = parser.add_argument_group("required arguments")
     required.add_argument(
-        "-s", "--sid",
-        required=True, metavar="<str>",
-        help="the subject identifier.")
-    required.add_argument(
         "-p", "--protocol",
         required=True, metavar="<str>",
         help="the protocol name.")
@@ -136,6 +137,10 @@ def get_cmd_line_args():
         help="the subject output folders.")
 
     # Optional arguments
+    parser.add_argument(
+        "-s", "--sid",
+        metavar="<str>",
+        help="the subject identifier.")
     parser.add_argument(
         "-t", "--transcode",
         action="store_true",
@@ -201,8 +206,10 @@ if inputs["transcode"]:
                 inputs["sid"], inputs["transcode_table"]))
     niidir = os.path.join(inputs["outdir"], transcoding[inputs["sid"]],
                           inputs["protocol"])
-else:
+elif inputs["sid"] is not None:
     niidir = os.path.join(inputs["outdir"], inputs["sid"], inputs["protocol"])
+else:
+    niidir = os.path.join(inputs["outdir"], inputs["protocol"])
 if inputs["erase"] and os.path.isdir(niidir):
     shutil.rmtree(niidir)
 if not os.path.isdir(niidir):
@@ -232,31 +239,33 @@ else:
 
 """
 Step 2: force the normalization of the generated files.
+Only required for dcm2nii since dcm2niix use the BIDS format.
 """
-for index, path in enumerate(files):
-    dirname, basename = os.path.split(path)
-    suffix = "" if index == 0 else str(index)
-    dest_path = os.path.join(
-        dirname,
-        inputs["protocol"] + suffix + ".nii.gz")
-    shutil.move(path, dest_path)
-    files[index] = dest_path
-for index, path in enumerate(bvecs):
-    dirname, basename = os.path.split(path)
-    suffix = "" if index == 0 else str(index)
-    dest_path = os.path.join(
-        dirname,
-        inputs["protocol"] + suffix + ".bvecs")
-    shutil.move(path, dest_path)
-    bvecs[index] = dest_path
-for index, path in enumerate(bvals):
-    dirname, basename = os.path.split(path)
-    suffix = "" if index == 0 else str(index)
-    dest_path = os.path.join(
-        dirname,
-        inputs["protocol"] + suffix + ".bvals")
-    shutil.move(path, dest_path)
-    bvals[index] = dest_path
+if not inputs["dcm2niix"]:
+    for index, path in enumerate(files):
+        dirname, basename = os.path.split(path)
+        suffix = "" if index == 0 else str(index)
+        dest_path = os.path.join(
+            dirname,
+            inputs["protocol"] + suffix + ".nii.gz")
+        shutil.move(path, dest_path)
+        files[index] = dest_path
+    for index, path in enumerate(bvecs):
+        dirname, basename = os.path.split(path)
+        suffix = "" if index == 0 else str(index)
+        dest_path = os.path.join(
+            dirname,
+            inputs["protocol"] + suffix + ".bvecs")
+        shutil.move(path, dest_path)
+        bvecs[index] = dest_path
+    for index, path in enumerate(bvals):
+        dirname, basename = os.path.split(path)
+        suffix = "" if index == 0 else str(index)
+        dest_path = os.path.join(
+            dirname,
+            inputs["protocol"] + suffix + ".bvals")
+        shutil.move(path, dest_path)
+        bvals[index] = dest_path
 if verbose > 1:
     print("[result] Files: {0}.".format(files))
     print("[result] Reoriented files: {0}.".format(reoriented_files))
