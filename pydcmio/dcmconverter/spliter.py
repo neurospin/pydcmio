@@ -17,9 +17,11 @@ import os
 import sys
 import shutil
 import string
-import dicom
 import traceback
-from pip.utils.ui import DownloadProgressBar
+
+# Third party import
+import progressbar
+import dicom
 
 
 def decode(attribute):
@@ -106,96 +108,92 @@ def split_series(dicom_dir, outdir, skip_non_dicom_files=False,
             os.path.join(root, basename) for basename in files])
 
     # Go through each file: expected to be in Dicom format
-    progress_indicator = DownloadProgressBar(max=len(to_treat_dicom))
     acquisition_datetime = None
-    for dicom_file in to_treat_dicom:
+    with progressbar.ProgressBar(max_value=len(to_treat_dicom),
+                                 redirect_stdout=True) as bar:
+        for cnt, dicom_file in enumerate(to_treat_dicom):
 
-        # Update progress bar
-        statinfo = os.stat(dicom_file)
-        DownloadProgressBar.suffix = "{0:.3f}MB".format(
-            statinfo.st_size / 10e5)
-        progress_indicator.next(1)
+            # Get the time of last modification
+            mtime = os.path.getmtime(dicom_file)
 
-        # Get the time of last modification
-        mtime = os.path.getmtime(dicom_file)
-
-        # Read DICOM dataset
-        try:
-            dataset = dicom.read_file(dicom_file)
-        except:
-            if skip_non_dicom_files:
-                continue
-            traceback.print_exc(file=sys.stdout)
-            raise ValueError(
-                "'{0}' is not a valid DICOM file.".format(dicom_file))
-
-        # Find character encoding of DICOM attributes:
-        # we currently expect encoding to be ISO_IR 100
-        if check_encoding:
-            if (0x0008, 0x0005) in dataset:
-                SpecificCharacterSet = dataset[0x0008, 0x0005].value
-                if SpecificCharacterSet != "ISO_IR 100":
-                    print("'{0}' file encoding is not ISO_IR 100 as "
-                          "expected.".format(dicom_file))
+            # Read DICOM dataset
+            try:
+                dataset = dicom.read_file(dicom_file)
+            except:
+                if skip_non_dicom_files:
                     continue
-            else:
-                print("Can't check encoding of '{0}', missing "
-                      "(0x0008, 0x0005) tag.".format(dicom_file))
-
-        # Process other DICOM attributes:
-        # decode strings assuming 'ISO_IR 100'
-        SeriesDescription = None
-        SOPInstanceUID = dataset[0x0008, 0x0018].value
-        if (0x0008, 0x103e) in dataset:
-            SeriesDescription = cleanup(decode(dataset[0x0008, 0x103e].value))
-        if check_session:
-            SeriesNumber = dataset[0x0020, 0x0011].value
-            EchoTime = dataset[0x0018, 0x0081].value
-
-        # Check the session time
-        if check_session:
-            current_acquisition_datetime = (dataset[0x0008, 0x0020].value +
-                                            dataset[0x0008, 0x0030].value)
-            if acquisition_datetime is None:
-                acquisition_datetime = current_acquisition_datetime
-            elif acquisition_datetime != current_acquisition_datetime:
+                traceback.print_exc(file=sys.stdout)
                 raise ValueError(
-                    "Two sessions detected in the input folder '{0}': {1} - "
-                    "{2}.".format(dicom_dir, acquisition_datetime,
-                                  current_acquisition_datetime))
+                    "'{0}' is not a valid DICOM file.".format(dicom_file))
 
-        # Build the full path to the outgoing directory:
-        # we assume that there is only one session
-        if check_session:
-            if SeriesDescription:
-                serie_name = (SeriesDescription + "_" + str(EchoTime) + "_" +
-                              str(SeriesNumber).rjust(6, "0"))
+            # Find character encoding of DICOM attributes:
+            # we currently expect encoding to be ISO_IR 100
+            if check_encoding:
+                if (0x0008, 0x0005) in dataset:
+                    SpecificCharacterSet = dataset[0x0008, 0x0005].value
+                    if SpecificCharacterSet != "ISO_IR 100":
+                        print("'{0}' file encoding is not ISO_IR 100 as "
+                              "expected.".format(dicom_file))
+                        continue
+                else:
+                    print("Can't check encoding of '{0}', missing "
+                          "(0x0008, 0x0005) tag.".format(dicom_file))
+
+            # Process other DICOM attributes:
+            # decode strings assuming 'ISO_IR 100'
+            SeriesDescription = None
+            SOPInstanceUID = dataset[0x0008, 0x0018].value
+            if (0x0008, 0x103e) in dataset:
+                SeriesDescription = cleanup(
+                    decode(dataset[0x0008, 0x103e].value))
+            if check_session:
+                SeriesNumber = dataset[0x0020, 0x0011].value
+                EchoTime = dataset[0x0018, 0x0081].value
+
+            # Check the session time
+            if check_session:
+                current_acquisition_datetime = (dataset[0x0008, 0x0020].value +
+                                                dataset[0x0008, 0x0030].value)
+                if acquisition_datetime is None:
+                    acquisition_datetime = current_acquisition_datetime
+                elif acquisition_datetime != current_acquisition_datetime:
+                    raise ValueError(
+                        "Two sessions detected in the input folder '{0}': {1} "
+                        "- {2}.".format(dicom_dir, acquisition_datetime,
+                                        current_acquisition_datetime))
+
+            # Build the full path to the outgoing directory:
+            # we assume that there is only one session
+            if check_session:
+                if SeriesDescription:
+                    serie_name = (SeriesDescription + "_" + str(EchoTime) +
+                                  "_" + str(SeriesNumber).rjust(6, "0"))
+                else:
+                    serie_name = (str(EchoTime) + "_" +
+                                  str(SeriesNumber).rjust(6, "0"))
             else:
-                serie_name = (str(EchoTime) + "_" +
-                              str(SeriesNumber).rjust(6, "0"))
-        else:
-            serie_name = "all_dicoms"
-        output_dicom_dir = os.path.join(outdir, serie_name)
+                serie_name = "all_dicoms"
+            output_dicom_dir = os.path.join(outdir, serie_name)
 
-        # Check that the destination folder exists
-        if not os.path.isdir(output_dicom_dir):
-            os.mkdir(output_dicom_dir)
+            # Check that the destination folder exists
+            if not os.path.isdir(output_dicom_dir):
+                os.mkdir(output_dicom_dir)
 
-        # Build a new name for the DICOM file
-        output_dicom_file = os.path.join(output_dicom_dir,
-                                         SOPInstanceUID + '.dcm')
+            # Build a new name for the DICOM file
+            output_dicom_file = os.path.join(output_dicom_dir,
+                                             SOPInstanceUID + '.dcm')
 
-        # Copy DICOM file:
-        # handle case where outgoing file already exists
-        if os.path.exists(output_dicom_file):
+            # Copy DICOM file:
+            # handle case where outgoing file already exists
+            if os.path.exists(output_dicom_file):
 
-            # Compare modification time and keep the most recent file
-            if os.path.getmtime(output_dicom_file) < mtime:
+                # Compare modification time and keep the most recent file
+                if os.path.getmtime(output_dicom_file) < mtime:
+                    shutil.copy2(dicom_file, output_dicom_file)
+
+            # file does not exists and can be copied
+            else:
                 shutil.copy2(dicom_file, output_dicom_file)
 
-        # file does not exists and can be copied
-        else:
-            shutil.copy2(dicom_file, output_dicom_file)
-
-    # Add empty line
-    print()
+            # Update progress bar
+            bar.update(cnt)

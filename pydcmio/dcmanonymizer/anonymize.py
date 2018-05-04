@@ -14,8 +14,10 @@ Module that provides tools to anonymize DICOM files.
 import os
 import json
 import re
-import dicom
+
+# Third party import
 import progressbar
+import dicom
 
 # Dcmio import
 from .callbacks import callback_private
