@@ -71,7 +71,8 @@ PROVIDES = ["pydcmio"]
 REQUIRES = [
     "numpy>=1.6.1",
     "pydicom>=0.9",
-    "nibabel>=2.0.2"
+    "nibabel>=2.0.2",
+    "progressbar2>=3.34.3"
 ]
 EXTRA_REQUIRES = {}
 SCRIPTS = [

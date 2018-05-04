@@ -15,7 +15,7 @@ import os
 import json
 import re
 import dicom
-from pip.utils.ui import DownloadProgressBar
+import progressbar
 
 # Dcmio import
 from .callbacks import callback_private
@@ -99,19 +99,16 @@ def anonymize_dicomdir(inputdir, outdir, write_logs=True):
             PRIVATE_DEIDENTIFY.setdefault(key, []).append(pattern)
 
     # Process all DICOM files
-    progress_indicator = DownloadProgressBar(max=len(input_dicoms))
     dcmfiles = []
     logfiles = []
-    for cnt, input_dicom in enumerate(input_dicoms):
-        statinfo = os.stat(input_dicom)
-        DownloadProgressBar.suffix = "{0:.3f}MB".format(
-            statinfo.st_size / 10e5)
-        progress_indicator.next(1)
-        output_dicom, output_log = anonymize_dicomfile(
-            input_dicom, outdir, outname=str(cnt), write_log=write_logs)
-        dcmfiles.append(output_dicom)
-        logfiles.append(output_log)
-    progress_indicator.finish()
+    with progressbar.ProgressBar(max_value=len(input_dicoms),
+                                 redirect_stdout=True) as bar:
+        for cnt, input_dicom in enumerate(input_dicoms):
+            output_dicom, output_log = anonymize_dicomfile(
+                input_dicom, outdir, outname=str(cnt), write_log=write_logs)
+            dcmfiles.append(output_dicom)
+            logfiles.append(output_log)
+            bar.update(cnt)
 
     return dcmfiles, logfiles
 
