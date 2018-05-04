@@ -12,6 +12,8 @@ from __future__ import print_function
 import argparse
 import os
 import shutil
+import textwrap
+from argparse import RawTextHelpFormatter
 
 # Bredala import
 try:
@@ -32,7 +34,7 @@ __hopla__ = ["tool", "version", "inputs", "outputs",
 
 
 # Script documentation
-doc = """
+DOC = """
 Dicom to dicom anonymization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -60,21 +62,24 @@ def is_directory(dirarg):
     return dirarg
 
 
-parser = argparse.ArgumentParser(description=doc)
+parser = argparse.ArgumentParser(
+    description=textwrap.dedent(DOC),
+    formatter_class=RawTextHelpFormatter)
+required = parser.add_argument_group("required arguments")
+required.add_argument(
+    "-d", "--dcmdir", dest="dcmdir", required=True, metavar="PATH",
+    help="the folder that contains the DICOMs to be anonymized.",
+    type=is_directory)
+required.add_argument(
+    "-o", "--outdir", dest="outdir", required=True, metavar="PATH",
+    help="the folder that contains the anonymized dicom files.",
+    type=is_directory)
 parser.add_argument(
     "-v", "--verbose", dest="verbose", type=int, choices=[0, 1, 2], default=0,
     help="increase the verbosity level: 0 silent, [1, 2] verbose.")
 parser.add_argument(
     "-e", "--erase", dest="erase", action="store_true",
     help="if activated, clean the output folder.")
-parser.add_argument(
-    "-d", "--dcmdir", dest="dcmdir", required=True, metavar="PATH",
-    help="the folder that contains the DICOMs to be anonymized.",
-    type=is_directory)
-parser.add_argument(
-    "-o", "--outdir", dest="outdir", required=True, metavar="PATH",
-    help="the folder that contains the anonymized dicom files.",
-    type=is_directory)
 args = parser.parse_args()
 
 
