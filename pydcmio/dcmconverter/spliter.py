@@ -123,7 +123,7 @@ def split_series(dicom_dir, outdir, skip_non_dicom_files=False,
         except:
             if skip_non_dicom_files:
                 continue
-            raise      
+            raise
 
         # Find character encoding of DICOM attributes:
         # we currently expect encoding to be ISO_IR 100
