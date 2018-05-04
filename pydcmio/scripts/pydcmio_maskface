@@ -23,7 +23,7 @@ try:
     bredala.USE_PROFILER = False
     bredala.register("pydcmio.deface.mask_face", names=["deface"])
     bredala.register("pydcmio.deface.mri_deface", names=["deface"])
-    bredala.register("pydcmio.deface.pydeface", names=["deface"])
+    bredala.register("pydcmio.deface.pdeface", names=["deface"])
 except:
     pass
 
@@ -31,7 +31,7 @@ except:
 from pydcmio import __version__ as version
 from pydcmio.deface import mask_face
 from pydcmio.deface import mri_deface
-from pydcmio.deface import pydeface
+from pydcmio.deface import pdeface
 
 # Pyconnectome import
 from pyconnectome import DEFAULT_FSL_PATH
@@ -74,7 +74,7 @@ python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_maskface \
     -o $HOME/Desktop/results/001 \
     -T mask_face \
     -F /etc/fsl/5.0/fsl.sh \
-    -M /usr/local/MATLAB/MATLAB_Runtime/v901 \
+    -M /neurospin/nsap/local/maskface/MCR/v901 \
     -v 2 \
     -E
 
@@ -140,7 +140,7 @@ def get_cmd_line_args():
     # Optional arguments
     parser.add_argument(
         "-R", "--reference",
-        required=True, type=is_file,
+        type=is_file,
         help="The image that must be used as reference if more than one image"
              "have been supplied as input or if the input volume is 4d.")
     parser.add_argument(
@@ -233,7 +233,7 @@ elif inputs["defacing_type"] == "mri_deface":
         verbose=verbose,
         fs_config=inputs["fs_sh"])
 elif inputs["defacing_type"] == "pydeface":
-    deface_files, snap_files = pydeface(
+    deface_files, snap_files = pdeface(
         input_files=inputs["images"],
         outdir=inputs["outdir"],
         reference_file=None,
