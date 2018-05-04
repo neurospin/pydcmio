@@ -12,11 +12,13 @@ Module that provides tools to reorganize DICOM files.
 
 
 # System import
+from __future__ import print_function
 import os
 import sys
 import shutil
 import string
 import dicom
+import traceback
 from pip.utils.ui import DownloadProgressBar
 
 
@@ -123,7 +125,9 @@ def split_series(dicom_dir, outdir, skip_non_dicom_files=False,
         except:
             if skip_non_dicom_files:
                 continue
-            raise
+            traceback.print_exc(file=sys.stdout)
+            raise ValueError(
+                "'{0}' is not a valid DICOM file.".format(dicom_file))
 
         # Find character encoding of DICOM attributes:
         # we currently expect encoding to be ISO_IR 100
@@ -192,3 +196,6 @@ def split_series(dicom_dir, outdir, skip_non_dicom_files=False,
         # file does not exists and can be copied
         else:
             shutil.copy2(dicom_file, output_dicom_file)
+
+    # Add empty line
+    print()
