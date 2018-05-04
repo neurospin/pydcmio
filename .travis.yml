@@ -27,7 +27,7 @@ install:
     - pip install coveralls
     - pip install pep8
     - pip install nibabel
-    - pip install pydicom
+    - pip install dicom
     - pip install .
 
 script:
