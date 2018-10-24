@@ -75,11 +75,13 @@ def deface(input_files, outdir, matlab_mcr, reference_file=None,
     # Convert in analyse format
     pair_files = []
     basenames = []
+    affines = []
     for fp in input_files:
         fp = os.path.abspath(fp)
         basenames.append(os.path.basename(fp).split(".")[0])
         pair_filepath = os.path.join(outdir, "{0}.img".format(basenames[-1]))
         im = nibabel.load(fp)
+        affines.append(im.affine)
         pair_im = nibabel.Nifti1Pair(im.get_data(), im.affine)
         pair_im.to_filename(pair_filepath)
         pair_files.append(pair_filepath)
@@ -105,13 +107,13 @@ def deface(input_files, outdir, matlab_mcr, reference_file=None,
     deface_files = []
     snap_files = []
     wdir = os.path.join(outdir, "maskface")
-    for fp, basename in zip(pair_files, basenames):
+    for fp, basename, aff in zip(pair_files, basenames, affines):
         deface_pair_file = os.path.join(
             wdir, "{0}_full_normfilter.hdr".format(basename))
         nii_file = os.path.join(
             outdir, "{0}_full_normfilter.nii.gz".format(basename))
         im = nibabel.load(deface_pair_file)
-        nii_im = nibabel.Nifti1Image(im.get_data(), im.affine)
+        nii_im = nibabel.Nifti1Image(im.get_data(), aff)
         nibabel.save(nii_im, nii_file)
         del im, nii_im
         deface_files.append(nii_file)

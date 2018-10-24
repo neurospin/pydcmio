@@ -79,6 +79,9 @@ SCRIPTS = [
     "pydcmio/scripts/pydcmio_dicom2nifti",
     "pydcmio/scripts/pydcmio_dicomanonymizer",
     "pydcmio/scripts/pydcmio_dicomreader",
+    "pydcmio/scripts/pydcmio_maskface",
+    "pydcmio/scripts/pydcmio_nifti2dicom",
+    "pydcmio/scripts/pydcmio_rtstruct",
     "pydcmio/scripts/pydcmio_splitseries",
     "pydcmio/scripts/pydcmio_transcode"
 ]

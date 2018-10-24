@@ -32,7 +32,7 @@ def callback_private(dataset, data_element):
         # Check if this private tag needs to be removed
         tag_repr = repr(data_element.tag)[1:-1].replace(" ", "")
         keep_private_tag = False
-        for pattern in PRIVATE_DEIDENTIFY[MANUFACTURER[0]]:
+        for pattern in PRIVATE_DEIDENTIFY.get(MANUFACTURER[0], []):
             if pattern.match(tag_repr):
                 keep_private_tag = True
                 break

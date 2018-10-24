@@ -327,7 +327,7 @@ outputs = dict([(name, params[name])
                              "bvals", "filled_nii_files", "figures", "bids")])
 for name, final_struct in [("inputs", inputs), ("outputs", outputs),
                            ("runtime", runtime)]:
-    log_file = os.path.join(logdir, "{0}.json".format(name))
+    log_file = os.path.join(logdir, "{0}-{1}.json".format(name, timestamp))
     with open(log_file, "wt") as open_file:
         json.dump(final_struct, open_file, sort_keys=True, check_circular=True,
                   indent=4)

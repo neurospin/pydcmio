@@ -13,6 +13,7 @@ Module that provides tools to anonymize DICOM files.
 
 # System import
 import dicom
+from dicom.dataelem import DataElement_from_raw, RawDataElement
 
 
 def repr_dataelement(data_element):
@@ -30,6 +31,8 @@ def repr_dataelement(data_element):
     """
     desc = []
     if data_element.VR == "SQ":
+        if isinstance(data_element, RawDataElement):
+            data_element = DataElement_from_raw(data_element)
         for inner_dataset in data_element.value:
             inner_desc = []
             for inner_tag, innerdata_element in inner_dataset.items():

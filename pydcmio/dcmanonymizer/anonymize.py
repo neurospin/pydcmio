@@ -32,7 +32,8 @@ from .utils import replace_by
 from .utils import repr_dataelement
 
 
-def anonymize_dicomdir(inputdir, outdir, write_logs=True):
+def anonymize_dicomdir(inputdir, outdir, write_logs=True,
+                       use_dicom_names=False, remove_all_private_tags=False):
     """ Anonymize all DICOM files of the input directory.
 
     Parameters
@@ -43,6 +44,12 @@ def anonymize_dicomdir(inputdir, outdir, write_logs=True):
         The anonimized DICOM files folder.
     write_logs: bool (optional, default True)
         If True write the anonimization logs.
+    use_dicom_names: bool (optional, default False)
+        If set use the input DICOM file names as anonymized DICOM file names
+        (removing the file extension), otherwise just use a random numbering.
+    remove_all_private_tags: bool (optional, default False)
+        If set remove all the private tags in the DICOM files, otherwise
+        apply the mapping available in the 'private_deidentify' file.
 
     Returns
     -------
@@ -50,11 +57,12 @@ def anonymize_dicomdir(inputdir, outdir, write_logs=True):
         The anonimized DICOM files.
     logfiles: list
         The anonimization log files.
-
     """
     # Load the first dataset
+    # Do not consider hidden files
     input_dicoms = [os.path.join(inputdir, fname)
-                    for fname in os.listdir(inputdir)]
+                    for fname in os.listdir(inputdir)
+                    if not fname.startswith(".")]
     dataset = dicom.read_file(input_dicoms[0], force=True)
 
     # Load the tags to anonymize
@@ -92,9 +100,12 @@ def anonymize_dicomdir(inputdir, outdir, write_logs=True):
 
     # Now compile the diffusion private tags patterns
     filedir = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(filedir, "private_deidentify.json"),
-              "r") as open_file:
-        private_anons = json.load(open_file)
+    if remove_all_private_tags:
+        private_anons = {}
+    else:
+        with open(os.path.join(filedir, "private_deidentify.json"),
+                  "r") as open_file:
+            private_anons = json.load(open_file)
     for key, values in private_anons.items():
         for value in values:
             pattern = re.compile(value["Tag"].replace("x", "[0-9A-Fa-f]"))
@@ -106,8 +117,12 @@ def anonymize_dicomdir(inputdir, outdir, write_logs=True):
     with progressbar.ProgressBar(max_value=len(input_dicoms),
                                  redirect_stdout=True) as bar:
         for cnt, input_dicom in enumerate(input_dicoms):
+            if use_dicom_names:
+                otuname = os.path.basename(input_dicom).rsplit(".", 1)[0]
+            else:
+                otuname = str(cnt)
             output_dicom, output_log = anonymize_dicomfile(
-                input_dicom, outdir, outname=str(cnt), write_log=write_logs)
+                input_dicom, outdir, outname=otuname, write_log=write_logs)
             dcmfiles.append(output_dicom)
             logfiles.append(output_log)
             bar.update(cnt)

@@ -108,7 +108,7 @@ def plot_mosaic(nifti_file, title=None, overlay_mask=None, overlay_alpha=None,
     z_vals = np.array(range(0, mean_data.shape[2]))
 
     # Crop inferior and posterior
-    rem = 15
+    rem = 3
     mean_data = mean_data[..., rem:-rem]
     z_vals = z_vals[rem:-rem]
     # Reduce the number of slices shown
