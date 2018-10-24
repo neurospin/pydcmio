@@ -12,9 +12,13 @@ Module that provides tools to convert DICOM files.
 
 
 # System import
+from __future__ import print_function
 import os
 import re
 import json
+import time
+
+# Third party import
 import dicom
 import nibabel
 import numpy
@@ -220,7 +224,7 @@ def dcm2niix(input, o, f="%p", z="y", b="y"):
     dcm2niix [options] <in_folder>
 
     Options:
-    b: BIDS sidecar (y/n, default n)
+    b: BIDS sidecar (y/n/o, default n)
     f: filename (%a=antenna  (coil) number, %c=comments, %d=description,
     %e echo number, %f=folder name, %i ID of patient, %m=manufacturer,
     %n=name of patient, %p=protocol, %s=series number, %t=time,
@@ -379,3 +383,150 @@ def add_meta_to_nii(nii_file, dicom_dir, dcm_tags, outdir, prefix="f",
                 nii_file, type(niiimage)))
 
     return filled_nii_file
+
+
+def nii2dcm(nii_file, outdir, sid=None, study_id=None, debug=False):
+    """ Write a DICOM series from a Nifti array and create appropriate
+    meta-data so it can be read by DICOM viewers.
+
+    Writing the 3D image as a DICOM series is done by configuring the
+    meta-data dictionary for each of the slices and then writing it in
+    DICOM format. In our case we generate all of the meta-data to
+    indicate that this series is derived. Note that we write the intensity
+    values as is and thus do not set the rescale slope (0028|1053), rescale
+    intercept (0028|1052) meta-data dictionary values.
+
+    Parameters
+    ----------
+    nii_file: str
+        The nifti image to convert.
+    outdir: str
+        The destination folder.
+    sid: str, default None
+        The subject identifier.
+    study_id: str, default None
+        The study name.
+    debug: bool, default False
+        If set try to reload the DICOM serie.
+
+    Returns
+    -------
+    series_fnames: list of str
+        The generated DICOM files.
+    """
+    import SimpleITK as sitk
+
+    # Read the Nifti image
+    img = sitk.ReadImage(nii_file)
+
+    # DICOM does not support directly floating point value. The
+    # only thing we can do is apply a well designed linear operation to
+    # transform the floating point data to discretized one, here a simple
+    # cast.
+    print("Casting {0} to 32-bit unsigned integer.".format(
+        img.GetPixelIDTypeAsString()))
+    img = sitk.Cast(img, sitk.sitkUInt32)
+
+    # Write the 3D image as a serie
+    # IMPORTANT: 
+    # There are many DICOM tags that need to be updated when you modify an
+    # original image. This is a delicate opration and requires knowlege of
+    # the DICOM standard. This example only modifies some. For a more complete
+    # list of tags that need to be modified see:
+    #   http://gdcm.sourceforge.net/wiki/index.php/Writing_DICOM
+    # If it is critical for your work to generate valid DICOM files,
+    # It is recommended to use David Clunie's Dicom3tools to validate the files 
+    #   (http://www.dclunie.com/dicom3tools.html).
+    writer = sitk.ImageFileWriter()
+
+    # Use the study/series/frame of reference information given in the
+    # meta-data dictionary and not the automatically generated information
+    # from the file IO
+    writer.KeepOriginalImageUIDOn()
+
+    # Copy some of the tags and add the relevant tags indicating the change.
+    # For the series instance UID (0020|000e), each of the components is a
+    # number, cannot start with zero, and separated by a '.' We create a
+    # unique series ID using the date and time.
+    # Tags of interest:
+    modification_time = time.strftime("%H%M%S")
+    modification_date = time.strftime("%Y%m%d")
+    direction = img.GetDirection()
+    series_tag_values = [
+        ("0008|0031", modification_time), # Series Time
+        ("0008|0021", modification_date), # Series Date
+        ("0008|0030", modification_time), # Study Time
+        ("0008|0020", modification_date), # Study Date
+        ("0008|0008", "DERIVED\\SECONDARY"), # Image Type
+        ("0010|0020", sid or "NA"), # Patient ID
+        ("0020|0010", study_id or "Convert " + modification_date), # Study UID
+        ("0020|000e", ("1.2.826.0.1.3680043.2.1125." + modification_date +
+                       ".1" + modification_time)), # Series Instance UID
+        ("0020|000d", ("1.2.826.0.1.3680043.2.1125." + modification_date +
+                       ".1" + modification_time)), # Study Instance UID
+        ("0020|0037", "\\".join( # Image Orientation (Patient)
+            map(str, (direction[0], direction[3], direction[6],
+                      direction[1],direction[4],direction[7])))),
+        ("0008|103e", "Created-NeuroSpin-SimpleITK")] # Series Description
+
+    # Write slices to output directory
+    list(map(lambda index:
+        write_slices(series_tag_values, img, index, outdir, writer),
+        range(img.GetDepth())))
+
+    # Re-read the series
+    # Read the original series. First obtain the series file names using the
+    # image series reader.
+    series_ids = sitk.ImageSeriesReader.GetGDCMSeriesIDs(outdir)
+    if not series_ids:
+        raise ValueError("No DICOM files in '{0}'.".format(outdir))
+    series_fnames = sitk.ImageSeriesReader.GetGDCMSeriesFileNames(
+        outdir, series_ids[0])
+    series_reader = sitk.ImageSeriesReader()
+    series_reader.SetFileNames(series_fnames)
+
+    if debug:
+        # Configure the reader to load all of the DICOM tags (public+private):
+        # By default tags are not loaded (saves time).
+        # By default if tags are loaded, the private tags are not loaded.
+        # We explicitly configure the reader to load tags, including the
+        # private ones.
+        series_reader.LoadPrivateTagsOn()
+        new_img = series_reader.Execute()
+        print(new_img.GetSpacing(), "vs", img.GetSpacing())
+
+    return series_fnames
+
+
+def write_slices(series_tag_values, img, index, outdir, writer):
+    """ Write a DICOM slice.
+
+    Parameters
+    ----------
+    """
+    # Get the slice
+    image_slice = img[:, :, index]
+
+    # Tags shared by the series.
+    list(map(lambda tag_value: image_slice.SetMetaData(
+        tag_value[0], tag_value[1]), series_tag_values))
+
+    # Slice specific tags.
+    image_slice.SetMetaData(
+        "0008|0012", time.strftime("%Y%m%d")) # Instance Creation Date
+    image_slice.SetMetaData(
+        "0008|0013", time.strftime("%H%M%S")) # Instance Creation Time
+
+    # Setting the modality type to MR preserves the slice location.
+    image_slice.SetMetaData("0008|0060", "MR")
+
+    # (0020, 0032) image position patient determines the 3D spacing between
+    # slices.
+    image_slice.SetMetaData("0020|0032", "\\".join(map(
+        str, img.TransformIndexToPhysicalPoint((0, 0, index)))))
+    image_slice.SetMetaData("0020|0013", str(index)) # Instance Number
+
+    # Write to the output directory and add the extension dcm, to force
+    # writing in DICOM format.
+    writer.SetFileName(os.path.join(outdir, str(index) + ".dcm"))
+    writer.Execute(image_slice)

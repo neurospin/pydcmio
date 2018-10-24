@@ -1,0 +1,157 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*
+##########################################################################
+# NSAp - Copyright (C) CEA, 2018
+# Distributed under the terms of the CeCILL-B license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+# for details.
+##########################################################################
+
+# System import
+import os
+import json
+import argparse
+from datetime import datetime
+from pprint import pprint
+import textwrap
+from argparse import RawTextHelpFormatter
+
+# Bredala module
+try:
+    import bredala
+    bredala.USE_PROFILER = False
+    bredala.register("pydcmio.dcmconverter.converter",
+                     names=["nii2dcm"])
+except:
+    pass
+
+# Package import
+from pydcmio import __version__ as version
+from pydcmio.dcmconverter.converter import nii2dcm
+
+
+# Parameters to keep trace
+__hopla__ = ["runtime", "inputs", "outputs"]
+
+
+# Script documentation
+DOC = """
+Convert a Nifti image in DICOM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Command example:
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_nifti2dicom \
+    -i /tmp/test/sub-101612_ses-10306_acq-axial_run-500_T1w.nii.gz \
+    -o /tmp/test/dicom \
+    -V 2
+"""
+
+
+def is_file(filearg):
+    """ Type for argparse - checks that file exists but does not open.
+    """
+    if not os.path.isfile(filearg):
+        raise argparse.ArgumentError(
+            "The file '{0}' does not exist!".format(filearg))
+    return filearg
+
+
+def is_directory(dirarg):
+    """ Type for argparse - checks that directory exists.
+    """
+    if not os.path.isdir(dirarg):
+        raise argparse.ArgumentError(
+            "The directory '{0}' does not exist!".format(dirarg))
+    return dirarg
+
+
+def get_cmd_line_args():
+    """
+    Create a command line argument parser and return a dict mapping
+    <argument name> -> <argument value>.
+    """
+    parser = argparse.ArgumentParser(
+        prog="python pydcmio_nifti2dicom",
+        description=textwrap.dedent(DOC),
+        formatter_class=RawTextHelpFormatter)
+
+    # Required arguments
+    required = parser.add_argument_group("required arguments")
+    required.add_argument(
+        "-i", "--nifti-image",
+        required=True, type=is_file, metavar="<path>",
+        help="Input Nifti Image to be converted.")
+    required.add_argument(
+        "-o", "--outdir",
+        required=True, type=is_directory, metavar="<path>",
+        help="The destination folder.")
+
+    # Optional arguments
+    parser.add_argument(
+        "-S", "--sid",
+        help="The subject identifier.")
+    parser.add_argument(
+        "-N", "--study-name",
+        help="The study name.")
+    parser.add_argument(
+        "-V", "--verbose",
+        type=int, choices=[0, 1, 2],
+        help="Increase the verbosity level: 0 silent, [1, 2] verbose.")
+
+    # Create a dict of arguments to pass to the 'main' function
+    args = parser.parse_args()
+    kwargs = vars(args)
+    verbose = kwargs.pop("verbose")
+
+    return kwargs, verbose
+
+
+"""
+Parse the command line.
+"""
+inputs, verbose = get_cmd_line_args()
+runtime = {
+    "tool": "pydcmio_nifti2dicom",
+    "tool_version": version,
+    "timestamp": datetime.now().isoformat()}
+outputs = None
+if verbose > 0:
+    print("[info] Starting Nifti to DICOM conversion...")
+    print("[info] Runtime:")
+    pprint(runtime)
+    print("[info] Inputs:")
+    pprint(inputs)
+
+
+"""
+Convert
+"""
+series_fnames = nii2dcm(
+    nii_file=inputs["nifti_image"],
+    outdir=inputs["outdir"],
+    sid=inputs["sid"],
+    study_id=inputs["study_name"],
+    debug=False)
+
+
+"""
+Update the outputs and save them and the inputs in a 'logs' directory.
+"""
+logdir = os.path.join(inputs["outdir"], "logs")
+if not os.path.isdir(logdir):
+    os.mkdir(logdir)
+params = locals()
+outputs = dict([(name, params[name])
+               for name in ("series_fnames", )])
+for name, final_struct in [("inputs", inputs), ("outputs", outputs),
+                           ("runtime", runtime)]:
+    log_file = os.path.join(logdir, "{0}_{1}.json".format(
+        name, runtime["timestamp"]))
+    with open(log_file, "wt") as open_file:
+        json.dump(final_struct, open_file, sort_keys=True, check_circular=True,
+                  indent=4)
+if verbose > 1:
+    print("[info] Outputs:")
+    pprint(outputs)
