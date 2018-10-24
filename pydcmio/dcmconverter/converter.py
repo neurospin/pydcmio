@@ -428,14 +428,14 @@ def nii2dcm(nii_file, outdir, sid=None, study_id=None, debug=False):
     img = sitk.Cast(img, sitk.sitkUInt32)
 
     # Write the 3D image as a serie
-    # IMPORTANT: 
+    # IMPORTANT:
     # There are many DICOM tags that need to be updated when you modify an
     # original image. This is a delicate opration and requires knowlege of
     # the DICOM standard. This example only modifies some. For a more complete
     # list of tags that need to be modified see:
     #   http://gdcm.sourceforge.net/wiki/index.php/Writing_DICOM
     # If it is critical for your work to generate valid DICOM files,
-    # It is recommended to use David Clunie's Dicom3tools to validate the files 
+    # It is recommended to use David Clunie's Dicom3tools to validate the files
     #   (http://www.dclunie.com/dicom3tools.html).
     writer = sitk.ImageFileWriter()
 
@@ -453,26 +453,27 @@ def nii2dcm(nii_file, outdir, sid=None, study_id=None, debug=False):
     modification_date = time.strftime("%Y%m%d")
     direction = img.GetDirection()
     series_tag_values = [
-        ("0008|0031", modification_time), # Series Time
-        ("0008|0021", modification_date), # Series Date
-        ("0008|0030", modification_time), # Study Time
-        ("0008|0020", modification_date), # Study Date
-        ("0008|0008", "DERIVED\\SECONDARY"), # Image Type
-        ("0010|0020", sid or "NA"), # Patient ID
-        ("0020|0010", study_id or "Convert " + modification_date), # Study UID
+        ("0008|0031", modification_time),  # Series Time
+        ("0008|0021", modification_date),  # Series Date
+        ("0008|0030", modification_time),  # Study Time
+        ("0008|0020", modification_date),  # Study Date
+        ("0008|0008", "DERIVED\\SECONDARY"),  # Image Type
+        ("0010|0020", sid or "NA"),  # Patient ID
+        ("0020|0010", study_id or "Convert " + modification_date),  # Study UID
         ("0020|000e", ("1.2.826.0.1.3680043.2.1125." + modification_date +
-                       ".1" + modification_time)), # Series Instance UID
+                       ".1" + modification_time)),  # Series Instance UID
         ("0020|000d", ("1.2.826.0.1.3680043.2.1125." + modification_date +
-                       ".1" + modification_time)), # Study Instance UID
-        ("0020|0037", "\\".join( # Image Orientation (Patient)
+                       ".1" + modification_time)),  # Study Instance UID
+        ("0020|0037", "\\".join(  # Image Orientation (Patient)
             map(str, (direction[0], direction[3], direction[6],
-                      direction[1],direction[4],direction[7])))),
-        ("0008|103e", "Created-NeuroSpin-SimpleITK")] # Series Description
+                      direction[1], direction[4], direction[7])))),
+        ("0008|103e", "Created-NeuroSpin-SimpleITK")]  # Series Description
 
     # Write slices to output directory
-    list(map(lambda index:
-        write_slices(series_tag_values, img, index, outdir, writer),
-        range(img.GetDepth())))
+    list(map(
+        lambda index:
+            write_slices(series_tag_values, img, index, outdir, writer),
+            range(img.GetDepth())))
 
     # Re-read the series
     # Read the original series. First obtain the series file names using the
@@ -513,9 +514,9 @@ def write_slices(series_tag_values, img, index, outdir, writer):
 
     # Slice specific tags.
     image_slice.SetMetaData(
-        "0008|0012", time.strftime("%Y%m%d")) # Instance Creation Date
+        "0008|0012", time.strftime("%Y%m%d"))  # Instance Creation Date
     image_slice.SetMetaData(
-        "0008|0013", time.strftime("%H%M%S")) # Instance Creation Time
+        "0008|0013", time.strftime("%H%M%S"))  # Instance Creation Time
 
     # Setting the modality type to MR preserves the slice location.
     image_slice.SetMetaData("0008|0060", "MR")
@@ -524,7 +525,7 @@ def write_slices(series_tag_values, img, index, outdir, writer):
     # slices.
     image_slice.SetMetaData("0020|0032", "\\".join(map(
         str, img.TransformIndexToPhysicalPoint((0, 0, index)))))
-    image_slice.SetMetaData("0020|0013", str(index)) # Instance Number
+    image_slice.SetMetaData("0020|0013", str(index))  # Instance Number
 
     # Write to the output directory and add the extension dcm, to force
     # writing in DICOM format.

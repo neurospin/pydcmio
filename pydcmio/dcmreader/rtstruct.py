@@ -49,8 +49,8 @@ def regions_of_interest(rtstruct_file):
             num_pts = np.array(num_pts).astype(int)
             num_pts = np.sum(num_pts)
             rois.update({
-                name:{
-                    "num_slices": num_slices, 
+                name: {
+                    "num_slices": num_slices,
                     "num_pts": num_pts}
             })
     return rois
@@ -137,7 +137,8 @@ def generate_masks(rois, ref_file, outdir, axes="RAS", fname="mask"):
     for name, (pt_loc, method, frames) in rois.items():
         cmask = np.zeros(shape + (1, ), dtype=int)
         pt_loc = np.asarray(pt_loc)
-        pt_loc_vox = np.round(apply_affine_on_mesh(pt_loc, inv_aff)).astype(int)
+        pt_loc_vox = np.round(apply_affine_on_mesh(
+            pt_loc, inv_aff)).astype(int)
         for pt in pt_loc_vox:
             cmask[tuple(pt)] = 1
         if mask is None:
@@ -148,4 +149,3 @@ def generate_masks(rois, ref_file, outdir, axes="RAS", fname="mask"):
     mask_file = os.path.join(outdir, "{0}.nii.gz".format(fname))
     nibabel.save(mask_im, mask_file)
     return mask_file
-
