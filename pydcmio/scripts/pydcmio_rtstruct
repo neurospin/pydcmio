@@ -1,0 +1,207 @@
+#!/usr/bin/env python
+##########################################################################
+# NSAp - Copyright (C) CEA, 2018
+# Distributed under the terms of the CeCILL-B license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+# for details.
+##########################################################################
+
+# System import
+from __future__ import print_function
+import os
+import json
+import shutil
+import argparse
+import textwrap
+import  tarfile
+from pprint import pprint
+from datetime import datetime
+from argparse import RawTextHelpFormatter
+
+# Bredala import
+try:
+    import bredala
+    bredala.USE_PROFILER = False
+    bredala.register("pydcmio.dcmreader.rtstruct",
+                     names=["points_of_interest", "generate_masks"])
+except:
+    pass
+
+
+# Package import
+from pydcmio.info import __version__ as version
+from pydcmio.dcmreader.rtstruct import points_of_interest
+from pydcmio.dcmreader.rtstruct import generate_masks
+
+# Third party import
+
+
+
+# Parameters to keep trace
+__hopla__ = ["runtime", "inputs", "outputs"]
+
+
+# Script documentation
+DOC = """
+Convert RTstruct segmentation data.
+
+Example on HERBY data:
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_rtstruct \
+    -o /tmp/rtstruct \
+    -i /neurospin/radiomics_pub/HERBY/dicom/HERBYdB/392511/20140415_RTSTRUCT/20140415_1733_1101_Reader1\ RTSTRUCT\ ROIS/392511_20140415_RTSTRUCT_0001.dcm \
+    -d /neurospin/radiomics_pub/HERBY/sourcedata/sub-392511/ses-10144/anat/sub-392511_ses-10144_acq-axial_run-601_T1w/sub-392511_ses-10144_acq-axial_run-601_T1w.nii.gz /neurospin/radiomics_pub/HERBY/sourcedata/sub-392511/ses-10144/anat/sub-392511_ses-10144_acq-axial_run-601_T1w/sub-392511_ses-10144_acq-axial_run-601_T1w.dicom.tar.gz \
+    -d /neurospin/radiomics_pub/HERBY/sourcedata/sub-392511/ses-10144/anat/sub-392511_ses-10144_acq-axial_run-1101_T1w/sub-392511_ses-10144_acq-axial_run-1101_T1w.nii.gz /neurospin/radiomics_pub/HERBY/sourcedata/sub-392511/ses-10144/anat/sub-392511_ses-10144_acq-axial_run-1101_T1w/sub-392511_ses-10144_acq-axial_run-1101_T1w.dicom.tar.gz \
+    -a LPS \
+    -v 2
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_rtstruct \
+    -o /tmp/rtstruct \
+    -i /neurospin/radiomics_pub/HERBY/dicom/HERBYdB/229268/20140626_RTSTRUCT/20140626_1052_20_Reader1\ RTSTRUCT\ ROIS/229268_20140626_RTSTRUCT_0001.dcm \
+    -d /neurospin/radiomics_pub/HERBY/sourcedata/sub-229268/ses-10216/anat/sub-229268_ses-10216_acq-axial_run-20_T1w/sub-229268_ses-10216_acq-axial_run-20_T1w.nii.gz /neurospin/radiomics_pub/HERBY/sourcedata/sub-229268/ses-10216/anat/sub-229268_ses-10216_acq-axial_run-20_T1w/sub-229268_ses-10216_acq-axial_run-20_T1w.dicom.tar.gz \
+    -a LPS \
+    -v 2
+
+python $HOME/git/pydcmio/pydcmio/scripts/pydcmio_rtstruct \
+    -o /tmp/rtstruct \
+    -i /neurospin/radiomics_pub/HERBY/dicom/HERBYdB/229268/20140626_RTSTRUCT/20140626_1052_24_Reader2\ RTSTRUCT\ ROIS/229268_20140626_RTSTRUCT_0001.dcm \
+    -d /neurospin/radiomics_pub/HERBY/sourcedata/sub-229268/ses-10216/anat/sub-229268_ses-10216_acq-axial_run-24_T1w/sub-229268_ses-10216_acq-axial_run-24_T1w.nii.gz /neurospin/radiomics_pub/HERBY/sourcedata/sub-229268/ses-10216/anat/sub-229268_ses-10216_acq-axial_run-24_T1w/sub-229268_ses-10216_acq-axial_run-24_T1w.dicom.tar.gz \
+    -a LPS \
+    -v 2
+"""
+
+def is_file(filearg):
+    """ Type for argparse - checks that file exists but does not open.
+    """
+    if not os.path.isfile(filearg):
+        raise argparse.ArgumentError(
+            "The file '{0}' does not exist!".format(filearg))
+    return filearg
+
+
+def is_directory(dirarg):
+    """ Type for argparse - checks that directory exists.
+    """
+    if not os.path.isdir(dirarg):
+        raise argparse.ArgumentError(
+            "The directory '{0}' does not exist!".format(dirarg))
+    return dirarg
+
+
+def get_cmd_line_args():
+    """
+    Create a command line argument parser and return a dict mapping
+    <argument name> -> <argument value>.
+    """
+    parser = argparse.ArgumentParser(
+        prog="python pydcmio_rtstruct",
+        description=textwrap.dedent(DOC),
+        formatter_class=RawTextHelpFormatter)
+
+    # Required arguments
+    required = parser.add_argument_group("required arguments")
+    required.add_argument(
+        "-o", "--outdir",
+        type=is_directory, required=True, metavar="<path>",
+        help="Directory where to output.")
+    required.add_argument(
+        "-i", "--rtstruct-file",
+        type=is_file, required=True, metavar="<path>",
+        help="The RTstruct DICOM file to be converted.")
+    required.add_argument(
+        "-d", "--reference-data",
+        type=is_file, action="append", nargs="+", required=True,
+        help="The potential reference data as a list of 2-uplet of the form "
+             "(Nifti file, Dicom folder or tarball). The Dicom files "
+             "must be named with the SOP instance UID.")
+
+    # Optional arguments
+    parser.add_argument(
+        "-v", "--verbose",
+        type=int, choices=[0, 1, 2], default=2,
+        help="Increase the verbosity level: 0 silent, [1, 2] verbose.")
+    parser.add_argument(
+        "-a", "--axes",
+        required=True, default="RAS",
+        help="The ROIs points orientation axes.")
+
+    # Create a dict of arguments to pass to the 'main' function
+    args = parser.parse_args()
+    kwargs = vars(args)
+    verbose = kwargs.pop("verbose")
+
+    return kwargs, verbose
+
+
+"""
+Parse the command line.
+"""
+inputs, verbose = get_cmd_line_args()
+runtime = {
+    "tool": "pydcmio_rtstruct",
+    "tool_version": version,
+    "timestamp": datetime.now().isoformat()
+}
+outputs = None
+if verbose > 0:
+    pprint("[info] Starting RTstruct DICOM conversion...")
+    pprint("[info] Runtime:")
+    pprint(runtime)
+    pprint("[info] Inputs:")
+    pprint(inputs)
+
+
+"""
+Generate the segmentation mask.
+"""
+rois, sop_instance_uids, institution, operator = points_of_interest(
+    inputs["rtstruct_file"])
+ref_file = None
+sop_instance_uids = sorted(sop_instance_uids)
+for nii_file, dcm_item in inputs["reference_data"]:
+    if os.path.isfile(dcm_item):
+        tar = tarfile.open(dcm_item)
+        ref_sop_instance_uids = []
+        for item in tar.getmembers():
+            if os.sep in item.name:
+                ref_sop_instance_uids.append(
+                    item.name.split(os.sep)[-1].replace(".dcm", ""))
+    elif os.path.isdir(dcm_item):
+        ref_sop_instance_uids = os.listdir(dcm_item)
+    else:
+        raise ValueError("'{0}' is not a valid Dicom directory or "
+                         "tarball.".format(dcm_item))
+    ref_sop_instance_uids = sorted(ref_sop_instance_uids)
+    if len(set(sop_instance_uids) - set(ref_sop_instance_uids)) == 0:
+        ref_file = nii_file
+        break
+if ref_file is None:
+    raise ValueError("Impossible to detect the reference file from the "
+                     "provided reference data.")
+fname = os.path.basename(ref_file).split(".")[0].split("_")
+fname[-1] = "mod-{0}".format(fname[-1])
+fname = "{0}_lesionmask".format("_".join(fname))
+mask_file = generate_masks(rois, ref_file, inputs["outdir"],
+                           axes=inputs["axes"], fname=fname)
+
+
+"""
+Update the outputs and save them and the inputs in a 'logs' directory.
+"""
+logdir = os.path.join(inputs["outdir"], "logs")
+if not os.path.isdir(logdir):
+    os.mkdir(logdir)
+params = locals()
+outputs = dict([(name, params[name]) for name in [
+    "rois", "sop_instance_uids", "institution", "operator", "ref_file",
+    "mask_file"]])
+for name, final_struct in [("inputs", inputs), ("outputs", outputs),
+                           ("runtime", runtime)]:
+    log_file = os.path.join(logdir, "{0}.json".format(name))
+    with open(log_file, "wt") as open_file:
+        json.dump(final_struct, open_file, sort_keys=True, check_circular=True,
+                  indent=4)
+if verbose > 1:
+    print("[info] Outputs:")
+    pprint(outputs)

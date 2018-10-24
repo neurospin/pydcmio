@@ -1,0 +1,185 @@
+#! /usr/bin/env python
+##########################################################################
+# NSAp - Copyright (C) CEA, 2013 - 2018
+# Distributed under the terms of the CeCILL-B license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+# for details.
+##########################################################################
+
+# System import
+from __future__ import print_function
+import argparse
+import os
+import shutil
+import json
+from datetime import datetime
+from pprint import pprint
+import textwrap
+from argparse import RawTextHelpFormatter
+
+# Bredala import
+try:
+    import bredala
+    bredala.USE_PROFILER = False
+    bredala.register("pyconnectome.utils.regtools",
+                     names=["flirt"])
+    bredala.register("pyconnectome.utils.filetools",
+                     names=["fslreorient2std"])
+except:
+    pass
+
+# Third party import
+from pyconnectome import DEFAULT_FSL_PATH
+from pyconnectome.utils.regtools import flirt
+from pyconnectome.utils.filetools import fslreorient2std
+
+
+# Parameters to keep trace
+__hopla__ = ["runtime", "inputs", "outputs"]
+
+
+# Script documentation
+DOC = """
+Reorient & resample image using FSL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
+
+
+def is_file(filearg):
+    """ Type for argparse - checks that file exists but does not open.
+    """
+    if not os.path.isfile(filearg):
+        raise argparse.ArgumentError(
+            "The file '{0}' does not exist!".format(filearg))
+    return filearg
+
+
+def is_directory(dirarg):
+    """ Type for argparse - checks that directory exists.
+    """
+    if not os.path.isdir(dirarg):
+        raise argparse.ArgumentError(
+            "The directory '{0}' does not exist!".format(dirarg))
+    return dirarg
+
+
+def get_cmd_line_args():
+    """
+    Create a command line argument parser and return a dict mapping
+    <argument name> -> <argument value>.
+    """
+    parser = argparse.ArgumentParser(
+        prog="python pydcmio_deface_pre",
+        description=textwrap.dedent(DOC),
+        formatter_class=RawTextHelpFormatter)
+
+    # Required arguments
+    required = parser.add_argument_group("required arguments")
+    required.add_argument(
+        "-i", "--in-file",
+        required=True, metavar="<path>", type=is_file,
+        help="Path of nifti image to resampled and reorient.")
+    required.add_argument(
+        "-o", "--outdir",
+        required=True, metavar="<path>", type=is_directory,
+        help="The destination folder.")
+
+    # Optional arguments
+    parser.add_argument(
+        "-F", "--fsl-config", metavar="<path>", type=is_file,
+        help="Path to fsl sh config file.")
+    parser.add_argument(
+        "-v", "--verbose",
+        type=int, choices=[0, 1, 2], default=0,
+        help="increase the verbosity level: 0 silent, [1, 2] verbose.")
+
+
+    # Create a dict of arguments to pass to the 'main' function
+    args = parser.parse_args()
+    kwargs = vars(args)
+    if kwargs["fsl_config"] is None:
+        kwargs["fsl_config"] = DEFAULT_FSL_PATH
+    verbose = kwargs.pop("verbose")
+
+    return kwargs, verbose
+
+
+"""
+First check if the output directory exists on the file system, and
+clean it if requested. Transcode also the subject identifier if requested.
+"""
+inputs, verbose = get_cmd_line_args()
+runtime = {
+    "tool": "pydcmio_deface_pre",
+    "timestamp": datetime.now().isoformat()
+}
+outputs = None
+if verbose > 0:
+    print("[info] Starting deface pre ...")
+    print("[info] Runtime:")
+    pprint(runtime)
+    print("[info] Inputs:")
+    pprint(inputs)
+
+
+"""
+Reorient & resample
+"""
+basename = os.path.basename(inputs["in_file"])
+if basename.startswith("sub-"):
+    if "acq-" in basename:
+        pos = basename.find("acq-") + 4
+        reo_basename = basename[:pos] + "reorient" + basename[pos:]
+        iso_basename = basename[:pos] + "iso2" + basename[pos:]
+    else:
+        _basename = basename.split("_")
+        _basename.insert(-2, "acq-reorient")
+        reo_basename = "_".join(_basename)
+        _basename[-2] = "acq-iso2"
+        iso_basename = "_".join(_basename)
+else:
+    reo_basename = "r" + basename
+    iso_basename = "i2" + basename
+reo_file = os.path.join(inputs["outdir"], reo_basename)
+if verbose > 1:
+    print(reo_file)
+fslreorient2std(
+    input_image=inputs["in_file"],
+    output_image=reo_file,
+    save_trf=False,
+    fslconfig=inputs["fsl_config"])
+iso_file = os.path.join(inputs["outdir"], iso_basename)
+iso_trf = os.path.join(inputs["outdir"], iso_basename + ".trf")
+if verbose > 1:
+    print(iso_file)
+flirt(
+    in_file=reo_file,
+    ref_file=reo_file,
+    omat=iso_trf,
+    out=iso_file,
+    applyisoxfm=2,
+    shfile=inputs["fsl_config"])
+os.remove(iso_trf)
+
+"""
+Update the outputs and save them and the inputs in a 'logs' directory.
+"""
+logdir = os.path.join(inputs["outdir"], "logs")
+if not os.path.isdir(logdir):
+    os.mkdir(logdir)
+outputs = {
+    "reo_file": reo_file,
+    "iso_file": iso_file
+}
+for name, final_struct in [("inputs_pre", inputs), ("outputs_pre", outputs),
+                           ("runtime_pre", runtime)]:
+    log_file = os.path.join(logdir, "{0}.json".format(name))
+    with open(log_file, "wt") as open_file:
+        json.dump(final_struct, open_file, sort_keys=True, check_circular=True,
+                  indent=4)
+if verbose > 1:
+    print("[info] Outputs:")
+    pprint(outputs)
+
+
