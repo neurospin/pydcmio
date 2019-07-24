@@ -209,7 +209,8 @@ if inputs["transcode"]:
 elif inputs["sid"] is not None:
     niidir = os.path.join(inputs["outdir"], inputs["sid"], inputs["protocol"])
 else:
-    niidir = os.path.join(inputs["outdir"], inputs["protocol"])
+    niidir = inputs["outdir"]
+#     niidir = os.path.join(inputs["outdir"], inputs["protocol"])
 if inputs["erase"] and os.path.isdir(niidir):
     shutil.rmtree(niidir)
 if not os.path.isdir(niidir):

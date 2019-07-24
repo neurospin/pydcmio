@@ -76,6 +76,8 @@ REQUIRES = [
 ]
 EXTRA_REQUIRES = {}
 SCRIPTS = [
+    "pydcmio/scripts/pydcmio_deface_post",
+    "pydcmio/scripts/pydcmio_deface_pre",
     "pydcmio/scripts/pydcmio_dicom2nifti",
     "pydcmio/scripts/pydcmio_dicomanonymizer",
     "pydcmio/scripts/pydcmio_dicomreader",
