@@ -123,7 +123,7 @@ def safe_run(func):
     """
     def func_wrapper(*args, **kwargs):
         try:
-           return func(*args, **kwargs)
+            return func(*args, **kwargs)
         except Exception as e:
             print("-" * 50)
             print(args)
@@ -172,7 +172,7 @@ def _split(dicom_file, acquisition_datetime, outdir, skip_non_dicom_files,
             return
         raise ValueError(
             "'{0}' does not contain a SOPInstanceUID.".format(
-                dicom_file))                
+                dicom_file))
     SOPInstanceUID = dataset[0x0008, 0x0018].value
     if (0x0008, 0x103e) in dataset:
         SeriesDescription = cleanup(
@@ -233,4 +233,3 @@ def _split(dicom_file, acquisition_datetime, outdir, skip_non_dicom_files,
     # file does not exists and can be copied
     else:
         shutil.copy2(dicom_file, output_dicom_file)
-
