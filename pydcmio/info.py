@@ -42,14 +42,11 @@ SUMMARY = """
     * pydcmio_transcode: can be used to transcode the subject identifiers.
     * pydcmio_dicom2nifti: can be used to convert DICOM files in Nifti format.
 """
-long_description = """
-========================
-PYDCMIO: Python DiCoM IO
-========================
-
-[pydcmio] A Python project that provides a wrapping over the 'dcm2nii' command,
-common tools to read and anonymize DICOM files, and transcoding features.
-"""
+long_description = (
+    "PYDCMIO: Python DiCoM IO\n\n"
+    "[pydcmio] A Python project that provides a wrapping over the 'dcm2nii' "
+    "and 'dcm2niix' commands, common tools to read and anonymize DICOM "
+    "files, and transcoding features.\n")
 
 # Main setup parameters
 NAME = "pyDcmio"
